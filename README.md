@@ -25,7 +25,7 @@ Juego web de exploración 3D de **Peyrano, Santa Fe, Argentina**, hecho en un ú
 - **E:** bajar del auto
 
 ### Modo Admin
-- **F2:** abrir panel Admin (volar con `V`, noclip con `N`, teletransporte, nafta/turbo infinitos y exportador).
+- **F2:** abrir panel Admin (volar con `V`, noclip con `N`, teletransporte y nafta/turbo infinitos).
 
 ## Ejecutar localmente
 

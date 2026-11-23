@@ -191,15 +191,34 @@ const scene = new THREE.Scene();
 const SKY = 0xa9c9e8;
 scene.background = new THREE.Color(SKY);
 scene.fog = new THREE.Fog(SKY, 250, 1700);
-const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 2200);   // la niebla tapa todo a 1700 m: más lejos no hace falta dibujar
+const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.25, 2200);   // la niebla tapa todo a 1700 m: más lejos no hace falta dibujar
 
 scene.add(new THREE.HemisphereLight(0xdcecff, 0x5d6b3a, 1.3));
 const sun = new THREE.DirectionalLight(0xfff1dc, 2.4);
 sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
-Object.assign(sun.shadow.camera, { left: -80, right: 80, top: 80, bottom: -80, near: 1, far: 400 });
-sun.shadow.bias = -0.0005;
+Object.assign(sun.shadow.camera, { left: -80, right: 80, top: 80, bottom: -80, near: 20, far: 260 });
+sun.shadow.bias = -0.00025;
+sun.shadow.normalBias = 0.035;
 scene.add(sun, sun.target);
+// Anclado de la cámara de sombras a la grilla de téxeles en espacio de luz (evita el parpadeo/temblor de sombras al moverse)
+const SUN_OFF = new THREE.Vector3(70, 130, 45);
+const SUN_L = SUN_OFF.clone().normalize();
+const SUN_U = new THREE.Vector3(0, 1, 0).cross(SUN_L).normalize();
+const SUN_V = SUN_L.clone().cross(SUN_U).normalize();
+const _sunC = new THREE.Vector3(), _sunT = new THREE.Vector3();
+function updateSun(cx, cz){
+  const sc = sun.shadow.camera;
+  const texel = (sc.right - sc.left) / Math.max(1, sun.shadow.mapSize.x);
+  _sunC.set(cx, 0, cz);
+  const u = Math.round(_sunC.dot(SUN_U) / texel) * texel;
+  const v = Math.round(_sunC.dot(SUN_V) / texel) * texel;
+  const w = Math.round(_sunC.dot(SUN_L) / texel) * texel;
+  _sunT.copy(SUN_U).multiplyScalar(u).addScaledVector(SUN_V, v).addScaledVector(SUN_L, w);
+  sun.target.position.copy(_sunT);
+  sun.position.copy(_sunT).add(SUN_OFF);
+  sun.target.updateMatrixWorld();
+}
 
 /* =========================================================
    Helpers de geometría
@@ -234,8 +253,8 @@ class Flat {
       let hit = false;
       for (let k = 0; k < n; k++){
         const o = P[cand ? cand[k] : k];
-        if (Math.abs(o.y - yr) < .0007 && x1 > o.x0 + 1e-3 && x0 < o.x1 - 1e-3 && z1 > o.z0 + 1e-3 && z0 < o.z1 - 1e-3){
-          yr = o.y + .0008; hit = true; break;
+        if (Math.abs(o.y - yr) < .0025 && x1 > o.x0 + 1e-3 && x0 < o.x1 - 1e-3 && z1 > o.z0 + 1e-3 && z0 < o.z1 - 1e-3){
+          yr = o.y + .003; hit = true; break;
         }
       }
       if (!hit) break;
@@ -271,7 +290,18 @@ class Flat {
       for (const q of [lp, rp]){ if (q[0] < bx0) bx0 = q[0]; if (q[0] > bx1) bx1 = q[0]; if (q[1] < bz0) bz0 = q[1]; if (q[1] > bz1) bz1 = q[1]; }
     }
     const yr = this._resolveY(bx0, bz0, bx1, bz1, y);
-    for (let i = 0; i < pts.length - 1; i++){ this._triRaw(L[i], Rr[i], Rr[i+1], yr, col); this._triRaw(L[i], Rr[i+1], L[i+1], yr, col); }
+    for (let i = 0; i < pts.length - 1; i++){
+      const segLen = Math.hypot(pts[i+1][0] - pts[i][0], pts[i+1][1] - pts[i][1]);
+      const steps = Math.max(1, Math.ceil(segLen / 40));
+      for (let s = 0; s < steps; s++){
+        const t0 = s / steps, t1 = (s + 1) / steps;
+        const l0 = [L[i][0] + (L[i+1][0] - L[i][0]) * t0, L[i][1] + (L[i+1][1] - L[i][1]) * t0];
+        const l1 = [L[i][0] + (L[i+1][0] - L[i][0]) * t1, L[i][1] + (L[i+1][1] - L[i][1]) * t1];
+        const r0 = [Rr[i][0] + (Rr[i+1][0] - Rr[i][0]) * t0, Rr[i][1] + (Rr[i+1][1] - Rr[i][1]) * t0];
+        const r1 = [Rr[i][0] + (Rr[i+1][0] - Rr[i][0]) * t1, Rr[i][1] + (Rr[i+1][1] - Rr[i][1]) * t1];
+        this._triRaw(l0, r0, r1, yr, col); this._triRaw(l0, r1, l1, yr, col);
+      }
+    }
   }
   build(){
     this._placed = []; this._cells = new Map(); this._big = []; this._stamp = [];   // ya no se necesitan: liberar memoria
@@ -341,12 +371,18 @@ class RoadLayer {
       if (l < 1e-3) continue;
       const nx = -dz / l, nz = dx / l;
       const lOff = off + hw, rOff = off - hw;
-      this.addPoly([
-        [x0 + nx * lOff, z0 + nz * lOff],
-        [x0 + nx * rOff, z0 + nz * rOff],
-        [x1 + nx * rOff, z1 + nz * rOff],
-        [x1 + nx * lOff, z1 + nz * lOff],
-      ], prio, col);
+      const steps = Math.max(1, Math.ceil(l / 50));
+      for (let s = 0; s < steps; s++){
+        const t0 = s / steps, t1 = (s + 1) / steps;
+        const ax = x0 + dx * t0, az = z0 + dz * t0;
+        const bx = x0 + dx * t1, bz = z0 + dz * t1;
+        this.addPoly([
+          [ax + nx * lOff, az + nz * lOff],
+          [ax + nx * rOff, az + nz * rOff],
+          [bx + nx * rOff, bz + nz * rOff],
+          [bx + nx * lOff, bz + nz * lOff],
+        ], prio, col);
+      }
     }
     if (off === 0){
       const i0 = capStart ? 0 : 1, i1 = capEnd ? pts.length - 1 : pts.length - 2;
@@ -545,7 +581,7 @@ const mapRoads = [], mapRects = [], mapFields = [];
 /* =========================================================
    Suelo, campos alrededor
    ========================================================= */
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(12000, 12000), lam({ color: 0x6f8c48 }));
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(12000, 12000, 48, 48), lam({ color: 0x6f8c48 }));
 ground.rotation.x = -Math.PI/2; ground.receiveShadow = true; scene.add(ground);
 
 const [TX0, TZ0] = W(0, 0), [TX1, TZ1] = W(AMAX, BMAX);
@@ -840,7 +876,7 @@ function drawSeg(s){
       if (uEnd <= u + .2) continue;
       const [fx, fz] = P((u + uEnd) / 2, o);
       if (nearDiagRoad(fx, fz, 5.5) || inPoly(fx, fz, RAIL_YARD_POLY)) continue;
-      strip(o, sw, u, uEnd, ROAD_Y + .004, rnd() < .5 ? '#66696e' : '#8b8f94');
+      strip(o, sw, u, uEnd, ROAD_Y + .012, rnd() < .5 ? '#66696e' : '#8b8f94');
     }
   }
   mapRoads.push({ pts: [P(u0,0), P(u1,0)], w: st.w, col: st.map, y: st.y });
@@ -1829,7 +1865,7 @@ function frustumMesh(bot, top, y0, h, col){
     trims.add(x - .2, .84, z, .24, .05, .1, 0, '#111111'); trims.add(x + .44, .54, z, .05, .44, .05, 0, c); trims.add(x + .44, .98, z, .05, .05, .52, 0, '#333333');
   }
   // Lomo de burro amarillo y negro sobre calle Córdoba frente al ala norte (Street View -SbL)
-  for (let k = 0; k < 6; k++) flat.rect(-97.2 + k * 1.4, -296.2, -95.8 + k * 1.4, -295.0, ROAD_Y + .006, k % 2 ? '#1e2022' : '#f0c422');
+  for (let k = 0; k < 6; k++) flat.rect(-97.2 + k * 1.4, -296.2, -95.8 + k * 1.4, -295.0, ROAD_Y + .018, k % 2 ? '#1e2022' : '#f0c422');
   for (const z of [-297.8, -289.2, -271.0, -255.0]) addTree(-89.4, z, .78, false, ['#967642', '#856638', '#a07e4a']);
   mapLabels.push([-75, -276, 'Escuela 186']);
 }
@@ -2293,12 +2329,14 @@ function frustumMesh(bot, top, y0, h, col){
     }
     return out;
   };
+  const trimPolyStart = (pts, dist) => trimPolyEnd(pts.slice().reverse(), dist).reverse();
   const drawAsphalt = (pts, ramps = false) => {
     roadLayer.addRibbon(pts, 13, ramps ? 14 : 15, '#a49a86');
     roadLayer.addRibbon(pts, 7.4, ramps ? 66 : 68, '#55575c');
-    const lPts = trimPolyEnd(pts, 4.2);
-    for (const o of [-3.45, 3.45]) flat.ribbon(lPts, .15, ROAD_Y + .008, '#e8e8e8', o);
-    if (!ramps) for (const o of [-.17, .17]) flat.ribbon(lPts, .12, ROAD_Y + .008, '#e3b52b', o);
+    let lPts = trimPolyEnd(pts, 4.2);
+    if (ramps) lPts = trimPolyStart(lPts, 8.5);
+    for (const o of [-3.45, 3.45]) flat.ribbon(lPts, .18, ROAD_Y + .022, '#e8e8e8', o);
+    if (!ramps) for (const o of [-.18, .18]) flat.ribbon(lPts, .15, ROAD_Y + .022, '#e3b52b', o);
     mapRoads.push({ pts, w: 8, col: '#3b4fd0', y: .1 });
   };
   drawAsphalt(ACC_PTS);
@@ -2349,11 +2387,11 @@ function frustumMesh(bot, top, y0, h, col){
 {
   roadLayer.addRibbon(R18_PTS, 15, 16, '#a49a86');
   roadLayer.addRibbon(R18_PTS, 7.8, 75, '#4d4f54');
-  for (const o of [-3.6, 3.6]) flat.ribbon(R18_PTS, .15, ROAD_Y + .01, '#e8e8e8', o);
+  for (const o of [-3.6, 3.6]) flat.ribbon(R18_PTS, .2, ROAD_Y + .025, '#e8e8e8', o);
   for (let i = 1; i < R18_PTS.length; i++){
     const [x0, z0] = R18_PTS[i-1], [x1, z1] = R18_PTS[i], l = Math.hypot(x1-x0, z1-z0) || 1;
     const tx = (x1 - x0) / l, tz = (z1 - z0) / l;
-    for (let t = 0; t + 4.5 < l; t += 12) flat.ribbon([[x0 + tx * t, z0 + tz * t], [x0 + tx * (t + 4.5), z0 + tz * (t + 4.5)]], .15, ROAD_Y + .01, '#e3b52b');
+    for (let t = 0; t + 4.5 < l; t += 12) flat.ribbon([[x0 + tx * t, z0 + tz * t], [x0 + tx * (t + 4.5), z0 + tz * (t + 4.5)]], .18, ROAD_Y + .025, '#e3b52b');
   }
   mapRoads.push({ pts: R18_PTS, w: 9, col: '#8a8a8a', y: .11 });
   mapLabels.push([68.4, -2710, 'Ruta 18']);
@@ -3548,13 +3586,13 @@ const GROUP_W = group, TREE_W = addTree, BUSH_W = addBush, FLAT_W = flat;
   const PELADO = ['#9c7a45', '#8a6a3a'], VERDE = ['#4b7a30', '#5e8a3a', '#557f35'];
   const XE = 66.5, ZN = -403;   // línea de las casas: lado este (mira al -x) y lado norte (mira al +z); la vereda va entre la calle y esa línea
   // veredas con franja de pasto y cordón (con cortes en las entradas de autos)
-  flat.rect(63.5, ZN, XE, -350.5, .2, '#c4bfb4'); flat.rect(63.5, -400.5, 64.9, -350.5, .201, '#6f8f45');
-  flat.rect(41, ZN, 63.5, -400.5, .2, '#c4bfb4'); flat.rect(41, -401.6, 63.5, -400.5, .201, '#6f8f45');
+  flat.rect(63.5, ZN, XE, -350.5, .204, '#c4bfb4'); flat.rect(63.5, -400.5, 64.9, -350.5, .210, '#6f8f45');
+  flat.rect(41, ZN, 63.5, -400.5, .204, '#c4bfb4'); flat.rect(41, -401.6, 63.5, -400.5, .210, '#6f8f45');
   const cordonE = (z0, z1) => { const g = group(63.58, (z0 + z1) / 2); bx(g, 0, 0, 0, .16, .24, z1 - z0, '#bdb8ac'); };
   for (const [z0, z1] of [[-400.5, -399.4], [-397.6, -391.4], [-387.6, -376.9], [-371.3, -350.5]]) cordonE(z0, z1);
-  for (const [z0, z1] of [[-399.4, -397.6], [-391.4, -387.6], [-376.9, -371.3]]) flat.rect(63.5, z0, 64.9, z1, .2015, '#c4bfb4');
+  for (const [z0, z1] of [[-399.4, -397.6], [-391.4, -387.6], [-376.9, -371.3]]) flat.rect(63.5, z0, 64.9, z1, .216, '#c4bfb4');
   { const g = group(50.5, -400.58); bx(g, 0, 0, 0, 19, .24, .16, '#bdb8ac'); }
-  flat.rect(60, -401.6, 62.6, -400.5, .2015, '#c4bfb4');   // entrada al garaje de la casa de la esquina
+  flat.rect(60, -401.6, 62.6, -400.5, .216, '#c4bfb4');   // entrada al garaje de la casa de la esquina
   { const g = group(63.25, -400.58); bx(g, 0, 0, 0, .5, .24, .16, '#bdb8ac'); }
 
   // ---- LADO NORTE ----
@@ -6929,12 +6967,12 @@ const USE_REAL_BUILDINGS = REAL_BUILDINGS.length > 0;
   quadL(-8.6, -26, -4.4, -1.6, .085, '#9d9382');
   quadL(4.4, -26, 7.6, -1.6, .085, '#9d9382');
   // Borde irregular del hormigón sobre la banquina derecha (como en Street View)
-  quadL(-5.3, -24, -4.4, -14.5, ROAD_Y + .001, '#9d9b96');
-  quadL(-5.8, -22, -5.2, -16.5, ROAD_Y + .001, '#9d9b96');
+  quadL(-5.3, -24, -4.4, -14.5, ROAD_Y + .012, '#9d9b96');
+  quadL(-5.8, -22, -5.2, -16.5, ROAD_Y + .012, '#9d9b96');
   // Juntas de dilatación de las losas de hormigón (longitudinal central y transversales)
   for (const [zA, zB] of [[-25, -2.0], [12.0, 27]]){
-    quadL(-.05, zA, .05, zB, ROAD_Y + .003, '#83817b');
-    for (let z = zA + 2; z < zB - .5; z += 4.5) quadL(-4.45, z - .04, 4.45, z + .04, ROAD_Y + .003, '#83817b');
+    quadL(-.05, zA, .05, zB, ROAD_Y + .018, '#83817b');
+    for (let z = zA + 2; z < zB - .5; z += 4.5) quadL(-4.45, z - .04, 4.45, z + .04, ROAD_Y + .018, '#83817b');
   }
 
   // Planchas de madera/durmientes en LAS TRES VÍAS (vía principal z=0, desvío 1 z=4.8, desvío 2 z=10.1)
@@ -7083,7 +7121,7 @@ const USE_REAL_BUILDINGS = REAL_BUILDINGS.length > 0;
   const FZ = 157.5;                   // línea de frente (mirando al norte, hacia Catamarca)
   plazaRects.push([-56, 150, 15, 176]);
   flat.rect(-56, 151, 15, 176, .05, '#6f9a4a');                       // pasto del predio
-  flat.rect(-56, 155.5, 15, FZ - .2, .2, '#c4bdb0');                  // vereda frente a la Terminal (empalma al ras con Catamarca)
+  flat.rect(-56, 155.5, 15, FZ - .2, .204, '#c4bdb0');                  // vereda frente a la Terminal (empalma al ras con Catamarca)
   // lot local: x = a lo largo del frente (hacia el oeste = -x mundo), z = hacia la calle (frente en z = 0)
   const front = (xE, xW, depth) => { const g = group((xE + xW) / 2, FZ, Math.PI); return { g, w: xE - xW, d: depth, xc: (xE + xW) / 2 }; };
   const win = (g, x, y, w, h, frame = '#e6e6e2', glass = '#3b4650') => { bx(g, x, y - .08, .05, w + .16, h + .16, .08, frame); bx(g, x, y, .1, w, h, .05, glass); };
@@ -7525,8 +7563,21 @@ for (const [x, z] of lampSpots){
 // 2) En cada edificio (Group), detecta cajas BoxGeometry hermanas con caras exteriores coplanares superpuestas y desplaza 4 mm hacia afuera solo la cara de la caja menor.
 {
   const EPS = .0028, NUDGE = .004;
+  const maxAniso = Math.min(renderer.capabilities.getMaxAnisotropy(), 16);
   const containers = [scene];
   scene.traverse(o => {
+    if (o.isMesh && o.material){
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      for (const m of mats){
+        if (m && m.map){
+          m.map.anisotropy = Math.max(m.map.anisotropy || 1, maxAniso);
+          m.map.generateMipmaps = true;
+          m.map.minFilter = THREE.LinearMipmapLinearFilter;
+          m.map.magFilter = THREE.LinearFilter;
+          m.map.needsUpdate = true;
+        }
+      }
+    }
     if (o !== ground && o.isMesh && o.geometry && o.geometry.type === 'PlaneGeometry' && o.material && !Array.isArray(o.material)){
       o.material.polygonOffset = true;
       o.material.polygonOffsetFactor = -2;
@@ -7629,7 +7680,6 @@ function makePlayer(){
   return { g, legL, legR, armL, armR };
 }
 const P = makePlayer();
-P.g.userData.noExport = true;   // el personaje no se exporta a Roblox (allá se usa el avatar del jugador)
 const pos = new THREE.Vector3(SPAWN[0], 0, SPAWN[1]);
 const vel = new THREE.Vector2();
 let vy = 0, onGround = true, facing = SPAWN[2], phase = 0;
@@ -7916,8 +7966,7 @@ function update(dt){
   if (isInsideComuna() && camera.position.y > 4.25) camera.position.y = 4.25;
   camera.lookAt(tgt);
 
-  sun.position.set(pos.x + 70, 130, pos.z + 45);
-  sun.target.position.set(pos.x, 0, pos.z);
+  updateSun(pos.x, pos.z);
 }
 
 /* =========================================================
@@ -8272,7 +8321,6 @@ let bigM = null;
     Velocidad: <input type="range" id="adSpd" min="5" max="150" style="width:120px;vertical-align:middle"> <span id="adSpdV"></span><br>
     <select id="adTp" style="width:100%;margin:4px 0"></select>
     <button id="adGo" style="width:49%">Ir</button> <button id="adCar" style="width:49%">Traer auto</button>
-    <button id="adRbx" style="width:100%;margin-top:4px;background:#2b6cb0;color:#fff;border:1px solid #4a90d9;padding:4px 6px;border-radius:4px;cursor:pointer;font-weight:600">Exportar a Roblox (.rbxlx)</button>
     <div id="adPos" style="font:11px monospace;opacity:.85;margin-top:6px;white-space:pre"></div>
     <small style="opacity:.75">Volando: Espacio sube, C baja, Shift x3.<br>Con el mapa grande (M) abierto, hacé click para teletransportarte.</small>`;
   document.body.appendChild(el);
@@ -8294,19 +8342,6 @@ let bigM = null;
   $('adSpd').oninput = e => { ADMIN.speed = +e.target.value; sync(); };
   $('adGo').onclick = () => { const p = places()[+$('adTp').value]; if (p) teleport(p[1], p[2]); };
   $('adCar').onclick = () => { if (!driving){ car.x = pos.x + 4; car.z = pos.z; car.vx = car.vz = 0; car.h = facing; CAR.g.position.set(car.x, 0, car.z); CAR.g.rotation.y = car.h; } };
-  $('adRbx').onclick = () => {
-    const btn = $('adRbx'); btn.disabled = true; btn.textContent = 'Exportando Peyrano.rbxlx...';
-    setTimeout(() => {
-      try {
-        const res = window.__exportRoblox({ spawnAtPlaza: false });
-        const blob = new Blob([res.xml], { type: 'application/xml' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Peyrano.rbxlx'; a.click();
-        setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-        btn.textContent = `Listo (${res.count.toLocaleString('es-AR')} Parts) — Exportar otra vez`;
-      } catch (e){ console.error(e); btn.textContent = 'Error al exportar (ver consola)'; }
-      btn.disabled = false;
-    }, 50);
-  };
   addEventListener('keydown', e => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
     if (e.code === 'Backquote' || e.code === 'F2'){ e.preventDefault(); toggle(); }
@@ -8330,206 +8365,6 @@ let bigM = null;
   }, 200);
 }
 /* ===== fin MODO ADMIN ===== */
-
-/* =========================================================
-   ===== EXPORTAR A ROBLOX STUDIO (.rbxlx) =====
-   window.__exportRoblox() recorre toda la escena (usando los objetos originales sin fusionar
-   para exportar cajas/cilindros/esferas nativas de Roblox) y arma un archivo .rbxlx listo para Roblox Studio:
-   cajas -> Part, cilindros -> Part cilindro, esferas -> Part bola, cuadriláteros -> Part fino, triángulos -> 2 WedgeParts,
-   carteles -> Part con SurfaceGui/TextLabel, Lighting + Atmosphere + SpawnLocation. Escala: 1 m = 3.57 studs.
-   ========================================================= */
-const MERGED_ORIG = [];   // respaldo liviano de meshes originales antes de mergeStaticMeshes() para exportar Parts nativos limpios
-window.__exportRoblox = (opts = {}) => {
-  const SPM = 3.57, LIM = opts.lim || 3000, THK = .05, MAXS = 2000;
-  const folders = new Map(); let ref = 1, count = 0;
-  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  const f4 = v => (Math.abs(v) < 1e-6 ? '0' : (+v.toFixed(4)).toString());
-  const V = THREE.Vector3;
-  const push = (folder, xml) => { if (!folders.has(folder)) folders.set(folder, []); folders.get(folder).push(xml); count++; };
-  const c3 = hex => ({ r: ((hex >> 16) & 255) / 255, g: ((hex >> 8) & 255) / 255, b: (hex & 255) / 255 });
-  const texColCache = new WeakMap();
-  const sampleMapHex = map => {
-    if (!map || !map.image) return 0xcfcfcf;
-    if (texColCache.has(map)) return texColCache.get(map);
-    let hex = 0xcfcfcf;
-    try {
-      const img = map.image, ctx = img.getContext && img.getContext('2d');
-      if (ctx && img.width > 0 && img.height > 0){
-        const d = ctx.getImageData(0, 0, img.width, img.height).data;
-        let r = 0, g = 0, b = 0, n = 0, step = Math.max(1, Math.floor((img.width * img.height) / 64)) * 4;
-        for (let i = 0; i < d.length; i += step){ if (d[i + 3] < 40) continue; r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; }
-        if (n > 0) hex = ((Math.round(r / n) << 16) | (Math.round(g / n) << 8) | Math.round(b / n));
-      }
-    } catch (e){}
-    texColCache.set(map, hex);
-    return hex;
-  };
-  const matFor = (hex, isFlat, folder = '') => {
-    const c = c3(hex), avg = (c.r + c.g + c.b) / 3, sat = Math.max(c.r, c.g, c.b) - Math.min(c.r, c.g, c.b);
-    if (folder === 'Arboles') return 1280;                                         // Grass (follaje)
-    if (isFlat){
-      if (c.g > c.r * 1.07 && c.g > c.b * 1.12) return 1280;                       // Grass (pasto/campos)
-      if (c.b > c.r * 1.15 && c.b > c.g * 1.02) return 1568;                       // Glass (agua)
-      if (sat < .06 && avg < .42) return 800;                                      // Slate (asfalto oscuro)
-      if (sat < .08 && avg >= .42) return 816;                                     // Concrete (hormigón / veredas / ripio)
-      if (c.r > c.b * 1.25 && c.g > c.b * 1.05) return 1296;                       // Sand (calles de tierra / arena)
-      return 816;
-    }
-    return 272;                                                                    // SmoothPlastic (edificios limpios)
-  };
-  // Part genérico a partir de centro (m), ejes unitarios X,Y,Z y tamaños (m)
-  const part = (folder, cls, name, ctr, X, Y, Z, sx, sy, sz, hex, o = {}) => {
-    if (Math.abs(ctr.x) > LIM || Math.abs(ctr.z) > LIM) return;
-    if (!(sx > 0) || !(sy > 0) || !(sz > 0)) return;
-    const big = [sx, sy, sz].map(s => s * SPM), mi = big.indexOf(Math.max(...big));
-    if (big[mi] > MAXS && cls === 'Part' && (o.shape ?? 1) === 1){
-      const nch = Math.ceil(big[mi] / MAXS), ax = [X, Y, Z][mi], len = [sx, sy, sz][mi];
-      for (let k = 0; k < nch; k++){ const off = -len / 2 + len * (k + .5) / nch; const s2 = [sx, sy, sz]; s2[mi] = len / nch; part(folder, cls, name, ctr.clone().addScaledVector(ax, off), X, Y, Z, ...s2, hex, o); }
-      return;
-    }
-    const p = ctr.clone().multiplyScalar(SPM);
-    const R = [X.x, Y.x, Z.x, X.y, Y.y, Z.y, X.z, Y.z, Z.z].map(f4);
-    const col = (0xFF000000 | (hex & 0xFFFFFF)) >>> 0;
-    const xml = `<Item class="${cls}" referent="RBX${ref++}"><Properties>` +
-      `<string name="Name">${esc(name)}</string><bool name="Anchored">true</bool>` +
-      `<CoordinateFrame name="CFrame"><X>${f4(p.x)}</X><Y>${f4(p.y)}</Y><Z>${f4(p.z)}</Z><R00>${R[0]}</R00><R01>${R[1]}</R01><R02>${R[2]}</R02><R10>${R[3]}</R10><R11>${R[4]}</R11><R12>${R[5]}</R12><R20>${R[6]}</R20><R21>${R[7]}</R21><R22>${R[8]}</R22></CoordinateFrame>` +
-      `<Vector3 name="size"><X>${f4(Math.max(.05, sx * SPM))}</X><Y>${f4(Math.max(.05, sy * SPM))}</Y><Z>${f4(Math.max(.05, sz * SPM))}</Z></Vector3>` +
-      `<Color3uint8 name="Color3uint8">${col}</Color3uint8><token name="Material">${o.mat || 272}</token>` +
-      `<bool name="CanCollide">${o.collide === false ? 'false' : 'true'}</bool><bool name="CastShadow">${o.shadow === false ? 'false' : 'true'}</bool>` +
-      `<float name="Transparency">${f4(o.transp || 0)}</float><token name="TopSurface">0</token><token name="BottomSurface">0</token>` +
-      (cls === 'Part' ? `<token name="shape">${o.shape ?? 1}</token>` : '') +
-      `</Properties>${o.children || ''}</Item>`;
-    push(folder, xml);
-  };
-  const sign = s => { const t = c3(new THREE.Color(s.fg).getHex()), b = c3(new THREE.Color(s.bg).getHex());
-    return `<Item class="SurfaceGui" referent="RBX${ref++}"><Properties><string name="Name">Cartel</string><token name="Face">2</token><float name="PixelsPerStud">40</float><token name="SizingMode">1</token></Properties>` +
-      `<Item class="TextLabel" referent="RBX${ref++}"><Properties><string name="Name">Texto</string><UDim2 name="Size"><XS>1</XS><XO>0</XO><YS>1</YS><YO>0</YO></UDim2>` +
-      `<string name="Text">${esc(s.text)}</string><bool name="TextScaled">true</bool><token name="Font">4</token>` +
-      `<Color3 name="TextColor3"><R>${f4(t.r)}</R><G>${f4(t.g)}</G><B>${f4(t.b)}</B></Color3><Color3 name="BackgroundColor3"><R>${f4(b.r)}</R><G>${f4(b.g)}</G><B>${f4(b.b)}</B></Color3><float name="BackgroundTransparency">0</float>` +
-      `</Properties></Item></Item>`; };
-  const axes = M => { const e = M.elements, X = new V(e[0], e[1], e[2]), Y = new V(e[4], e[5], e[6]), Z = new V(e[8], e[9], e[10]); const sx = X.length(), sy = Y.length(), sz = Z.length(); X.normalize(); Y.normalize(); Z.crossVectors(X, Y).normalize(); Y.crossVectors(Z, X).normalize(); return { X, Y, Z, sx, sy, sz }; };
-  const wedges = (folder, name, a, b, c, hex, o) => {
-    let ab = b.clone().sub(a), ac = c.clone().sub(a), bc = c.clone().sub(b);
-    const abd = ab.dot(ab), acd = ac.dot(ac), bcd = bc.dot(bc);
-    if (abd > acd && abd > bcd){ [c, a] = [a, c]; } else if (acd > bcd && acd > abd){ [a, b] = [b, a]; }
-    ab = b.clone().sub(a); ac = c.clone().sub(a); bc = c.clone().sub(b);
-    const right = new V().crossVectors(ac, ab); if (right.lengthSq() < 1e-10) return; right.normalize();
-    const up = new V().crossVectors(bc, right).normalize(), back = bc.clone().normalize();
-    const h = Math.abs(ab.dot(up)); if (h < 1e-4) return;
-    part(folder, 'WedgePart', name, a.clone().add(b).multiplyScalar(.5), right, up, back, THK, h, Math.abs(ab.dot(back)), hex, o);
-    part(folder, 'WedgePart', name, a.clone().add(c).multiplyScalar(.5), right.clone().negate(), up, back.clone().negate(), THK, h, Math.abs(ac.dot(back)), hex, o);
-  };
-  const quad = (folder, name, P4, hex, o, thick) => {
-    const c = P4.reduce((s, p) => s.add(p), new V()).multiplyScalar(.25);
-    const n = new V().crossVectors(P4[1].clone().sub(P4[0]), P4[2].clone().sub(P4[0])).normalize();
-    const ang = p => { const d = p.clone().sub(c); const u = new V().crossVectors(n, new V(0, 1, 0)); if (u.lengthSq() < 1e-6) u.set(1, 0, 0); u.normalize(); const w = new V().crossVectors(n, u); return Math.atan2(d.dot(w), d.dot(u)); };
-    const Q = P4.slice().sort((p, q) => ang(p) - ang(q));
-    if (Math.abs(Q[3].clone().sub(Q[0]).dot(n)) > .08){ wedges(folder, name, Q[0], Q[1], Q[2], hex, o); wedges(folder, name, Q[0], Q[2], Q[3], hex, o); return; }
-    const X = Q[1].clone().sub(Q[0]); const lenA = X.length(), lenB = Q[2].distanceTo(Q[3]); X.normalize();
-    let Y = n.clone(); if (Y.y < 0) Y.negate();
-    const Z = new V().crossVectors(X, Y).normalize();
-    const wA = Math.abs(Q[3].clone().sub(Q[0]).dot(Z)), wB = Math.abs(Q[2].clone().sub(Q[1]).dot(Z));
-    const ctr = c.clone().addScaledVector(Y, -thick / 2);
-    part(folder, 'Part', name, ctr, X, Y, Z, (lenA + lenB) / 2, thick, (wA + wB) / 2, hex, o);
-  };
-  const tris = (folder, name, geo, M, hexOf, o, yMap) => {
-    const pos = geo.attributes.position, idx = geo.index, colA = geo.attributes.color, n = idx ? idx.count : pos.count;
-    const getV = i => { const k = idx ? idx.getX(i) : i; const v = new V(pos.getX(k), pos.getY(k), pos.getZ(k)).applyMatrix4(M); if (yMap) v.y = yMap(v.y); return v; };
-    const getC = i => { if (!colA) return hexOf; const k = idx ? idx.getX(i) : i; return new THREE.Color(colA.getX(k), colA.getY(k), colA.getZ(k)).getHex(); };
-    const key = v => `${v.x.toFixed(3)},${v.y.toFixed(3)},${v.z.toFixed(3)}`;
-    for (let i = 0; i + 2 < n; i += 3){
-      const t1 = [getV(i), getV(i + 1), getV(i + 2)], hex = getC(i);
-      const mOpt = { ...o, mat: o.mat || matFor(hex, !!yMap, folder), shadow: yMap ? false : o.shadow };
-      if (i + 5 < n && getC(i + 3) === hex){
-        const t2 = [getV(i + 3), getV(i + 4), getV(i + 5)], k1 = t1.map(key), shared = t2.filter(v => k1.includes(key(v)));
-        if (shared.length === 2){ const extra = t2.find(v => !k1.includes(key(v))); quad(folder, name, [...t1, extra], hex, mOpt, yMap ? THK : .15); i += 3; continue; }
-      }
-      wedges(folder, name, ...t1, hex, mOpt);
-    }
-  };
-  const tmp = new THREE.Matrix4(), cTmp = new THREE.Color();
-  const doGeom = (folder, name, geo, M, hex, o = {}, ud = {}) => {
-    const t = geo.type, P = geo.parameters || {};
-    if (!geo.boundingBox) geo.computeBoundingBox();
-    const bb = geo.boundingBox, size = bb.getSize(new V()), ctrL = bb.getCenter(new V()), { X, Y, Z, sx, sy, sz } = axes(M);
-    const ctr = ctrL.clone().applyMatrix4(M);
-    if (t === 'BoxGeometry') return part(folder, 'Part', name, ctr, X, Y, Z, size.x * sx, size.y * sy, size.z * sz, hex, o);
-    if ((t === 'CylinderGeometry' || t === 'ConeGeometry') && (P.thetaLength === undefined || P.thetaLength > 6.2)){
-      const rt = P.radiusTop ?? 0, rb = P.radiusBottom ?? P.radius ?? .5, r = t === 'ConeGeometry' ? rb * .55 : (rt + rb) / 2;
-      return part(folder, 'Part', name, ctr, Y, X.clone().negate(), Z, size.y * sy, 2 * r * sx, 2 * r * sz, hex, { ...o, shape: 2 });
-    }
-    if (t === 'SphereGeometry' || t === 'IcosahedronGeometry'){
-      if (t === 'SphereGeometry' && P.thetaLength && P.thetaLength < 3) return part(folder, 'Part', name, ctr, X, Y, Z, size.x * sx, Math.max(.1, size.y * sy), size.z * sz, hex, o);
-      const d = (size.x * sx + size.y * sy + size.z * sz) / 3; return part(folder, 'Part', name, ctr, X, Y, Z, d, d, d, hex, { ...o, shape: 0 });
-    }
-    if (t === 'TorusGeometry') return part(folder, 'Part', name, ctr, Z, Y, X.clone().negate(), Math.max(.05, size.z * sz), size.y * sy, size.x * sx, hex, { ...o, shape: 2, collide: false });
-    if (t === 'PlaneGeometry' || t === 'CircleGeometry'){
-      if (size.x * sx > 900 || size.y * sy > 900) return;
-      const children = ud.sign ? sign(ud.sign) : '';
-      const hx = ud.sign ? new THREE.Color(ud.sign.bg).getHex() : hex;
-      return part(folder, 'Part', name, ctr.clone().addScaledVector(Z, -.02), X, Y, Z, size.x * sx, size.y * sy, .04, hx, { ...o, children, collide: false });
-    }
-    tris(folder, name, geo, M, hex, o);
-  };
-  const isFlatVC = m => { const nA = m.geometry.attributes.normal; if (!nA) return false; for (let i = 0; i < Math.min(nA.count, 300); i++) if (Math.abs(nA.getY(i) - 1) > .01) return false; return true; };
-  scene.updateMatrixWorld(true);
-  // 1) Exportar primero los objetos estáticos originales antes de mergeStaticMeshes() como Parts nativos limpios
-  for (const o of MERGED_ORIG){
-    const hex = o.mat.color ? o.mat.color.getHex() : 0xcfcfcf;
-    doGeom('Edificios y objetos', 'Objeto', o.geo, o.matrixWorld, hex, { mat: matFor(hex, false) }, o.userData || {});
-  }
-  // 2) Recorrer la escena restante (ignorando las mallas ya fusionadas mm.userData.merged)
-  const visit = obj => {
-    if (!obj.visible || obj.userData.noExport || obj.userData.merged) return;
-    if (obj.isInstancedMesh){
-      const geo = obj.geometry, gt = geo.type;
-      const heavy = gt === 'BufferGeometry' && geo.attributes.position.count > 300;
-      const folder = heavy || gt === 'IcosahedronGeometry' || obj.material.flatShading ? 'Arboles' : gt === 'CylinderGeometry' ? 'Troncos y postes' : 'Detalles';
-      if (heavy && !geo.boundingBox) geo.computeBoundingBox();
-      for (let i = 0; i < obj.count; i++){
-        obj.getMatrixAt(i, tmp); tmp.premultiply(obj.matrixWorld);
-        if (Math.abs(tmp.determinant()) < 1e-9) continue;
-        const hex = obj.instanceColor ? (obj.getColorAt(i, cTmp), cTmp.getHex()) : obj.material.color.getHex();
-        if (heavy){
-          const bb = geo.boundingBox, s = bb.getSize(new V()), c = bb.getCenter(new V()).applyMatrix4(tmp), a = axes(tmp);
-          part(folder, 'Part', 'Palmera', c, a.X, a.Y, a.Z, s.x * a.sx * .8, s.y * a.sy * 1.6, s.z * a.sz * .8, hex, { shape: 0, collide: false, mat: 1280 });
-          continue;
-        }
-        doGeom(folder, folder, geo, tmp, hex, { collide: folder !== 'Arboles', mat: matFor(hex, false, folder) });
-      }
-    } else if (obj.isMesh){
-      const mat = Array.isArray(obj.material) ? (obj.material[4] || obj.material[0]) : obj.material;
-      if (mat){
-        const hex = mat.map && !obj.userData.sign ? sampleMapHex(mat.map) : (mat.color ? mat.color.getHex() : 0xcfcfcf);
-        const transp = mat.transparent ? 1 - (mat.opacity ?? 1) : 0;
-        if (mat.vertexColors){
-          if (isFlatVC(obj)) tris('Suelo y calles', 'Piso', obj.geometry, obj.matrixWorld, hex, {}, y => .04 + y * 1.8);
-          else tris('Edificios', 'Edificio', obj.geometry, obj.matrixWorld, hex, { mat: 272 });
-        } else doGeom('Edificios y objetos', obj.userData.sign ? 'Cartel' : 'Objeto', obj.geometry, obj.matrixWorld, hex, { transp, mat: matFor(hex, false) }, obj.userData);
-      }
-    }
-    for (const ch of obj.children) visit(ch);
-  };
-  visit(scene);
-  // Base de pasto en placas de 2000 studs
-  const T = MAXS / SPM;
-  for (let x = -LIM; x < LIM; x += T) for (let z = -LIM; z < LIM; z += T)
-    part('Base', 'Part', 'Base', new V(x + T / 2, -.5, z + T / 2), new V(1, 0, 0), new V(0, 1, 0), new V(0, 0, 1), T, 1, T, 0x6f8c48, { mat: 1280, shadow: false });
-  // XML final con Lighting, Atmosphere y SpawnLocation en Plaza Colón / posición actual
-  const sp = (opts.spawnAtPlaza ? new V(0, 0, -324) : __game.pos.clone()).multiplyScalar(SPM);
-  let xml = `<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">\n`;
-  xml += `<Item class="Workspace" referent="RBX${ref++}"><Properties><string name="Name">Workspace</string></Properties>\n`;
-  xml += `<Item class="SpawnLocation" referent="RBX${ref++}"><Properties><string name="Name">SpawnLocation</string><bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>${f4(sp.x)}</X><Y>2.5</Y><Z>${f4(sp.z)}</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>6</X><Y>1</Y><Z>6</Z></Vector3><float name="Transparency">1</float><bool name="CanCollide">false</bool></Properties></Item>\n`;
-  xml += `<Item class="Model" referent="RBX${ref++}"><Properties><string name="Name">Peyrano</string></Properties>\n`;
-  for (const [name, list] of folders){ xml += `<Item class="Folder" referent="RBX${ref++}"><Properties><string name="Name">${esc(name)}</string></Properties>\n${list.join('\n')}\n</Item>\n`; }
-  xml += `</Item>\n</Item>\n`;
-  xml += `<Item class="Lighting" referent="RBX${ref++}"><Properties><string name="Name">Lighting</string><float name="Brightness">2.2</float><float name="ClockTime">14.5</float><float name="GeographicLatitude">-33.54</float><bool name="GlobalShadows">true</bool><Color3 name="Ambient"><R>0.38</R><G>0.40</G><B>0.42</B></Color3><Color3 name="OutdoorAmbient"><R>0.55</R><G>0.58</G><B>0.62</B></Color3></Properties>\n`;
-  xml += `<Item class="Atmosphere" referent="RBX${ref++}"><Properties><string name="Name">Atmosphere</string><float name="Density">0.28</float><float name="Offset">0.15</float><Color3 name="Color"><R>0.76</R><G>0.86</G><B>0.96</B></Color3><Color3 name="Decay"><R>0.65</R><G>0.72</G><B>0.82</B></Color3><float name="Glare">0.15</float><float name="Haze">1.2</float></Properties></Item>\n`;
-  xml += `</Item>\n</roblox>\n`;
-  const stats = {}; for (const [k, v] of folders) stats[k] = v.length;
-  return { xml, count, stats };
-};
-/* ===== fin EXPORTAR A ROBLOX ===== */
 
 /* =========================================================
    OPTIMIZACIÓN: fusionar los objetos fijos
@@ -8594,9 +8429,9 @@ function mergeStaticMeshes(){
     geo.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
     geo.computeBoundingBox(); geo.computeBoundingSphere();
     const mm = new THREE.Mesh(geo, b.mat);
-    mm.castShadow = b.cast; mm.receiveShadow = b.recv; mm.matrixAutoUpdate = false; mm.userData.merged = true;
+    mm.castShadow = b.cast; mm.receiveShadow = b.recv; mm.matrixAutoUpdate = false;
     scene.add(mm);
-    for (const o of b.list){ MERGED_ORIG.push({ geo: o.geometry, mat: o.material, matrixWorld: o.matrixWorld.clone(), userData: o.userData }); o.parent.remove(o); }
+    for (const o of b.list) o.parent.remove(o);
     before += b.list.length; after++;
   }
   MERGE_INFO = { before, after, moving: moving.size, ms: performance.now() - t0 };
@@ -8825,7 +8660,7 @@ function cineFrame(dt){
   const s = CINE[cineI], u = cineT / CINE_D, e = u * u * (3 - 2 * u) * .6 + u * .4, C = s.path(e);
   camera.position.set(C[0], C[1], C[2]);
   camera.lookAt(s.T[0], s.T[1], s.T[2]);
-  sun.position.set(s.T[0] + 70, 130, s.T[2] + 45); sun.target.position.set(s.T[0], 0, s.T[2]);
+  updateSun(s.T[0], s.T[2]);
 }
 function showMenu(mode){
   GS = mode;
