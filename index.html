@@ -602,7 +602,7 @@ const CASA1070_POLY = [[-480, -430], [-434, -430], [-434, -383], [-480, -383]]; 
 const LAV25_POLY = [[-480, -386], [-449, -386], [-449, -350.4], [-480, -350.4]];   // esquina Av. 25 de Mayo y Bv. Lavalle (lado norte): casa de ladrillo con cipreses y pileta (armada a mano)
 const LAV25_E_POLY = [[-449, -386], [-437, -386], [-437, -350.4], [-449, -350.4]];   // Bv. Lavalle lado norte, al lado de la esquina de 25 de Mayo: casa del cartel VENDO (armada a mano)
 const ACOPIO_POLY = [[-437.5, -405.5], [-398.5, -405.5], [-398.5, -350.4], [-437.5, -350.4]];   // planta de acopio de Bv. Lavalle y Buenos Aires: galpón, silos y maquinaria (armada a mano)
-const SHELL_POLY = [[13.5, -624.5], [89.5, -624.5], [89.5, -583], [13.5, -583]];   // Shell de Av. Centenario e Iriondo y patio de camiones hasta Entre Ríos (armado a mano)
+const SHELL_POLY = [[12, -628], [89.5, -628], [89.5, -582], [12, -582]];   // Shell de Av. Centenario e Iriondo y patio de camiones hasta Entre Ríos (armado a mano)
 const HOGAR_POLY = [[398, -624.5], [428, -624.5], [436, -629], [479.5, -680], [479.5, -543], [398, -543]];   // cuadra San Juan / Iriondo-RP 10-S / Av. 9 de Julio / Bolívar: Hogar de Ancianos y casas de Bolívar (armada a mano)
 // RP 10-S (OSM): sale de Iriondo antes de 9 de Julio, dobla en diagonal, recibe a 9 de Julio y sigue de tierra hasta cruzar la Ruta 18
 const RP10S_E = [[412, -632.5], [421, -632.8], [429.8, -636], [437.5, -640.8], [482.3, -694.4], [827.7, -1118.5], [842.5, -1140.7], [849.8, -1158.1], [853.8, -1175], [865.4, -1271.1], [870.8, -1284.9], [878.2, -1296], [1224.5, -1580.9], [1747, -2010.3]];
@@ -728,7 +728,7 @@ const ST = {
 };
 // rebajes de cordón: zonas [x0, z0, x1, z1] donde la vereda no frena al auto (entrada a la Shell)
 const CAR_OPEN = [[8.8, -624.5, 13.7, -586],
-  [13.5, -630, 63, -624], [65.5, -630, 72, -624],   // playón de la Shell y portón del patio de camiones sobre Iriondo
+  [13.5, -630, 67, -624],   // playón de la Shell abierto sobre Iriondo
   // portones de garaje / pasillos de autos (sin cordón enfrente): Dr. Brunet lado norte y Av. Centenario lado oeste (Jujuy–Brunet)
   [-72.3, -56, -68.7, -49.5], [-42.8, -56, -39.8, -49.5],
   [-14, -115.3, -8.5, -113.5], [-14, -106.2, -8.5, -103.6], [-14, -99.6, -8.5, -96.8], [-14, -96.4, -8.5, -93.6],
@@ -2413,15 +2413,18 @@ function frustumMesh(bot, top, y0, h, col){
   mapLabels.push([68.4, -2710, 'Ruta 18']);
 }
 
-// Estación de servicio Shell (Ruano Hnos), esquina Av. Centenario e Iriondo, y el patio de camiones de Transporte Salazar
-// hasta la esquina de Entre Ríos (fotos 360 de Street View del usuario): playón de cemento abierto a las dos calles, marquesina grande
-// con el logo sobre la esquina y otra más baja al lado, shop, lubricentro Helix y lavadero, gomería alta, oficinas con paneles solares,
-// cartel alto y cartel de precios, tres mástiles con banderas, antena reticulada atrás, y el patio cercado con murito blanco y tejido,
-// portón verde, cipreses, sauce y camiones. Enfrente, sobre Iriondo, la cortina de árboles oscuros.
+// Estación de servicio Shell (Ruano Hnos), esquina Av. Centenario e Iriondo, hasta la esquina de Entre Ríos
+// (dibujo del usuario sobre el satelital + fotos 360 de Street View; medidas de las huellas de edificios):
+//  · marquesina grande sobre la avenida y otra más chica sobre Iriondo, con los surtidores
+//  · tiendita / café (Shop) entre las dos marquesinas
+//  · oficinas y baños al lado, con las puertas mirando a Iriondo
+//  · taller pasante (se entra de un lado y se sale del otro) con la fosa abajo, lubricentro Helix y lavadero
+//  · tira larga de garajes / talleres al fondo, con paneles solares
+//  · patio de camiones (Transporte Salazar) cercado con murito blanco y tejido sobre Iriondo y Entre Ríos, abierto hacia el playón
 const PUMPS = [];
 {
   const g = group(0, 0);
-  plazaRects.push([13.5, -624.5, 89.5, -583]);
+  plazaRects.push([12, -628, 89.5, -582]);
   const hsh = k => { const s = Math.sin(k * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
   // árbol armado sin usar el aleatorio global (para no correr el resto del pueblo)
   const arbol = (x, z, s, cols, k) => {
@@ -2453,22 +2456,26 @@ const PUMPS = [];
   const ruedaAuto = new THREE.CylinderGeometry(.32, .32, .22, 12).rotateX(Math.PI / 2);
   const rueda = (p, geo, x, y, z) => { const m = new THREE.Mesh(geo, ruedaMat); m.position.set(x, y, z); m.castShadow = true; p.add(m); };
   // auto estacionado (largo a lo largo del +x local)
-  const auto = (x, z, ry, col) => {
+  const auto = (x, z, ry, col, pick) => {
     const a = group(x, z, ry);
-    bx(a, 0, .3, 0, 4.1, .68, 1.75, col); bx(a, -.25, .98, 0, 2.2, .55, 1.58, '#2b3440'); bx(a, -.25, 1.53, 0, 2.0, .06, 1.52, col);
-    for (const sx of [-1.3, 1.3]) for (const sz of [-.8, .8]) rueda(a, ruedaAuto, sx, .32, sz);
-    const v = Math.abs(Math.sin(ry)) > .5;
-    addCol(x - (v ? .9 : 2.05), z - (v ? 2.05 : .9), x + (v ? .9 : 2.05), z + (v ? 2.05 : .9));
+    if (pick){ bx(a, 0, .4, 0, 5.1, .75, 1.85, col); bx(a, .55, 1.15, 0, 2.0, .7, 1.7, '#2b3440'); bx(a, .55, 1.82, 0, 1.9, .07, 1.65, col); for (const s of [-1, 1]) bx(a, -1.4, 1.15, s * .9, 2.2, .3, .06, col); }
+    else { bx(a, 0, .3, 0, 4.1, .68, 1.75, col); bx(a, -.25, .98, 0, 2.2, .55, 1.58, '#2b3440'); bx(a, -.25, 1.53, 0, 2.0, .06, 1.52, col); }
+    const lx = pick ? 1.7 : 1.3;
+    for (const sx of [-lx, lx]) for (const sz of [-.82, .82]) rueda(a, ruedaAuto, sx, .32, sz);
+    const v = Math.abs(Math.sin(ry)) > .5, hl = pick ? 2.6 : 2.05;
+    addCol(x - (v ? .95 : hl), z - (v ? hl : .95), x + (v ? .95 : hl), z + (v ? hl : .95));
   };
 
   // ---- playón de cemento (sin cordón sobre la avenida ni sobre Iriondo), juntas y manchas ----
-  flat.rect(13.5, -624.5, 63, -584, .075, '#bdb8ae');
-  flat.rect(13.5, -629.5, 63, -624.5, .072, '#b2ada3');
-  for (const [x0, z0, x1, z1] of [[19, -604, 29, -597], [38, -596, 52, -590], [14, -628.5, 24, -625], [44, -628, 58, -625.5], [34, -609.5, 44, -607]]) flat.rect(x0, z0, x1, z1, .078, '#a8a296');
-  for (let x = 19.5; x < 63; x += 6) flat.rect(x, -624.5, x + .08, -606.5, .079, '#9a958b');
-  for (let z = -618.5; z < -584; z += 6) flat.rect(13.5, z, 29.5, z + .08, .079, '#9a958b');
+  flat.rect(13.5, -624.5, 67, -592.6, .075, '#bdb8ae');
+  flat.rect(51, -605.3, 67, -587, .075, '#bdb8ae');
+  flat.rect(13.5, -629.5, 67, -624.5, .072, '#b2ada3');
+  for (const [x0, z0, x1, z1] of [[14, -603, 27, -594], [38, -604, 47, -594], [14, -628.5, 26, -625], [52, -626, 64, -620], [55, -600, 66, -592]]) flat.rect(x0, z0, x1, z1, .078, '#a8a296');
+  for (let x = 41.5; x < 67; x += 6) flat.rect(x, -624.5, x + .08, -618.6, .079, '#9a958b');
+  for (let z = -598.5; z > -625; z -= 6) flat.rect(13.5, z, 27.8, z + .08, .079, '#9a958b');
+  flat.rect(13.6, -629.7, 67, -629.45, .08, '#d9b23a');   // línea amarilla al borde de Iriondo
 
-  // ---- marquesinas: la grande con el logo sobre la esquina y la más baja al lado, hacia Entre Ríos ----
+  // ---- marquesinas: la grande sobre la avenida y la chica sobre Iriondo ----
   const marquesina = (x0, z0, x1, z1, h, logos) => {
     const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, w = x1 - x0, d = z1 - z0;
     bx(g, cx, h, cz, w, .12, d, '#f4f4f2');
@@ -2476,16 +2483,16 @@ const PUMPS = [];
     bx(g, cx, h + .38, cz, w + .32, .62, d + .32, '#f3b21c');
     bx(g, cx, h + 1.0, cz, w + .32, .1, d + .32, '#f7f6f2');
     for (const [x, z, ry] of logos) logoAt(g, x, h + .69, z, 1.05, ry);
-    for (let x = x0 + 2; x < x1 - 1; x += 3.2) for (let z = z0 + 2; z < z1 - 1; z += 3.2) bx(g, x, h - .05, z, 1.3, .05, .35, '#fffbe8');
+    for (let x = x0 + 2; x < x1 - 1; x += 3.2) for (let z = z0 + 1.8; z < z1 - 1; z += 3.2) bx(g, x, h - .05, z, 1.3, .05, .35, '#fffbe8');
     mapRects.push([x0, z0, x1, z1, '#f2c21b']);
   };
-  marquesina(18, -622, 34, -606, 5.3, [[26, -622.18, Math.PI], [17.82, -614, -Math.PI / 2], [26, -605.82, 0]]);
-  marquesina(34, -621, 49, -610, 4.9, [[41.5, -621.18, Math.PI], [49.18, -615.5, Math.PI / 2]]);
+  marquesina(12.2, -613.4, 27.8, -604, 5.3, [[20, -613.58, Math.PI], [12.02, -608.7, -Math.PI / 2], [20, -603.82, 0]]);
+  marquesina(27.8, -627, 35.4, -619.4, 4.9, [[31.6, -627.18, Math.PI], [35.58, -623.2, Math.PI / 2], [27.62, -623.2, -Math.PI / 2]]);
   // islas con surtidores (las columnas de la marquesina salen de las puntas de cada isla)
   const isla = (x, z, len, h) => {
     bx(g, x, 0, z, len, .22, 1.4, '#d9d5cd'); bx(g, x, 0, z, len + .2, .1, 1.6, '#f2c21b');
     for (const dx of [-len / 2 + .45, len / 2 - .45]) bx(g, x + dx, .22, z, .4, h - .22, .4, '#f4f4f2');
-    for (const dx of [-1.7, 1.7]){
+    for (const dx of (len > 7 ? [-1.7, 1.7] : [0])){
       const px = x + dx;
       bx(g, px, .22, z, 1.0, 1.95, .62, '#f4f4f2'); bx(g, px, .22, z, 1.02, .5, .64, '#f2c21b'); bx(g, px, 2.17, z, 1.04, .22, .66, '#d7261e');
       for (const s of [-1, 1]){ bx(g, px, 1.05, z + s * .32, .55, .45, .03, '#1d2a33'); bx(g, px + .33, .75, z + s * .35, .08, .55, .08, '#2a2a2a'); }
@@ -2494,74 +2501,106 @@ const PUMPS = [];
     addCol(x - len / 2, z - .8, x + len / 2, z + .8);
     PUMPS.push([x, z - 2.6], [x, z + 2.6]);
   };
-  isla(26, -617.5, 9, 5.3); isla(26, -610.5, 9, 5.3); isla(41.5, -615.5, 8, 4.9);
+  isla(19.8, -611, 9, 5.3); isla(19.8, -606.4, 9, 5.3); isla(31.6, -623.2, 6, 4.9);
   // "Aire y Agua" junto a la marquesina grande
-  bx(g, 16.3, 0, -607.5, .7, 1.25, .5, '#f2c21b'); signIn(g, 'Aire y Agua', 16.3, 1.0, -607.24, .66, .3, '#f2c21b', '#d7261e');
-  addCol(15.9, -607.8, 16.7, -607.2);
+  bx(g, 14.2, 0, -601.5, .7, 1.25, .5, '#f2c21b'); signIn(g, 'Aire y Agua', 14.2, 1.0, -601.24, .66, .3, '#f2c21b', '#d7261e');
+  addCol(13.8, -601.8, 14.6, -601.2);
 
   // ---- cartel alto con el logo en la esquina y cartel de precios ("Tarjetas Habilitadas") sobre la avenida ----
-  bx(g, 15.6, 0, -622.3, 1.4, .35, 1.4, '#f1f1ee');
-  bx(g, 15.6, 0, -622.3, .45, 8.2, .45, '#e9e9e6');
-  bx(g, 15.6, 6.4, -622.3, 3.3, 3.4, .5, '#f7f7f5');
-  for (const s of [-1, 1]) logoAt(g, 15.6, 8.1, -622.3 + s * .26, 2.9, s > 0 ? 0 : Math.PI);
-  addCol(15.2, -622.7, 16, -621.9);
-  bx(g, 15.9, 0, -614, 2.7, .4, 1.3, '#e6e5e0');   // cantero con flores al pie
-  crowns.add(15.4, .55, -614, .5, .25, .4, 0, '#6f9a3c'); crowns.add(16.5, .55, -614, .4, .22, .4, 0, '#d9a62a');
-  bx(g, 15.9, .4, -614, 2.1, 2.9, .34, '#f4f4f2');
+  bx(g, 15, 0, -623, 1.4, .35, 1.4, '#f1f1ee');
+  bx(g, 15, 0, -623, .45, 8.2, .45, '#e9e9e6');
+  bx(g, 15, 6.4, -623, 3.3, 3.4, .5, '#f7f7f5');
+  for (const s of [-1, 1]) logoAt(g, 15, 8.1, -623 + s * .26, 2.9, s > 0 ? 0 : Math.PI);
+  addCol(14.6, -623.4, 15.4, -622.6);
+  bx(g, 15.6, 0, -617, 2.7, .4, 1.3, '#e6e5e0');   // cantero con flores al pie
+  crowns.add(15.1, .55, -617, .5, .25, .4, 0, '#6f9a3c'); crowns.add(16.2, .55, -617, .4, .22, .4, 0, '#d9a62a');
+  bx(g, 15.6, .4, -617, 2.1, 2.9, .34, '#f4f4f2');
   const precios = [['Súper', '$.2345'], ['V-Power', '$.2555'], ['Diesel', '$.2497'], ['V-Power D', '$.2689']];
   for (const s of [-1, 1]){
-    const zz = -614 + s * .18, ry = s > 0 ? 0 : Math.PI;
-    precios.forEach(([n, p], k) => { signIn(g, n, 15.9 - s * .62, 2.85 - k * .52, zz, .8, .4, '#ffffff', '#444444', ry); signIn(g, p, 15.9 + s * .33, 2.85 - k * .52, zz, 1.2, .44, '#ffffff', '#c8201c', ry); });
-    signIn(g, 'Tarjetas Habilitadas', 15.9, .8, zz, 1.9, .3, '#ffffff', '#c8201c', ry);
+    const zz = -617 + s * .18, ry = s > 0 ? 0 : Math.PI;
+    precios.forEach(([n, p], k) => { signIn(g, n, 15.6 - s * .62, 2.85 - k * .52, zz, .8, .4, '#ffffff', '#444444', ry); signIn(g, p, 15.6 + s * .33, 2.85 - k * .52, zz, 1.2, .44, '#ffffff', '#c8201c', ry); });
+    signIn(g, 'Tarjetas Habilitadas', 15.6, .8, zz, 1.9, .3, '#ffffff', '#c8201c', ry);
   }
-  addCol(14.5, -614.6, 17.3, -613.4);
+  addCol(14.2, -617.6, 17, -616.4);
 
-  // ---- Shop (vidriera hacia el playón y hacia la avenida) ----
-  bx(g, 37, 0, -601.5, 14, 3.9, 9, '#f4f4f2');
-  bx(g, 37, 3.05, -601.5, 14.16, .32, 9.16, '#d7261e'); bx(g, 37, 3.37, -601.5, 14.2, .5, 9.2, '#f3b21c');
-  bx(g, 37, .25, -606.06, 11.5, 2.5, .06, '#2c3f4f');
-  for (let x = 31.5; x <= 42.6; x += 1.85) bx(g, x, .25, -606.1, .07, 2.5, .05, '#d5d8da');
-  bx(g, 29.94, .25, -602, .06, 2.5, 6, '#2c3f4f');
-  signIn(g, 'Shop', 40.5, 3.62, -606.22, 2.2, .42, '#d7261e', '#ffffff', Math.PI);
-  signIn(g, 'Shell Select', 33.6, 3.62, -606.22, 3, .42, '#f3b21c', '#d7261e', Math.PI);
-  for (const x of [32, 35.2]){ bx(g, x, 0, -607.2, .9, .72, .9, '#dcdcdc'); for (const s of [-1, 1]) bx(g, x + s * .75, 0, -607.2, .4, .45, .4, '#c9c9c9'); }   // mesitas afuera
-  addCol(30, -606, 44, -597);
-  // ---- lubricentro Helix y lavadero ----
-  bx(g, 49, 0, -601.5, 10, 3.6, 9, '#f2f2ef');
-  bx(g, 49, 2.85, -601.5, 10.12, .2, 9.12, '#d7261e'); bx(g, 49, 3.05, -601.5, 10.14, .4, 9.14, '#f3b21c');
-  bx(g, 46.6, 0, -606.03, 3.2, 2.1, .06, '#4a5560');   // portón del lubricentro
-  signIn(g, 'HELIX Lubricentro', 46.6, 2.45, -606.08, 3.4, .46, '#f2c21b', '#d7261e', Math.PI);
-  bx(g, 51.6, 0, -606.03, 3.6, 2.6, .06, '#26292c');   // boca del lavadero
-  signIn(g, 'Lavado', 51.6, 3.2, -606.1, 2.2, .38, '#ffffff', '#d7261e', Math.PI);
-  addCol(44, -606, 54, -597);
-  // ---- gomería (volumen alto blanco con las letras y rayas rojas, mirando a Iriondo) ----
-  bx(g, 58.5, 0, -604.5, 9, 5.4, 17, '#f4f4f2');
-  bx(g, 58.5, 5.4, -604.5, 9.2, .2, 17.2, '#e4e4df');
-  for (const y of [3.85, 4.95]) bx(g, 58.5, y, -613.05, 7.6, .14, .05, '#e0603e');
-  letras(g, 'Gomería', 58.5, 4.4, -613.1, 4.6, .58, '#d0483a', 'bold 92px Arial', Math.PI);
-  bx(g, 59, 0, -613.04, 3.8, 3.1, .06, '#6b7178');   // portón
-  bx(g, 55.6, .9, -613.05, .9, 1.2, .05, '#c8261f');   // cartel rojo
-  bx(g, 53.96, 0, -611, .06, 2.1, 1, '#5c6670');      // puerta lateral
-  bx(g, 53.95, 1.1, -608.3, .06, 1.1, 1.3, '#2f3a44'); bx(g, 53.6, 2.45, -608.3, .7, .08, 1.7, '#7b7f84');   // ventana con alerito
-  cylIn(g, 53.3, .45, -612.4, .3, .9, '#c62a22');      // tambor rojo
-  for (const z of [-609.8, -606.9]){ bx(g, 53.45, 0, z, .5, .45, .5, '#e7c51e'); crowns.add(53.45, .78, z, .35, .38, .35, 0, '#4f7a3a'); }
-  addCol(54, -613, 63, -596);
-  // ---- oficinas blancas con paneles solares, hacia el fondo sobre la avenida ----
-  bx(g, 24.75, 0, -589.25, 19.5, 3.5, 7.5, '#f4f4f2');
-  bx(g, 24.75, 3.5, -589.25, 19.7, .22, 7.7, '#e6e6e1');
-  bx(g, 24.75, 2.85, -593.04, 19.5, .14, .05, '#d84a3a'); bx(g, 24.75, 3.08, -593.05, 19.5, .08, .05, '#f3b21c');
-  for (const x of [17.5, 20.8, 28.7, 32]) bx(g, x, 1.1, -593.05, 1.4, 1.1, .05, '#33414c');
-  bx(g, 24.75, 0, -593.05, 1.1, 2.2, .05, '#5c6670');
-  bx(g, 15.04, 1.1, -589.25, .05, 1.1, 1.6, '#33414c');
-  for (let x = 17.2; x < 33; x += 2.05) bx(g, x, 3.85, -589.6, 1.9, .06, 3.2, '#1f2c4a', -.32);
-  bx(g, 21.5, 0, -594.4, 5.5, .35, 1.1, '#d8d6d0');   // cantero con yuca y plantas
-  for (const [x, s] of [[19.6, 1], [21.4, .8], [23.2, 1.1]]){ trunks.add(x, .35, -594.4, .18, .4 * s, .18, 0, '#6a5a3a'); crowns.add(x, .75 + .55 * s, -594.4, .22, .65 * s, .22, 0, '#5d8a3e'); crowns.add(x, .7 + .4 * s, -594.4, .55 * s, .2, .2, .6, '#6b9445'); }
-  addCol(15, -593, 34.5, -585.5); addCol(18.75, -595, 24.25, -593.8);
-  auto(29.5, -595, 0, '#f2f2f0'); auto(51.1, -610.6, Math.PI / 2, '#b9bdc2');
-  mapRects.push([30, -606, 63, -597, '#d7261e'], [54, -613, 63, -596, '#e8e8e8'], [15, -593, 34.5, -585.5, '#e8e8e8']);
+  // ---- tiendita / café (Shop): vidriera hacia la marquesina grande (oeste) y hacia la chica (norte) ----
+  const X0 = 27.8, X1 = 36.3, Z0 = -618.6, Z1 = -605.3;
+  bx(g, (X0 + X1) / 2, 0, (Z0 + Z1) / 2, X1 - X0, 3.9, Z1 - Z0, '#f4f4f2');
+  bx(g, (X0 + X1) / 2, 3.05, (Z0 + Z1) / 2, X1 - X0 + .16, .32, Z1 - Z0 + .16, '#d7261e'); bx(g, (X0 + X1) / 2, 3.37, (Z0 + Z1) / 2, X1 - X0 + .2, .5, Z1 - Z0 + .2, '#f3b21c');
+  bx(g, X0 - .06, .25, -611.5, .06, 2.5, 11, '#2c3f4f');
+  for (let z = -616.6; z <= -606.4; z += 1.7) bx(g, X0 - .1, .25, z, .05, 2.5, .07, '#d5d8da');
+  bx(g, X0 - .1, 0, -609.2, .07, 2.3, 1.6, '#4a6272');   // puerta de vidrio
+  bx(g, 32, .25, Z0 - .06, 6.5, 2.5, .06, '#2c3f4f');
+  for (let x = 29.4; x <= 34.7; x += 1.6) bx(g, x, .25, Z0 - .1, .07, 2.5, .05, '#d5d8da');
+  signIn(g, 'Shop', X0 - .22, 3.62, -615.5, 2.2, .42, '#d7261e', '#ffffff', -Math.PI / 2);
+  signIn(g, 'Shell Select · Café', X0 - .22, 3.62, -609, 3.6, .42, '#f3b21c', '#d7261e', -Math.PI / 2);
+  signIn(g, 'Shop', 32, 3.62, Z0 - .22, 2.2, .42, '#d7261e', '#ffffff', Math.PI);
+  addCol(X0, Z0, X1, Z1);
+  bx(g, 35.6, 0, -619.1, 1.4, .45, .45, '#8a6a4a');   // banquito del café contra la vidriera
 
-  // ---- antena reticulada detrás del shop ----
-  { const ag = group(47, -589.5), H = 34, legs = [0, 1, 2].map(k => k * Math.PI * 2 / 3 + .3);
+  // ---- oficinas y baños (puertas mirando a Iriondo) ----
+  { const A0 = 36.3, A1 = 51, h = 3.4;
+    bx(g, (A0 + A1) / 2, 0, (Z0 + Z1) / 2, A1 - A0, h, Z1 - Z0, '#f1f0ec');
+    bx(g, (A0 + A1) / 2, h, (Z0 + Z1) / 2, A1 - A0 + .2, .2, Z1 - Z0 + .2, '#e2e1dc');
+    bx(g, (A0 + A1) / 2, 2.75, Z0 - .05, A1 - A0, .14, .05, '#d84a3a'); bx(g, (A0 + A1) / 2, 2.95, Z0 - .05, A1 - A0, .08, .05, '#f3b21c');
+    const puertas = [[38.2, 'Oficina'], [41.6, ''], [44.2, 'Damas'], [46.6, 'Caballeros'], [49.4, '']];
+    for (const [x, t] of puertas){
+      bx(g, x, 0, Z0 - .05, 1.0, 2.15, .06, t ? '#6b7a86' : '#2f3a44');
+      if (t) signIn(g, t, x, 2.35, Z0 - .1, 1.1, .22, '#1f3a8a', '#ffffff', Math.PI);
+    }
+    for (const x of [39.9, 47.9]){ bx(g, x, 1.1, Z0 - .05, 1.2, 1.0, .05, '#33414c'); bx(g, x, 2.35, Z0 - .4, 1.6, .07, .75, '#7b7f84'); }   // ventanas con alerito
+    for (const x of [43, 48.2]) bx(g, x, 1.3, Z1 + .05, 1.1, .9, .05, '#33414c');
+    for (const z of [-615.5, -610, -607.5]) bx(g, A1 + .05, 1.2, z, .05, .9, 1.1, '#33414c');
+    bx(g, A1 + .3, .6, -612.6, .5, .7, .7, '#c9cbcd');   // equipo de aire
+    for (const x of [42.5, 47.5]){ bx(g, x, 0, Z0 - .9, .5, .45, .5, '#e7c51e'); crowns.add(x, .78, Z0 - .9, .35, .38, .35, 0, '#4f7a3a'); }
+    addCol(A0, Z0, A1, Z1);
+    mapRects.push([X0, Z0, X1, Z1, '#d7261e'], [A0, Z0, A1, Z1, '#e8e8e8']);
+  }
+
+  // ---- taller pasante con fosa: lavadero / lubricentro Helix (se entra desde el playón de la avenida y se sale hacia el fondo) ----
+  { const T0 = 27.8, T1 = 37.2, U0 = -605.3, U1 = -596, h = 5.0, cz = (U0 + U1) / 2;
+    for (const z of [U0 + .15, U1 - .15]) bx(g, (T0 + T1) / 2, 0, z, T1 - T0, h, .3, '#f4f4f2');   // paredes laterales
+    bx(g, (T0 + T1) / 2, h, cz, T1 - T0 + .2, .3, U1 - U0 + .2, '#e4e4df');                          // techo
+    for (const x of [T0 + .15, T1 - .15]) bx(g, x, 3.4, cz, .3, h - 3.4, U1 - U0, '#f4f4f2');        // dinteles sobre los portones
+    bx(g, (T0 + T1) / 2, h - .9, U0 - .02, T1 - T0, .14, .04, '#e0603e'); bx(g, (T0 + T1) / 2, h - .65, U0 - .02, T1 - T0, .1, .04, '#f3b21c');
+    signIn(g, 'Lavado', T0 - .02, 4.15, cz, 2.4, .42, '#ffffff', '#d7261e', -Math.PI / 2);
+    signIn(g, 'HELIX Lubricentro', T0 - .02, 3.75, cz + 3.1, 2.4, .36, '#f2c21b', '#d7261e', -Math.PI / 2);
+    letras(g, 'Gomería', T1 + .04, 4.25, cz, 6, .62, '#d0483a', 'bold 92px Arial', Math.PI / 2);
+    for (const y of [3.7, 4.8]) bx(g, T1 + .02, y, cz, .04, .12, 7.5, '#e0603e');
+    // fosa con escalones y baranda; mangueras e hidrolavadora
+    flat.rect(30.2, cz - .45, 35.6, cz + .45, .082, '#2a2622'); flat.rect(30.2, cz - .62, 35.6, cz - .45, .083, '#e7c51e'); flat.rect(30.2, cz + .45, 35.6, cz + .62, .083, '#e7c51e');
+    bx(g, 34.8, 0, U1 - .7, 1.0, 1.0, .6, '#2f6fb5'); bx(g, 34.8, 1.0, U1 - .7, .6, .1, .4, '#2a2a2a');
+    for (const x of [29.5, 31.5]) bx(g, x, 0, U1 - .55, .5, .9, .5, '#3c3c3c');   // bidones de aceite
+    cylIn(g, 36.4, .45, U1 - .7, .3, .9, '#c62a22');                               // tambor rojo
+    addCol(T0, U0, T1, U0 + .3); addCol(T0, U1 - .3, T1, U1);
+    mapRects.push([T0, U0, T1, U1, '#5aa9e6']);
+  }
+
+  // ---- garajes / talleres al fondo: tira larga con portones, paneles solares sobre la parte de la avenida ----
+  { const tramos = [[14.9, 34.6, -593, -585.5, 3.6], [34.6, 47.3, -590, -585.5, 3.2], [47.3, 77.1, -592.6, -585, 4.2]];
+    for (const [a0, a1, z0, z1, h] of tramos){
+      bx(g, (a0 + a1) / 2, 0, (z0 + z1) / 2, a1 - a0, h, z1 - z0, '#f2f2ee');
+      bx(g, (a0 + a1) / 2, h, (z0 + z1) / 2, a1 - a0 + .2, .2, z1 - z0 + .2, '#e2e2dc');
+      bx(g, (a0 + a1) / 2, h - .7, z0 - .04, a1 - a0, .14, .05, '#d84a3a'); bx(g, (a0 + a1) / 2, h - .48, z0 - .04, a1 - a0, .08, .05, '#f3b21c');
+      addCol(a0, z0, a1, z1);
+      mapRects.push([a0, z0, a1, z1, '#e8e8e8']);
+    }
+    for (const x of [18.5, 23.5]) bx(g, x, 0, -593.05, 3.6, 2.8, .06, '#7e868d');   // portones
+    for (const x of [27.6, 31.6]) bx(g, x, 1.1, -593.05, 1.4, 1.1, .05, '#33414c');
+    bx(g, 29.6, 0, -593.05, 1.0, 2.2, .05, '#5c6670');
+    bx(g, 14.85, 1.1, -589.25, .05, 1.1, 1.6, '#33414c');
+    for (let x = 16.4; x < 34; x += 2.05) bx(g, x, 3.95, -589.4, 1.9, .06, 3.2, '#1f2c4a', -.32);   // paneles solares
+    for (const x of [38, 42.5]) bx(g, x, 0, -590.05, 3.2, 2.6, .06, '#8e959b');
+    for (let x = 50.5; x < 76; x += 4.6) bx(g, x, 0, -592.65, 3.6, 3.1, .06, (Math.round(x) % 2) ? '#7e868d' : '#8e959b');
+    bx(g, 21, 0, -594.4, 4.5, .35, 1.0, '#d8d6d0');   // cantero con yuca
+    for (const [x, s] of [[19.6, 1], [21.1, .8], [22.5, 1.1]]){ trunks.add(x, .35, -594.4, .18, .4 * s, .18, 0, '#6a5a3a'); crowns.add(x, .75 + .55 * s, -594.4, .22, .65 * s, .22, 0, '#5d8a3e'); crowns.add(x, .7 + .4 * s, -594.4, .55 * s, .2, .2, .6, '#6b9445'); }
+    addCol(18.75, -594.9, 23.25, -593.9);
+    bx(g, 13.6, 0, -588.5, .25, 2.0, 5, '#efefea'); addCol(13.4, -591, 13.8, -586);   // tapialito contra la avenida
+  }
+  auto(41, -594, 0, '#f2f2f0'); auto(46.5, -602.5, Math.PI / 2, '#b9bdc2'); auto(56, -611.5, Math.PI / 2, '#f4f4f2', true); auto(60.5, -596.5, 0, '#8a1f1f');
+
+  // ---- antena reticulada entre el taller y los garajes ----
+  { const ag = group(42, -599.5), H = 34, legs = [0, 1, 2].map(k => k * Math.PI * 2 / 3 + .3);
     for (let s = 0; s < H; s += 4){
       const s1 = Math.min(H, s + 4), r0 = .9 * (1 - s / H) + .25, r1 = .9 * (1 - s1 / H) + .25;
       legs.forEach((t, k) => {
@@ -2569,9 +2608,9 @@ const PUMPS = [];
         const t2 = legs[(k + 1) % 3]; poleIn(ag, [Math.cos(t) * r0, s, Math.sin(t) * r0], [Math.cos(t2) * r1, s1, Math.sin(t2) * r1], .025, '#c9ccd0');
       });
     }
-    bx(ag, 0, 0, 0, 2.6, .3, 2.6, '#bdbab2'); addCol(45.8, -590.7, 48.2, -588.3); }
+    bx(ag, 0, 0, 0, 2.6, .3, 2.6, '#bdbab2'); addCol(40.8, -600.7, 43.2, -598.3); }
 
-  // ---- tres mástiles con banderas en la punta del playón, contra el cerco del patio ----
+  // ---- tres mástiles con banderas donde empieza el cerco del patio ----
   const bTex = draw => { const cc = document.createElement('canvas'); cc.width = 96; cc.height = 64; draw(cc.getContext('2d')); const t = new THREE.CanvasTexture(cc); t.colorSpace = THREE.SRGBColorSpace; return t; };
   const banderas = [
     bTex(k => { k.fillStyle = '#74acdf'; k.fillRect(0, 0, 96, 64); k.fillStyle = '#ffffff'; k.fillRect(0, 21, 96, 22); k.fillStyle = '#f6b40e'; k.beginPath(); k.arc(48, 32, 6, 0, 7); k.fill(); }),
@@ -2579,21 +2618,20 @@ const PUMPS = [];
     bTex(k => { k.fillStyle = '#ffffff'; k.fillRect(0, 0, 96, 64); k.fillStyle = '#c0392b'; k.fillRect(0, 0, 96, 14); k.fillRect(0, 50, 96, 14); })
   ];
   banderas.forEach((t, i) => {
-    const x = 60 + i * 1.3, z = -622.6 + i * .5, h = 8.2 - i * .5;
+    const x = 64 + i * 1.2, z = -622.8 + i * .7, h = 8.2 - i * .5;
     poles.add(x, 0, z, .12, h, .12, 0, '#e6e6e3');
     const f = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1), new THREE.MeshLambertMaterial({ map: t, side: THREE.DoubleSide }));
     f.geometry.translate(.75, 0, 0); f.position.set(x, h - .6, z); f.rotation.y = .3; scene.add(f);
     anims.push(tt => { f.rotation.y = .3 + Math.sin(tt * 1.7 + i) * .25; });
     addCol(x - .12, z - .12, x + .12, z + .12);
   });
+  crowns.add(66.2, .5, -623.6, .7, .5, .6, 0, '#4f7a3a');
 
-  // ---- patio de camiones (Transporte Salazar) hasta Entre Ríos ----
-  flat.rect(63, -624.5, 89.5, -584, .072, '#a59e90');
-  flat.rect(63, -624.5, 89.5, -622, .074, '#7f9c52');
-  for (const [x0, z0, x1, z1] of [[64, -600, 70, -594], [82, -620, 89, -612], [64, -611, 68, -606]]) flat.rect(x0, z0, x1, z1, .074, '#86a05a');
-  flat.rect(63, -630, 89.5, -624.5, .073, '#6f9a47');     // franja de pasto de la vereda sobre Iriondo
-  flat.rect(89.5, -624.5, 93.5, -584, .073, '#6f9a47');   // y sobre Entre Ríos
-  flat.rect(66, -630, 71.5, -624.5, .076, '#a8a296');     // entrada de ripio al portón
+  // ---- patio de camiones (Transporte Salazar) cercado sobre Iriondo y Entre Ríos, abierto hacia el playón ----
+  flat.rect(67, -624.5, 89.5, -587, .072, '#a59e90');
+  for (const [x0, z0, x1, z1] of [[67, -624.5, 89.5, -622], [80, -606, 89.5, -594], [68, -606, 76, -598], [82, -620, 89, -612]]) flat.rect(x0, z0, x1, z1, .074, '#7f9c52');
+  flat.rect(67, -630, 89.5, -624.5, .073, '#6f9a47');     // franja de pasto de la vereda sobre Iriondo
+  flat.rect(89.5, -624.5, 93.5, -587, .073, '#6f9a47');   // y sobre Entre Ríos
   poles.add(76, 0, -626.5, .3, 8, .3, 0, '#c4c2bb');      // poste de hormigón con farol sobre la vereda
   poleIn(g, [76, 7.6, -626.5], [77.6, 7.9, -626.8], .05, '#9a9a96'); bx(g, 77.8, 7.75, -626.8, .7, .16, .3, '#d8d8d2');
   addCol(75.8, -626.7, 76.2, -626.3);
@@ -2607,54 +2645,46 @@ const PUMPS = [];
     const m = new THREE.Mesh(new THREE.PlaneGeometry(L, 1.45), tejido); m.position.set(L / 2, 1.22, 0); fg.add(m);
     addCol(Math.min(x0, x1) - .15, Math.min(z0, z1) - .15, Math.max(x0, x1) + .15, Math.max(z0, z1) + .15);
   };
-  cerco(63, -624.5, 66, -624.5); cerco(71.5, -624.5, 89.5, -624.5);
-  cerco(89.5, -624.5, 89.5, -584); cerco(63, -584, 89.5, -584); cerco(63, -624.5, 63, -613);
-  // portón de dos hojas de tejido verde, abiertas hacia adentro
-  const verde = new THREE.MeshLambertMaterial({ color: 0x7fa86a, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false });
-  for (const [hx, ang] of [[66, -1.2], [71.5, -1.94]]){
-    const pg = group(hx, -624.5, ang);
-    bx(pg, 1.37, 0, 0, 2.75, .08, .08, '#6c8f5a'); bx(pg, 1.37, 1.85, 0, 2.75, .08, .08, '#6c8f5a'); bx(pg, 2.71, 0, 0, .08, 1.93, .08, '#6c8f5a');
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(2.7, 1.8), verde); m.position.set(1.37, .95, 0); pg.add(m);
-  }
-  // cipreses contra el cerco de Iriondo, sauce y árbol pelado junto a los mástiles
+  cerco(67, -624.5, 89.5, -624.5); cerco(89.5, -624.5, 89.5, -587); cerco(77.1, -587, 89.5, -587);
+  // paño de tejido verde con ligustro al lado de los mástiles (foto)
+  { const verde = new THREE.MeshLambertMaterial({ color: 0x7fa86a, transparent: true, opacity: .6, side: THREE.DoubleSide, depthWrite: false });
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 1.45), verde); m.position.set(68.3, 1.22, -624.42); scene.add(m);
+    crowns.add(70.6, 1.1, -623.7, 1.0, 1.0, .6, 0, '#3f6a2a'); }
+  // cipreses contra el cerco de Iriondo, sauce, árbol pelado y los árboles del patio (satelital)
   const cipres = (x, z, h) => { trunks.add(x, 0, z, .3, 1.2, .3, 0, '#5b4632'); crowns.add(x, h * .45 + .6, z, .95, h * .45, .95, 0, '#34512c'); crowns.add(x, h * .8, z, .6, h * .22, .6, .5, '#3b5a30'); addCol(x - .4, z - .4, x + .4, z + .4); };
-  cipres(73.2, -622.8, 10); cipres(79.5, -622.8, 11.5); cipres(85.2, -622.8, 9.5); cipres(88.3, -621.5, 10.5); cipres(88.3, -603, 9);
-  arbol(64.8, -620.5, 1.05, ['#b5ad55', '#a9a64a', '#c2b862'], 1);   // sauce
-  arbol(68.5, -621.8, .9, ['#8e8c70', '#9a9678'], 2);
-  arbol(86, -588, 1.1, ['#4b7a30', '#557f35'], 3);
+  cipres(73.2, -622.9, 10); cipres(79.5, -622.9, 11.5); cipres(85.2, -622.9, 9.5); cipres(88.3, -621.5, 10.5);
+  arbol(68.6, -619.3, 1.05, ['#b5ad55', '#a9a64a', '#c2b862'], 1);   // sauce
+  arbol(59.4, -617.3, .95, ['#8e8c70', '#9a9678'], 2);                // árbol pelado en el playón, al lado de las oficinas
+  arbol(66.7, -611.6, 1.1, ['#4b7a30', '#557f35', '#3f6b2a'], 3);
+  arbol(73.7, -598.7, 1.2, ['#3f6b2a', '#4b7a30'], 4);
+  arbol(85, -602, 1.15, ['#4b7a30', '#557f35'], 5);
+  arbol(88, -596.5, 1.05, ['#38602a', '#466f2e'], 6);
   // semirremolque blanco "TRANSP. SALAZAR" con franja azul, paralelo a Iriondo
-  { const t = group(76.5, -619.3);
+  { const t = group(77.5, -619.6);
     bx(t, 0, .85, 0, 13, .3, 2.5, '#2a2b2e');
     bx(t, .2, 1.15, 0, 12.4, 1.65, 2.5, '#f2f2ee');
     for (const s of [-1, 1]){ bx(t, .2, 1.3, s * 1.26, 12.4, .2, .03, '#2f6fb5'); letras(t, 'TRANSP. SALAZAR', 1.5, 2.25, s * 1.28, 6.5, .7, '#3b4a5a', 'bold 88px Arial', s > 0 ? 0 : Math.PI); }
     for (const x of [-5.2, -4, -2.8]) for (const s of [-1, 1]) rueda(t, ruedaCam, x, .52, s * 1.05);
     bx(t, 5.5, 0, 0, .2, .85, 1.6, '#3a3a3a');
-    addCol(70, -620.6, 83, -618); }
+    addCol(71, -620.9, 84, -618.3); }
   // acoplado con lona gris
-  { const t = group(75.5, -613.2);
+  { const t = group(78, -614);
     bx(t, 0, .85, 0, 11, .3, 2.5, '#2b2d30'); bx(t, 0, 1.15, 0, 11, .9, 2.5, '#d9d6cc');
     bx(t, 0, 2.05, 0, 10.8, 1.1, 2.45, '#8d9296'); bx(t, 0, 3.15, 0, 10.6, .25, 2.2, '#848a8e');
     for (const x of [-4, -2.9, 2.9, 4]) for (const s of [-1, 1]) rueda(t, ruedaCam, x, .52, s * 1.05);
-    addCol(69.8, -614.6, 81.2, -611.8); }
-  // chasis de semirremolque vacío y tractor rojo
-  { const t = group(74, -607.5);
-    bx(t, 0, .9, 0, 12, .25, 2.4, '#3a3c3f'); for (const s of [-1, 1]) bx(t, 0, .7, s * .5, 12, .2, .18, '#e2c02c');
-    for (const x of [-5, -3.9, -2.8]) for (const s of [-1, 1]) rueda(t, ruedaCam, x, .52, s * 1.05);
-    addCol(67.8, -608.8, 80.2, -606.2); }
-  { const t = group(84.5, -598, Math.PI / 2);
+    addCol(72.5, -615.4, 83.5, -612.6); }
+  // casilla de chapa (huella del satelital) y tractor rojo
+  bx(g, 74.1, 0, -606.5, 6.8, 2.6, 3, '#9aa1a6'); bx(g, 74.1, 2.6, -606.5, 7.1, .12, 3.3, '#7f878d'); bx(g, 72, 0, -608.03, .9, 2, .05, '#5b6168');
+  addCol(70.7, -608, 77.5, -605);
+  { const t = group(86.5, -609, Math.PI / 2);
     bx(t, 0, .55, 0, 6, .4, 2.3, '#2b2b2b'); bx(t, 1.8, .9, 0, 2.2, 2.4, 2.4, '#b3261e'); bx(t, 1.85, 2.2, 0, 2.25, .7, 2.3, '#253039'); bx(t, 3.0, .6, 0, .2, 1.0, 2.3, '#9a9a9a');
     for (const x of [-2, -.8, 2.1]) for (const s of [-1, 1]) rueda(t, ruedaCam, x, .52, s * 1.05);
-    addCol(83.2, -601.5, 85.8, -594.5); }
-  // casilla de chapa y galpón del fondo
-  bx(g, 74, 0, -603, 7, 2.6, 3.5, '#9aa1a6'); bx(g, 74, 2.6, -603, 7.3, .12, 3.8, '#7f878d'); bx(g, 72, 0, -604.78, .9, 2, .05, '#5b6168');
-  addCol(70.5, -604.75, 77.5, -601.25);
-  bx(g, 71.5, 0, -589, 17, 5, 8, '#dddcd6'); bx(g, 71.5, 5, -589, 17.3, .3, 8.3, '#c9c8c2'); bx(g, 71.5, 0, -593.04, 5, 4, .06, '#8e959b');
-  addCol(63, -593, 80, -585);
-  mapRects.push([63, -624.5, 89.5, -584, '#a59e90'], [70, -620.6, 83, -618, '#f2f2ee'], [63, -593, 80, -585, '#d6d6d6']);
+    addCol(85.2, -612.5, 87.8, -605.5); }
+  mapRects.push([67, -624.5, 89.5, -587, '#a59e90'], [71, -620.9, 84, -618.3, '#f2f2ee']);
   // cortina de árboles oscuros del otro lado de Iriondo
   for (let k = 0; k < 18; k++){ const x = 16 + k * 4.6 + (hsh(k) - .5) * 1.5, z = -642.5 - hsh(k + 40) * 3; arbol(x, z, 1.15 + hsh(k + 80) * .45, ['#2f4f2a', '#3a5b30', '#2c4627'], k + 10); }
 
-  mapLabels.push([36, -606, 'Shell']);
+  mapLabels.push([30, -610, 'Shell']);
 }
 /* ---------- Datos reales de OpenStreetMap (descargados de api.openstreetmap.org, © colaboradores de OSM, ODbL) ----------
    Coordenadas ya convertidas al mundo (x, z) con la calibración del documento. */
