@@ -605,7 +605,8 @@ const ACOPIO_POLY = [[-437.5, -405.5], [-398.5, -405.5], [-398.5, -350.4], [-437
 const HOGAR_POLY = [[398, -624.5], [428, -624.5], [436, -629], [479.5, -680], [479.5, -543], [398, -543]];   // cuadra San Juan / Iriondo-RP 10-S / Av. 9 de Julio / Bolívar: Hogar de Ancianos y casas de Bolívar (armada a mano)
 // RP 10-S (OSM): sale de Iriondo antes de 9 de Julio, dobla en diagonal, recibe a 9 de Julio y sigue de tierra hasta cruzar la Ruta 18
 const RP10S_E = [[412, -632.5], [421, -632.8], [429.8, -636], [437.5, -640.8], [482.3, -694.4], [827.7, -1118.5], [842.5, -1140.7], [849.8, -1158.1], [853.8, -1175], [865.4, -1271.1], [870.8, -1284.9], [878.2, -1296], [1224.5, -1580.9], [1747, -2010.3]];
-const NUEVE_JULIO_N = [[487.5, -628], [487.8, -679], [486.8, -684.8], [482.3, -694.4]];   // Av. 9 de Julio pasando Iriondo hasta la RP 10-S
+const IRIONDO_TIERRA = [[419, -632.5], [432, -631.2], [450, -630.6], [468, -631], [481, -632.2], [488, -632.5]];   // callecita de tierra: Iriondo sigue derecho hasta 9 de Julio, entre el Hogar y la diagonal
+const NUEVE_JULIO_N =[[487.5, -628], [487.8, -679], [486.8, -684.8], [482.3, -694.4]];   // Av. 9 de Julio pasando Iriondo hasta la RP 10-S
 const CASITAS_COOP_POLY =[[-492,-82.5],[-526,-82.5],[-526,-98],[-536,-98],[-536,-135],[-492,-135]];   // casitas al norte del Semillero + galpón gris de techo redondo (armados a mano)
 const PLAZA_INM = [[-433.3,-42],[-395.5,-42],[-395.5,-30.5]];   // Plazoleta del Inmigrante (triángulo Dr. Brunet / Maipú / Buenos Aires)
 const COOP_FP = [];
@@ -637,7 +638,7 @@ const CORREO_N_POLY =[[-48, -234.5], [-13.5, -234.5], [-13.5, -187.3], [-48, -18
 const MALV_POLY =[[-47, -185], [-13, -185], [-13, -152.5], [-47, -152.5]];   // Plaza Islas Malvinas (esquina Jujuy y Av. Centenario, lado oeste) + Correo Argentino (Av. Centenario 821)
 const CENT_EAST_POLY =[[13, -234.5], [53, -234.5], [53, -152.5], [13, -152.5]];   // Av. Centenario lado este, de la esquina de Jujuy hasta San Luis (incluye lote de naranjos y AMFAC)
 function nearRuralRoad(x, z, m = 9){
-  if (distToPolyline(x, z, RP20S_PTS) < m + 2 || distToPolyline(x, z, RP26S_PTS) < m + 2 || distToPolyline(x, z, RP10S_E) < m + 2) return true;
+  if (distToPolyline(x, z, RP20S_PTS) < m + 2 || distToPolyline(x, z, RP26S_PTS) < m + 2 || distToPolyline(x, z, RP10S_E) < m + 2 || distToPolyline(x, z, IRIONDO_TIERRA) < m - 2) return true;
   if (distToPolyline(x, z, ACC_PTS) < m + 4 || distToPolyline(x, z, R18_PTS) < m + 5 ||
       distToPolyline(x, z, ACC_RAMP_S) < m + 4 || distToPolyline(x, z, ACC_RAMP_N) < m + 4) return true;
   const [a, b] = AB(x, z), mm = m / S;
@@ -1049,6 +1050,8 @@ for (const s of segs) drawSeg(s);
   drawPolyRoad(CHACABUCO_PTS, 'dirt', 38);                  // Chacabuco paralela SE del lado SO de las vías
   drawPolyRoad(RP10S_E, 'dirt', 24, false, false, true);    // RP 10-S de tierra: de Iriondo a la Ruta 18 (OSM)
   drawPolyRoad(NUEVE_JULIO_N, 'dirt', 23, false, false, false);   // Av. 9 de Julio de tierra hasta la RP 10-S
+  roadLayer.addRibbon(IRIONDO_TIERRA, 6, 21, '#a98a5f', 0, false, false);   // callecita de tierra de Iriondo hasta 9 de Julio
+  mapRoads.push({ pts: IRIONDO_TIERRA, w: 6, col: '#e8d23a', y: .08 });
   // banquinas de pasto de la RP 10-S fuera del pueblo
   flat.ribbon(RP10S_E.slice(3), 16, .035, '#7d9650');
   // cruce de San Andrés y plataforma de madera en el paso a nivel oeste (el central RP 10-S se arma detallado aparte)
@@ -6160,13 +6163,27 @@ const USE_REAL_BUILDINGS = REAL_BUILDINGS.length > 0;
   addCol(455, -560, 462, -555); mapRects.push([455, -560, 462, -555, LAD]);
   for (const [x, z] of [[463.2, -552.5], [464, -553.4], [463.5, -554.6]]) cylIn(g, x, .45, z, .3, .9, '#e07a2a');
   bx(g, 465.5, 0, -551.5, 1.2, .9, .9, '#e8853a');
-  alambre(448, -543.5, 479.2, -543.5); alambre(479.2, -543.5, 479.2, -679.6);
+  alambre(448, -543.5, 479.2, -543.5); alambre(479.2, -543.5, 479.2, -627.3); alambre(479.2, -634.6, 479.2, -679.6);
   for (const [x, z, s] of [[451.5, -549, 1.2], [468, -556, 1.4], [474.5, -548.5, 1.1], [457, -566, 1.3], [470, -569, 1.0], [452, -562, .9]]) addTree(x, z, s, false, ['#3f6a2a', '#4b7a30', '#557f35', '#5a7a34']);
 
   // ===== CAMPITO hasta la diagonal de la RP 10-S =====
-  alambre(428.3, -624.6, 436.5, -629.4); alambre(436.5, -629.4, 479.2, -679.6);
+  // (la callecita de tierra corta el campito: alambrado a lo largo de ella del lado del Hogar, y la punta norte queda de pasto)
+  alambre(441, -635, 479.2, -679.6);
+  alambre(446, -624, 446, -627.2); alambre(446, -627.2, 479.2, -627.2);
   alambre(448, -543.5, 448, -570); alambre(446, -585, 446, -570); alambre(446, -570, 479.2, -570);
-  for (const [x, z, s] of [[455, -600, 1.3], [470, -612, 1.0], [462, -632, 1.2], [452, -642, 1.1], [470, -658, 1.25], [474, -590, .9]]) addTree(x, z, s, false, ['#3f6a2a', '#4b7a30', '#557f35']);
+  for (const [x, z, s] of [[455, -600, 1.3], [470, -612, 1.0], [462, -646, 1.2], [452, -640, 1.0], [470, -658, 1.25], [474, -604, .9]]) addTree(x, z, s, false, ['#3f6a2a', '#4b7a30', '#557f35']);
+
+  // ===== VEGETACIÓN TUPIDA adentro de la cuadra (para que no se vea vacía): árboles y arbustos amontonados =====
+  const VERDES = ['#3f6a2a', '#4b7a30', '#557f35', '#5a7a34', '#2f5a24', '#6b8a3e'], ARBUSTOS = ['#4a6e2c', '#5a7a34', '#3f6228', '#6b8a3e', '#557a30', '#7d8f4c'];
+  const monte = (x0, z0, x1, z1, nT, nB, excl = []) => {
+    const libre = (x, z, m) => !excl.some(([a0, b0, a1, b1]) => x > a0 - m && x < a1 + m && z > b0 - m && z < b1 + m);
+    for (let k = 0; k < nT; k++){ const x = R(x0, x1), z = R(z0, z1); if (libre(x, z, 1.5)) addTree(x, z, R(.7, 1.35), false, VERDES); }
+    for (let k = 0; k < nB; k++){ const x = R(x0, x1), z = R(z0, z1); if (libre(x, z, .6)) crowns.add(x, R(.35, .8), z, R(.8, 1.5), R(.55, 1.05), R(.8, 1.5), R(0, 6), pick(ARBUSTOS)); }
+  };
+  monte(399.5, -562, 410.5, -544.5, 6, 22);                                                        // esquina San Juan y Bolívar
+  monte(433, -584, 445.5, -564, 7, 16);                                                            // fondos detrás de la casa del portón de madera
+  monte(447, -592, 478.5, -571, 12, 24);                                                           // franja del campito pegada a los fondos
+  monte(447.5, -569, 478.5, -545, 12, 26, [[454, -561.5, 467, -549.5]]);                           // esquina de 9 de Julio, alrededor de la casita
   // fila de árboles del otro lado de la RP 10-S, en la diagonal
   for (let t = .05; t < 1; t += .16){ const x = 437.5 + 44.8 * t - .772 * 10, z = -640.8 - 53.6 * t - .636 * 10; addTree(x + R(-.6, .6), z + R(-.6, .6), R(1.0, 1.4), false, ['#2f5a24', '#3a5f2c', '#4b7a30']); }
 
