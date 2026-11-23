@@ -13,11 +13,11 @@
   #menu{position:fixed;inset:0;display:flex;align-items:center;justify-content:flex-start;padding-left:max(16px,5vw);box-sizing:border-box;z-index:50;color:#fff}
   #menu.title{background:linear-gradient(90deg,rgba(0,0,0,.45),rgba(0,0,0,0) 38%)}
   #menu.pause{background:rgba(10,18,28,.35);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-  #menu .card{background:rgba(12,22,34,.55);border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:26px 34px;width:320px;max-width:calc(100vw - 32px);box-sizing:border-box;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.35);backdrop-filter:blur(3px)}
-  #menu h1{margin:0 0 2px;font-size:52px;letter-spacing:7px;text-shadow:0 3px 12px rgba(0,0,0,.5)}
-  #menu h2{margin:0 0 14px;font-size:26px;letter-spacing:4px}
-  #menu .sub{opacity:.85;margin-bottom:20px;font-size:13px;letter-spacing:3px}
-  #menu button.mb{display:block;width:100%;margin:10px 0;padding:13px 0;font-size:20px;font-weight:700;letter-spacing:3px;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);border-radius:10px;cursor:pointer;transition:background .15s,transform .15s,color .15s}
+  #menu .card{background:rgba(12,22,34,.55);border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:26px 28px;width:340px;max-width:calc(100vw - 32px);box-sizing:border-box;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.35);backdrop-filter:blur(3px)}
+  #menu h1{margin:0 0 2px;font-size:46px;letter-spacing:6px;padding-left:6px;text-shadow:0 3px 12px rgba(0,0,0,.5)}
+  #menu h2{margin:0 0 14px;font-size:26px;letter-spacing:4px;padding-left:4px}
+  #menu .sub{opacity:.85;margin-bottom:20px;font-size:13px;letter-spacing:3px;padding-left:3px}
+  #menu button.mb{display:block;width:100%;margin:10px 0;padding:13px 0 13px 3px;font-size:20px;font-weight:700;letter-spacing:3px;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);border-radius:10px;cursor:pointer;transition:background .15s,transform .15s,color .15s}
   #menu button.mb:hover,#menu button.mb:focus-visible{background:#f2c21b;color:#1d2a38;border-color:#f2c21b;transform:scale(1.03);outline:none}
   #menu button.sm{font-size:15px;padding:9px 0;letter-spacing:2px}
   #opts{width:430px !important;text-align:left !important}
@@ -631,6 +631,7 @@ const CORDOBA_E_POLY =[[-89.6, -114.4], [-70, -114.4], [-70, -80], [-89.6, -80]]
 const BRUNET_S_POLY = [[-89.6, -39.6], [-44, -39.6], [-44, -18], [-89.6, -18]];   // Dr. Brunet lado sur, del playón de Lo del Ariga a la esquina de Córdoba con el Punto Digital (casas armadas a mano)
 const ARIGA_POLY =[[-54, -39.6], [-13.4, -39.6], [-13.4, -13], [-54, -13]];   // esquina Av. Centenario y Dr. Brunet (lado sur): vieja estación de servicio con el kiosco "Lo del Ariga" (armada a mano)
 const BRUNET_N_POLY =[[-89.6, -80], [-26, -80], [-26, -55.4], [-89.6, -55.4]];   // Dr. Brunet lado norte, de la Ferretti a la esquina de Córdoba (casas armadas a mano)
+const MANZANA_BRUNET_POLY = [[-89.6, -137], [-13.5, -137], [-13.5, -55.4], [-89.6, -55.4]];   // manzana completa Dr. Brunet / Av. Centenario / Jujuy / Córdoba (frentes e interior armados a mano)
 const JUJUY_N_POLY =[[-60.8, -137], [-13.5, -137], [-13.5, -118], [-60.8, -118]];   // Jujuy lado norte, del Banco Macro a la esquina de Av. Centenario (casas armadas a mano)
 const JUJUY_SO_POLY =[[-89.6, -172], [-56.8, -172], [-56.8, -153], [-89.6, -153]];   // Jujuy lado sur, de la Comisaría a la esquina de Córdoba (casas armadas a mano)
 const COMISARIA_POLY =[[-57.5, -172], [-40.6, -172], [-40.6, -153], [-57.5, -153]];   // Comisaría sobre Jujuy, al oeste de la Plaza Malvinas (armada a mano)
@@ -4206,7 +4207,155 @@ const GROUP_W = group, TREE_W = addTree, BUSH_W = addBush, FLAT_W = flat;
     addTree(-83.6, -52.6, 1.0, false, PELADO); addTree(-92.5, -63, .9, false, PELADO);
     bici(XC - .6, ZB + .3, Math.PI / 4);
   }
-  plazaRects.push([-89.6, -80, -26, -55.5]);   // sin árboles ni casas al azar en estos lotes
+  plazaRects.push([-89.6, -137, -13.5, -55.5]);   // cubre toda la manzana para evitar árboles o casas al azar en el interior
+}
+
+// =========================================================================
+// INTERIOR DE LA MANZANA Dr. Brunet / Av. Centenario / Jujuy / Córdoba (según foto satelital de Google Maps, ignorando el pin "Casa Arca"):
+// - Sector SO (detrás de Siglo 21 Verdulería / Dr. Brunet D-E y Córdoba C1-C3): jardín verde con pileta arriñonada celeste y solárium blanco,
+//   quincho de chapa gris, galería larga de techo rojizo detrás de Brunet C y galponcito trasero sobre Córdoba.
+// - Sector SE (detrás de Farmacia Ferretti, Dr. Brunet A-B y Av. Centenario H4-H7): patio embaldosado interno, ala de techo rojizo detrás de H6-H7,
+//   gran galpón/quincho cuadrado de techo de chapa marrón-rojiza a dos aguas (x = -48..-36.5, z = -93..-81.5) y anexo blanco detrás de H4-H5.
+// - Pulmón verde central y Sector O (detrás de la Mutual / Córdoba C4-C5): gran salón trasero blanco de la Mutual, amplio parque central de césped
+//   dividido por medianeras con árboles frondosos, pabellón de techo gris a dos aguas, ala transversal blanca y quincho en L de tejas al norte.
+// - Sector E y NE (detrás de Av. Centenario H1-H3 y Jujuy C-G): patio parquizado con segunda pileta rectangular celeste, solárium y quincho blanco,
+//   ala trasera de chapa rojiza detrás de H3, taller/galpón largo de chapa gris detrás de H1 y patios arbolados.
+// - Sector NO (detrás del Banco Macro y Jujuy A-B): anexos traseros blancos del banco, edificio gris claro de archivo, ala salmón/terracota detrás
+//   de Jujuy A ("Porto Granado") y extensión blanca con jardín y parrilla detrás de Jujuy B-C.
+// =========================================================================
+{
+  const g = group(0, 0);
+  const VERDE = ['#43702b', '#528036', '#3a6224'], COPA_OSC = ['#2f5420', '#3b6329', '#487332'];
+  const blk = (x0, z0, x1, z1, h, wallCol, roofCol = null) => {
+    const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, w = x1 - x0, d = z1 - z0;
+    bx(g, cx, 0, cz, w, h, d, wallCol);
+    if (roofCol) bx(g, cx, h, cz, w + .24, .14, d + .24, roofCol);
+    addCol(x0, z0, x1, z1);
+    mapRects.push([x0, z0, x1, z1, roofCol || wallCol]);
+  };
+  const shed2 = (x0, z0, x1, z1, h, ridgeH, wallCol, roofCol, ry = 0) => {
+    const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, w = x1 - x0, d = z1 - z0;
+    bx(g, cx, 0, cz, w, h, d, wallCol);
+    gableIn(g, cx, h, cz, (ry === 0 ? w : d) + .5, ridgeH, (ry === 0 ? d : w) + .5, roofCol, ry);
+    addCol(x0, z0, x1, z1);
+    mapRects.push([x0, z0, x1, z1, roofCol]);
+  };
+  const med = (x0, z0, x1, z1, h = 2.1, col = '#d6cfc2') => {
+    const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, w = Math.max(.22, x1 - x0), d = Math.max(.22, z1 - z0);
+    bx(g, cx, 0, cz, w, h, d, col);
+    addCol(x0, z0, x1, z1);
+  };
+
+  // --- 1) Suelos base de los patios internos (césped en distintos tonos y patios embaldosados) ---
+  flat.rect(-78.0, -125.5, -25.2, -69.2, .032, '#5e883c');                       // base general de pasto del pulmón
+  flat.rect(-69.0, -111.5, -52.5, -85.0, .036, '#679444');                       // gran parque verde central
+  for (let z = -110; z < -86; z += 3.2) flat.rect(-68.6, z, -53.0, z + 1.5, .038, '#5b863a');   // franjas de césped cortado en el parque central
+  flat.rect(-77.5, -84.5, -58.0, -69.5, .036, '#628e40');                        // jardín SO de la pileta arriñonada (detrás de Siglo 21)
+  flat.rect(-46.5, -111.5, -31.8, -95.5, .036, '#659243');                       // jardín E de la segunda pileta rectangular
+  flat.rect(-40.0, -79.5, -25.5, -63.5, .042, '#c8c2b6');                        // patio embaldosado SE detrás de Farmacia Ferretti y KECO QUETA
+  flat.rect(-35.5, -112.0, -25.5, -94.0, .042, '#c2bbb0');                       // patio interno detrás de Av. Centenario H2-H3
+  flat.rect(-36.2, -95.5, -25.5, -80.0, .042, '#beb7ab');                        // patio interno detrás de Av. Centenario H4-H5
+  flat.rect(-88.5, -114.5, -75.0, -106.0, .042, '#b9b4aa');                      // playón trasero de servicio del Banco Macro
+  flat.rect(-60.9, -125.0, -51.0, -112.5, .042, '#b86b4b');                      // patio color terracota detrás de Jujuy A
+
+  // --- 2) Sector SO (detrás de "Siglo 21 Verdulería" / Dr. Brunet C-E y Córdoba C1-C3) ---
+  // Pileta arriñonada/ovalada celeste con solárium blanco (x ≈ -68.2, z ≈ -76.2)
+  {
+    const pg = group(-68.2, -76.2, .38);
+    // solárium blanco con puntas redondeadas
+    bx(pg, 0, .02, 0, 4.1, .06, 6.2, '#ebe7dd');
+    cylIn(pg, 0, .05, -2.9, 2.05, .06, '#ebe7dd');
+    cylIn(pg, 0, .05, 2.9, 2.05, .06, '#ebe7dd');
+    // espejo de agua celeste
+    bx(pg, 0, .05, 0, 3.1, .06, 5.4, '#36a6de');
+    cylIn(pg, 0, .08, -2.5, 1.55, .06, '#36a6de');
+    cylIn(pg, 0, .08, 2.5, 1.55, .06, '#36a6de');
+    mapRects.push([-70.4, -79.6, -66.0, -72.8, '#36a6de']);
+  }
+  // Quincho de techo de chapa gris junto a la pileta SO (x = -65.5..-61.5, z = -82.2..-76.0)
+  shed2(-65.5, -82.2, -61.5, -76.0, 2.9, .75, '#e8e4da', '#9aa0a6', Math.PI / 2);
+  // Galería/ala larga de techo de chapa rojiza detrás de Dr. Brunet C (x = -58.0..-53.0, z = -79.5..-70.5)
+  blk(-58.0, -79.5, -53.0, -70.5, 3.1, '#d8cec0', '#a4523d');
+  // Galponcito trasero de chapa detrás de Dr. Brunet E y Córdoba C1-C2 (x = -81.0..-75.5, z = -76.5..-69.5 y x = -77.5..-72.0, z = -85.5..-80.2)
+  blk(-81.0, -76.5, -75.5, -69.5, 3.2, '#cfc9bc', '#8f9498');
+  blk(-77.5, -85.5, -72.0, -80.2, 3.0, '#dcd6c8', '#7d8488');
+
+  // --- 3) Sector SE (detrás de Farmacia Ferretti, Dr. Brunet A-B y Av. Centenario H4-H7) ---
+  // Ala trasera de techo rojizo detrás de H6 y H7 (x = -32.5..-25.5, z = -75.5..-64.5)
+  shed2(-32.5, -75.5, -25.5, -64.5, 3.4, .85, '#e6e0d4', '#a64e38', Math.PI / 2);
+  // Anexo interno blanco de techo plano detrás de Dr. Brunet A ("KECO QUETA") (x = -39.5..-32.8, z = -77.5..-69.5)
+  blk(-39.5, -77.5, -32.8, -69.5, 3.3, '#eceae2', '#d8d4c8');
+  // Gran galpón/quincho cuadrado de techo marrón-rojizo a dos aguas en el corazón SE (x = -48.2..-36.4, z = -93.2..-81.2)
+  shed2(-48.2, -93.2, -36.4, -81.2, 3.5, 1.35, '#d9cfc0', '#8c4a36', 0);
+  // Extensión trasera blanca de techo plano detrás de Av. Centenario H4-H5 (x = -31.8..-25.5, z = -89.5..-80.5)
+  blk(-31.8, -89.5, -25.5, -80.5, 3.2, '#f0eee8', '#dcd8ce');
+
+  // --- 4) Pulmón Verde Central y Sector O (detrás de la Mutual / Córdoba C4-C5) ---
+  // Gran salón trasero blanco de losa plana de la Mutual (x = -77.5..-69.0, z = -106.2..-93.2)
+  blk(-77.5, -106.2, -69.0, -93.2, 3.8, '#f2f0ea', '#dfdcd2');
+  for (const [ax, az] of [[-74.5, -102.5], [-72.0, -97.0]]) bx(g, ax, 3.94, az, 1.1, .55, .8, '#c8ccd0');   // equipos de aire en la azotea de la Mutual
+  // Quincho en L con techo de tejas/chapa terracota al norte del parque central (x = -59.5..-46.8, z = -109.8..-102.0)
+  blk(-59.5, -109.8, -53.0, -104.8, 3.0, '#eeeae0', '#b2583c');
+  shed2(-53.0, -109.8, -46.8, -102.0, 3.1, .95, '#eeeae0', '#b2583c', Math.PI / 2);
+
+  // --- 5) Sector E y NE (segunda pileta detrás de Av. Centenario H1-H3 y Jujuy C-G) ---
+  // Pileta rectangular celeste con borde atérmico blanco (x = -42.4..-36.6, z = -104.4..-100.8)
+  flat.rect(-43.1, -105.1, -35.9, -100.1, .048, '#eeeae0');
+  flat.rect(-42.4, -104.4, -36.6, -100.8, .056, '#2d9fe0');
+  mapRects.push([-42.4, -104.4, -36.6, -100.8, '#2d9fe0']);
+  // Quincho blanco con parrilla junto a la pileta E (x = -46.3..-41.5, z = -109.5..-105.4)
+  blk(-46.3, -109.5, -41.5, -105.4, 2.9, '#f2f0ea', '#dcd8ce');
+  bx(g, -45.6, 2.9, -108.8, .75, 1.3, .75, '#9a543e');                           // chimenea de la parrilla
+  // Ala trasera de techo rojizo detrás de Av. Centenario H3 (x = -31.8..-25.5, z = -105.2..-95.5) y cuartito blanco detrás de H2
+  shed2(-31.8, -105.2, -25.5, -95.5, 3.3, .85, '#e2dad0', '#a6503a', Math.PI / 2);
+  blk(-31.2, -111.8, -25.5, -106.5, 3.0, '#f0eee8', '#d6d2c8');
+  // Galpón/taller largo de chapa gris detrás de Av. Centenario H1 y esquina G (x = -28.8..-21.4, z = -125.0..-112.0)
+  shed2(-28.8, -125.0, -21.4, -112.0, 3.5, .95, '#d4d0c8', '#9ea4aa', Math.PI / 2);
+  // Ala trasera blanca/crema detrás de Jujuy D-E (x = -41.2..-33.0, z = -125.0..-118.2)
+  blk(-41.2, -125.0, -33.0, -118.2, 3.4, '#e8e0d2', '#c8c0b2');
+
+  // --- 6) Sector NO (detrás del Banco Macro y Jujuy A-C) ---
+  // Anexos blancos de techo plano detrás del Banco Macro (x = -88.2..-76.2, z = -114.2..-109.5 y x = -80.8..-76.2, z = -109.5..-106.2)
+  blk(-88.2, -114.2, -76.2, -109.5, 3.5, '#f0eee8', '#dcd8ce');
+  blk(-80.8, -109.5, -76.2, -106.2, 3.0, '#eceae4', '#d4d0c6');
+  // Volumen gris claro de 1 planta alta al este del Banco Macro (x = -74.5..-61.2, z = -132.0..-120.2)
+  shed2(-74.5, -132.0, -61.2, -120.2, 4.2, 1.1, '#e6e4de', '#b6bcc2', 0);
+  // Ala trasera salmón/terracota detrás de Jujuy A ("Porto Granado") (x = -58.2..-51.6, z = -125.0..-113.2)
+  shed2(-58.2, -125.0, -51.6, -113.2, 3.0, .8, '#e49c76', '#9c523c', Math.PI / 2);
+  // Extensión trasera blanca con galería detrás de Jujuy B y C (x = -50.8..-43.5, z = -125.0..-117.5)
+  blk(-50.8, -125.0, -43.5, -117.5, 3.1, '#f2f0ea', '#dedad0');
+
+  // --- 7) Red de medianeras internas (muros divisorios de ladrillo y revoque entre los lotes) ---
+  // Medianeras horizontales (este-oeste)
+  med(-77.5, -111.6, -25.5, -111.35, 2.15, '#d4cdc0');
+  med(-77.5, -106.3, -60.9, -106.05, 2.2, '#b87458');
+  med(-69.0, -85.2, -25.5, -84.95, 2.1, '#cfc8ba');
+  med(-77.5, -80.2, -53.0, -79.95, 2.05, '#c28268');
+  med(-46.5, -95.6, -25.5, -95.35, 2.1, '#d8d2c6');
+  // Medianeras verticales (norte-sur)
+  med(-69.1, -111.5, -68.85, -80.0, 2.15, '#cfc7b8');
+  med(-61.0, -125.0, -60.75, -106.0, 2.15, '#c48066');
+  med(-53.2, -111.5, -52.95, -70.0, 2.1, '#d6cfc2');
+  med(-46.6, -125.0, -46.35, -95.5, 2.1, '#cbc3b4');
+  med(-40.1, -81.2, -39.85, -69.5, 2.05, '#d4cdc0');
+  med(-35.6, -111.5, -35.35, -95.5, 2.05, '#c8886e');
+
+  // --- 8) Arboleda tupida del pulmón de manzana (según las copas verdes oscuras de la foto satelital) ---
+  for (const [tx, tz, ts, col] of [
+    [-65.8, -96.8, 1.45, COPA_OSC], [-63.2, -90.5, 1.35, VERDE], [-67.0, -87.8, 1.25, COPA_OSC],
+    [-57.8, -110.2, 1.3, VERDE],    [-65.5, -113.5, 1.35, COPA_OSC], [-71.8, -115.2, 1.2, VERDE],
+    [-43.8, -97.5, 1.35, COPA_OSC], [-34.8, -108.2, 1.4, COPA_OSC],  [-33.8, -98.2, 1.25, VERDE],
+    [-42.5, -115.8, 1.25, VERDE],   [-48.0, -114.0, 1.2, COPA_OSC],  [-35.2, -114.8, 1.35, COPA_OSC],
+    [-30.5, -119.5, 1.3, VERDE],    [-72.0, -88.5, 1.3, COPA_OSC],   [-70.2, -82.8, 1.25, VERDE],
+    [-72.8, -75.2, 1.25, COPA_OSC], [-60.0, -76.5, 1.3, VERDE],      [-55.8, -82.8, 1.35, COPA_OSC],
+    [-44.2, -76.2, 1.25, VERDE],    [-35.0, -78.8, 1.15, VERDE]
+  ]) addTree(tx, tz, ts, false, col);
+
+  for (const [bx0, bz0, bs] of [
+    [-68.0, -104.5, .85], [-64.5, -86.2, .75], [-45.2, -102.5, .8],
+    [-38.0, -109.5, .75], [-66.5, -71.5, .8],  [-59.5, -83.5, .75],
+    [-50.5, -113.0, .8],  [-62.5, -116.5, .85]
+  ]) addBush(bx0, bz0, bs, 0);
 }
 // (la Farmacia Ferretti se arma a mano en la esquina de Av. Centenario y Dr. Brunet, en el bloque "Av. Centenario lado oeste, de Jujuy a Dr. Brunet")
 civic(-33.5385018, -60.8039401, { w: 9, d: 13, wall: '#eef3ee', trim: '#21b24b', sign: 'FARMACIA CIALONI', signBg: '#ffffff', signFg: '#118a3a', label: 'Farm. Cialoni', extra: (g, w) => greenCross(g, w/2 - .6, 2.6) });
@@ -5214,7 +5363,7 @@ const USE_REAL_BUILDINGS = REAL_BUILDINGS.length > 0;
     if (pts.length < 3) continue;
     { const [qx, qz] = polyCenter(pts);   // la Cooperativa y la Plazoleta del Inmigrante se arman aparte
       if (inPoly(qx, qz, COOP_POLY)){ COOP_FP.push(pts); continue; }
-      if (inPoly(qx, qz, PLAZA_INM) || inPoly(qx, qz, AGUA_POLY) || inPoly(qx, qz, CENT_EAST_POLY) || inPoly(qx, qz, MALV_POLY) || inPoly(qx, qz, TERM_POLY) || inPoly(qx, qz, QUINTA_POLY) || inPoly(qx, qz, GALP26_POLY) || inPoly(qx, qz, SANLUIS_E_POLY) || inPoly(qx, qz, ENTRERIOS_O_POLY) || inPoly(qx, qz, JUJUY_S_POLY) || inPoly(qx, qz, CASITAS_COOP_POLY) || inPoly(qx, qz, CASA1070_POLY) || inPoly(qx, qz, CORREO_N_POLY) || inPoly(qx, qz, DIABLITO_S_POLY) || inPoly(qx, qz, COMISARIA_POLY) || inPoly(qx, qz, JUJUY_SO_POLY) || inPoly(qx, qz, JUJUY_N_POLY) || inPoly(qx, qz, AVC_O_POLY) || inPoly(qx, qz, BRUNET_N_POLY) || inPoly(qx, qz, ARIGA_POLY) || inPoly(qx, qz, BRUNET_S_POLY) || inPoly(qx, qz, CORDOBA_E_POLY) || inPoly(qx, qz, ESCEN_N_POLY) || inPoly(qx, qz, ESCEN_E_POLY) || inPoly(qx, qz, MONG_POLY) || inPoly(qx, qz, MONG_S_POLY) || inPoly(qx, qz, CORD_BOMB_POLY) || inPoly(qx, qz, MUSEO_POLY) || inPoly(qx, qz, BOMB_N_POLY) || inPoly(qx, qz, SAGARDUY_POLY) || inPoly(qx, qz, LAV25_POLY) || inPoly(qx, qz, LAV25_E_POLY) || inPoly(qx, qz, ACOPIO_POLY) || inPoly(qx, qz, HOGAR_POLY)){ skipped++; continue; } }
+      if (inPoly(qx, qz, PLAZA_INM) || inPoly(qx, qz, AGUA_POLY) || inPoly(qx, qz, CENT_EAST_POLY) || inPoly(qx, qz, MALV_POLY) || inPoly(qx, qz, TERM_POLY) || inPoly(qx, qz, QUINTA_POLY) || inPoly(qx, qz, GALP26_POLY) || inPoly(qx, qz, SANLUIS_E_POLY) || inPoly(qx, qz, ENTRERIOS_O_POLY) || inPoly(qx, qz, JUJUY_S_POLY) || inPoly(qx, qz, CASITAS_COOP_POLY) || inPoly(qx, qz, CASA1070_POLY) || inPoly(qx, qz, CORREO_N_POLY) || inPoly(qx, qz, DIABLITO_S_POLY) || inPoly(qx, qz, COMISARIA_POLY) || inPoly(qx, qz, JUJUY_SO_POLY) || inPoly(qx, qz, JUJUY_N_POLY) || inPoly(qx, qz, AVC_O_POLY) || inPoly(qx, qz, BRUNET_N_POLY) || inPoly(qx, qz, MANZANA_BRUNET_POLY) || inPoly(qx, qz, ARIGA_POLY) || inPoly(qx, qz, BRUNET_S_POLY) || inPoly(qx, qz, CORDOBA_E_POLY) || inPoly(qx, qz, ESCEN_N_POLY) || inPoly(qx, qz, ESCEN_E_POLY) || inPoly(qx, qz, MONG_POLY) || inPoly(qx, qz, MONG_S_POLY) || inPoly(qx, qz, CORD_BOMB_POLY) || inPoly(qx, qz, MUSEO_POLY) || inPoly(qx, qz, BOMB_N_POLY) || inPoly(qx, qz, SAGARDUY_POLY) || inPoly(qx, qz, LAV25_POLY) || inPoly(qx, qz, LAV25_E_POLY) || inPoly(qx, qz, ACOPIO_POLY) || inPoly(qx, qz, HOGAR_POLY)){ skipped++; continue; } }
     const area = Math.abs(polyArea(pts));
     let bo = obb(pts);
     if (!cls && (area < 28 || !bo || Math.min(bo.len, bo.wid) < 3.4)){ skipped++; continue; }
@@ -7646,7 +7795,7 @@ function buildBlockPatiosAndWalls(){
     [13, -432, 62, -398]      // Comuna extendida
   ];
   // lotes armados a mano (casa de 25 de Mayo 1070 con canchita y baldío, casas de San Luis / Entre Ríos / Jujuy): sin medianeras ni patios automáticos encima
-  const HAND_LOTS = [CASA1070_POLY, SANLUIS_E_POLY, ENTRERIOS_O_POLY, JUJUY_S_POLY, CORREO_N_POLY, DIABLITO_S_POLY, COMISARIA_POLY, JUJUY_SO_POLY, JUJUY_N_POLY, AVC_O_POLY, BRUNET_N_POLY, ARIGA_POLY, BRUNET_S_POLY, CORDOBA_E_POLY, ESCEN_N_POLY, ESCEN_E_POLY, MONG_POLY, MONG_S_POLY, CORD_BOMB_POLY, MUSEO_POLY, BOMB_N_POLY, SAGARDUY_POLY, LAV25_POLY, LAV25_E_POLY, ACOPIO_POLY, HOGAR_POLY];
+  const HAND_LOTS = [CASA1070_POLY, SANLUIS_E_POLY, ENTRERIOS_O_POLY, JUJUY_S_POLY, CORREO_N_POLY, DIABLITO_S_POLY, COMISARIA_POLY, JUJUY_SO_POLY, JUJUY_N_POLY, AVC_O_POLY, BRUNET_N_POLY, MANZANA_BRUNET_POLY, ARIGA_POLY, BRUNET_S_POLY, CORDOBA_E_POLY, ESCEN_N_POLY, ESCEN_E_POLY, MONG_POLY, MONG_S_POLY, CORD_BOMB_POLY, MUSEO_POLY, BOMB_N_POLY, SAGARDUY_POLY, LAV25_POLY, LAV25_E_POLY, ACOPIO_POLY, HOGAR_POLY];
   const inExcl = (x, z) => CIVIC_EXCL.some(r => x > r[0] && x < r[2] && z > r[1] && z < r[3]) || HAND_LOTS.some(p => inPoly(x, z, p));
   const ptFree = (x, z) => !!region(...AB(x, z), 0) && !pointOnRoad(x, z) && !inPlaza(x - .5, z - .5, x + .5, z + .5) && !inOsmPark(x, z) && !inRailZone(x, z) && !inExcl(x, z);
   const segClear = (x0, z0, x1, z1, pad) => ptFree((x0 + x1) / 2, (z0 + z1) / 2) && ptFree(x0, z0) && ptFree(x1, z1) && !overlap(x0 - pad, z0 - pad, x1 + pad, z1 + pad);
