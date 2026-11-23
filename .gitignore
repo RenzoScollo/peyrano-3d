@@ -1,0 +1,11 @@
+# Exportaciones de Roblox (excluidas del repo)
+*.rbxlx
+*.rbxl
+
+# Backups locales
+*.backup*.html
+
+# Capturas y archivos del sistema
+Captura.PNG
+.DS_Store
+Thumbs.db
