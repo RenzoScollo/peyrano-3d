@@ -752,7 +752,7 @@ function classify(s){
   if (s.axis === 'A'){
     if (s.v === 195) return b <= 300 ? 'main' : 'paved';
     if (s.v === 78)  return b < 117 ? 'gAve' : 'pAve';
-    if (s.v === 312) return 'gAve';
+    if (s.v === 312) return b < 39 ? 'dirt' : 'gAve';   // Bv. Constitución: entre Bolívar e Iriondo es una calle de tierra simple
     if (s.v === 0 || s.v === AMAX) return 'gravel';
   } else {
     if (s.v === 117) return a < 117 ? 'gAve' : (a <= 234 ? 'pAve' : 'gAve');
@@ -6189,6 +6189,75 @@ const USE_REAL_BUILDINGS = REAL_BUILDINGS.length > 0;
 
   plazaRects.push([398, -624.5, 479.5, -543]); plazaRects.push([428, -680, 479.5, -624.5]);
   ruralExcl.push([395, -700, 495, -540]);
+}
+
+// =========================================================================
+// CUADRAS DE IRIONDO (RP 10-S) ENTRE MENDOZA Y SAN JUAN, hasta Bolívar — satélite del usuario
+// Las casas son las huellas reales de Overture (quedan como están); acá va lo que las rodea:
+//  · Mendoza–Constitución: casi todo un campito de pasto, con una zona de pastizal alto y matorrales hacia Constitución,
+//    árboles junto a las casas de Mendoza, tierra pelada con cachivaches al lado de la casa de Bolívar y un cuadrado
+//    cercado con una casilla cerca de la esquina de Constitución y Bolívar.
+//  · Constitución–San Juan: un monte tupido de árboles en el medio, entre las casas; tierra pelada en la esquina de
+//    Constitución y Bolívar, pasto abierto sobre Constitución, San Juan y Bolívar.
+//  · Del otro lado de la RP 10-S, una hilera de árboles a lo largo de la ruta.
+// =========================================================================
+{
+  const g = group(0, 0);
+  const VERDES = ['#3f6a2a', '#4b7a30', '#557f35', '#5a7a34', '#2f5a24', '#34552b'], ARBUSTOS = ['#4a6e2c', '#5a7a34', '#3f6228', '#6b8a3e', '#557a30', '#7d8f4c'];
+  // casas reales de estas dos cuadras (con margen) para no plantar nada encima
+  const casas = [];
+  for (const [, , , p] of REAL_BUILDINGS){
+    let x0 = 1e9, z0 = 1e9, x1 = -1e9, z1 = -1e9;
+    for (let k = 0; k < p.length; k += 2){ x0 = Math.min(x0, p[k]); x1 = Math.max(x1, p[k]); z0 = Math.min(z0, p[k + 1]); z1 = Math.max(z1, p[k + 1]); }
+    const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
+    if (cx > 195 && cx < 390 && cz > -632.5 && cz < -535) casas.push([x0, z0, x1, z1]);
+  }
+  const monte = (x0, z0, x1, z1, nT, nB, excl = [], sMin = .75, sMax = 1.35) => {
+    const ex = excl.concat(casas);
+    const libre = (x, z, m) => !ex.some(([a0, b0, a1, b1]) => x > a0 - m && x < a1 + m && z > b0 - m && z < b1 + m);
+    for (let k = 0; k < nT; k++){ const x = R(x0, x1), z = R(z0, z1); if (libre(x, z, 2.5)) addTree(x, z, R(sMin, sMax), false, VERDES); }
+    for (let k = 0; k < nB; k++){ const x = R(x0, x1), z = R(z0, z1); if (libre(x, z, 1)) crowns.add(x, R(.35, .8), z, R(.8, 1.6), R(.55, 1.05), R(.8, 1.6), R(0, 6), pick(ARBUSTOS)); }
+  };
+  const manchas = (x0, z0, x1, z1, n, cols, w0 = 2, w1 = 6) => { for (let k = 0; k < n; k++){ const x = R(x0, x1 - w0), z = R(z0, z1 - w0); flat.rect(x, z, Math.min(x1, x + R(w0, w1)), Math.min(z1, z + R(w0, w1)), .052, pick(cols)); } };
+
+  // ===== MENDOZA – CONSTITUCIÓN (lotes x 203..284.5) =====
+  flat.rect(203, -624.5, 284.5, -543, .045, '#76a04a');
+  manchas(240, -612, 284, -556, 26, ['#4f7a32', '#5a8236', '#466e2c', '#628a3a'], 3, 9);   // pastizal alto, más oscuro
+  manchas(206, -620, 280, -548, 14, ['#86ad56', '#7fa650', '#8ab05a']);
+  for (let k = 0; k < 40; k++){ const x = R(242, 283), z = R(-612, -556); crowns.add(x, .25, z, R(.5, 1.1), R(.25, .5), R(.5, 1.1), R(0, 6), pick(['#5a7a34', '#6b8a3e', '#4f7030', '#7d8f4c'])); }   // matas de pastizal
+  monte(244, -608, 283, -560, 6, 16);                                         // matorrales sueltos y algunos árboles en el pastizal
+  monte(203.5, -588, 216, -545, 7, 10);                                       // árboles junto a las casas de Mendoza
+  monte(203.5, -624, 232, -612, 3, 6);
+  flat.rect(217, -557, 225, -546, .06, '#7a6a52');                            // tierra pelada con cachivaches al lado de la casa de Bolívar
+  for (const [x, z, sx, sy, sz, c] of [[219, -552, 1.4, .5, .9, '#6a6e72'], [221.5, -549.5, .9, .9, .9, '#8a5a3a'], [219.8, -555, 2, .3, 1.2, '#7a7d80'], [223, -553.5, .6, .8, .6, '#3a5fa0']]) bx(g, x, 0, z, sx, sy, sz, c);
+  addCol(218.3, -556, 223.5, -548.5);
+  // cuadrado cercado con la casilla (murito blanco y tejido)
+  { const X0 = 262, X1 = 280, Z0 = -557.5, Z1 = -543.6;
+    flat.rect(X0, Z0, X1, Z1, .058, '#a9a596');
+    for (const [a, b, c, d] of [[X0, Z0, X1, Z0], [X0, Z1, X1, Z1], [X0, Z0, X0, Z1], [X1, Z0, X1, Z1]]){
+      const along = a !== c, len = along ? c - a : d - b, mx = (a + c) / 2, mz = (b + d) / 2;
+      bx(g, mx, 0, mz, along ? len : .2, .45, along ? .2 : len, '#e8e6df');
+      bx(g, mx, 1.9, mz, along ? len : .04, .04, along ? .04 : len, '#8f918e');
+      for (let t = 0; t <= len; t += 2.5) poles.add(along ? a + t : a, 0, along ? b : b + t, .07, 1.95, .07, 0, '#8f918e');
+      bx(g, mx, .45, mz, along ? len : .015, 1.45, along ? .015 : len, '#9aa0a0');
+      addCol(Math.min(a, c) - .12, Math.min(b, d) - .12, Math.max(a, c) + .12, Math.max(b, d) + .12);
+    } }
+
+  // ===== CONSTITUCIÓN – SAN JUAN (lotes x 300.5..382) =====
+  flat.rect(300.5, -624.5, 382, -543, .045, '#72a048');
+  manchas(312, -612, 372, -552, 22, ['#4a7230', '#557a34', '#3f6a2a'], 4, 10);   // sombra del monte
+  flat.rect(306.5, -557, 321, -543.5, .06, '#8a6e50');                         // tierra pelada de la esquina de Constitución y Bolívar
+  manchas(304, -556, 324, -544, 5, ['#7a6248', '#94785a']);
+  monte(312, -611, 372, -553, 52, 60, [[306.5, -557, 321, -543.5]], .85, 1.5);  // el monte del medio
+  monte(301, -624, 330, -614, 6, 10);                                         // árboles cerca de la esquina de Iriondo
+  monte(322, -551, 342, -544, 5, 8);                                          // árboles sobre Bolívar
+  monte(342, -624, 372, -614, 5, 8);                                          // entre las casas de Iriondo
+  manchas(301, -620, 311, -560, 6, ['#86ad56', '#8ab05a']);                    // pasto abierto sobre Constitución
+  manchas(346, -555, 381, -544, 8, ['#86ad56', '#8ab05a', '#7fa650']);         // pasto abierto sobre Bolívar y San Juan
+
+  // ===== hilera de árboles del otro lado de la RP 10-S =====
+  for (let x = 197; x < 418; x += R(4.5, 6.5)) addTree(x, -643.5 + R(-1.2, 1.2), R(1.0, 1.45), false, ['#2f5a24', '#3a5f2c', '#34552b', '#4b7a30']);
+  ruralExcl.push([190, -660, 420, -535]);
 }
 
 // Plazoleta del Inmigrante (inaugurada en 1991, renovada por la Escuela Secundaria y la Comuna)
