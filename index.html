@@ -602,7 +602,7 @@ const CASA1070_POLY = [[-480, -430], [-434, -430], [-434, -383], [-480, -383]]; 
 const LAV25_POLY = [[-480, -386], [-449, -386], [-449, -350.4], [-480, -350.4]];   // esquina Av. 25 de Mayo y Bv. Lavalle (lado norte): casa de ladrillo con cipreses y pileta (armada a mano)
 const LAV25_E_POLY = [[-449, -386], [-437, -386], [-437, -350.4], [-449, -350.4]];   // Bv. Lavalle lado norte, al lado de la esquina de 25 de Mayo: casa del cartel VENDO (armada a mano)
 const ACOPIO_POLY = [[-437.5, -405.5], [-398.5, -405.5], [-398.5, -350.4], [-437.5, -350.4]];   // planta de acopio de Bv. Lavalle y Buenos Aires: galpón, silos y maquinaria (armada a mano)
-const BRUNET_IND_POLY = [[-282, -39.5], [-257, -39.5], [-257, -8], [-282, -8]];   // Dr. Brunet lado sur, de la escuela a la esquina de Bv. Independencia (cerco de piedra, chalet de techo azul, esquina con tuyas)
+const BRUNET_IND_POLY = [[-282, -39.5], [-257, -39.5], [-257, -16.5], [-282, -16.5]];   // Dr. Brunet lado sur, de la escuela a la esquina de Bv. Independencia (cerco de piedra, chalet de techo azul, esquina con tuyas)
 const ESC_BRUNET_POLY = [[-257, -39.5], [-203, -39.5], [-203, -25.5], [-231, -25.5], [-231, -8], [-257, -8]];   // Escuela Secundaria sobre Dr. Brunet y casas hasta la esquina de Santa Fe (armadas a mano)
 const CENT_BOL_POLY = [[13.5, -582], [47, -582], [47, -543], [13.5, -543]];   // Av. Centenario lado este, de la Shell a la esquina de Bolívar (casas armadas a mano)
 const SHELL_POLY = [[12, -628], [89.5, -628], [89.5, -582], [12, -582]];   // Shell de Av. Centenario e Iriondo y patio de camiones hasta Entre Ríos (armado a mano)
@@ -735,7 +735,7 @@ const ST = {
 const CAR_OPEN = [[8.8, -624.5, 13.7, -586],
   [13.5, -630, 67, -624],   // playón de la Shell abierto sobre Iriondo
   [8.5, -584.9, 13.7, -579.2],   // portón de chapa al lado de la Shell sobre Av. Centenario
-  [-214.8, -43.5, -211.6, -39.5], [-253.1, -43.5, -250.1, -39.5], [-270.2, -43.5, -266.2, -39.5],   // portones de Dr. Brunet: chapa blanco cerca de Santa Fe, garaje de la casa blanca y portón de madera   // portón de chapa blanco de Dr. Brunet, cerca de la esquina de Santa Fe
+  [-214.8, -43.5, -211.6, -39.5], [-253.1, -43.5, -250.1, -39.5], [-266.2, -43.5, -263.2, -39.5],   // portones de Dr. Brunet: chapa blanco cerca de Santa Fe, garaje de la casa blanca y portón de madera   // portón de chapa blanco de Dr. Brunet, cerca de la esquina de Santa Fe
   // portones de garaje / pasillos de autos (sin cordón enfrente): Dr. Brunet lado norte y Av. Centenario lado oeste (Jujuy–Brunet)
   [-72.3, -56, -68.7, -49.5], [-42.8, -56, -39.8, -49.5],
   [-14, -115.3, -8.5, -113.5], [-14, -106.2, -8.5, -103.6], [-14, -99.6, -8.5, -96.8], [-14, -96.4, -8.5, -93.6],
@@ -5379,14 +5379,16 @@ civic(-33.5402056, -60.8084540, { w: 26, d: 16, wall: '#f1ead8', trim: '#e4d9bf'
 }
 
 // Dr. Brunet lado sur, de la Escuela Secundaria hacia el oeste hasta la esquina de Bv. Independencia, y doblando por Independencia
-// (fotos de Street View + satelital del usuario):
+// (fotos de Street View + dibujo del usuario sobre el satelital):
 //  · casa blanca pegada a la escuela: portón de garaje blanco, ventanita con reja, entrada metida con reja y farol, planta alta retirada
-//  · cerco de pilares y zócalo de piedra con paños de tablas de madera de remate curvo, portón grande de madera con placa y faroles;
-//    atrás el chalet de madera con techo azul, palmera y mucho verde; casita de madera de techo azul sobre la vereda y un bolsón
-//  · tapial blanco y la esquina: murito de ladrillo con tejido, pilares de ladrillo, portón de hierro trabajado y tuyas;
-//    por Independencia sigue el tejido con otro portón de hierro y el cartel amarillo de "Lomo de burro 50 mts"
+//  · terreno de la casa de techo azul, en L alrededor del terreno de la esquina: sale a Brunet (cerco de pilares y zócalo de piedra con
+//    tablas de madera y el portón grande con faroles) y a Bv. Independencia (tejido con portón de hierro); chalet de madera con techo azul
+//  · terreno de la esquina, ajeno a la casa y medio abandonado: tapial blanco y tejido con murito de ladrillo, portón de hierro trabajado,
+//    tuyas crecidas, yuyos y un tinglado de chapa en la esquinita contra la casa; cartel amarillo de "Lomo de burro 50 mts"
 {
   const g = group(0, 0), ZF = -39.5, XI = -282;   // líneas municipales de Dr. Brunet (sur) y de Bv. Independencia (este)
+  const XR = -269.5, ZR = -27.5;                 // límites del terreno de la esquina (hacia el este y hacia el sur)
+  const XB = -259.5, ZBk = -16.8;                // fondo del terreno de la casa azul (casa blanca de al lado / fondo sobre Independencia)
   const hsh = k => { const s = Math.sin(k * 33.7 + 4.9) * 43758.5453; return s - Math.floor(s); };
   const arbol = (x, z, s, cols, k) => {
     const th = 2.4 * s, cr = 2.4 * s * (.88 + hsh(k) * .25);
@@ -5395,10 +5397,9 @@ civic(-33.5402056, -60.8084540, { w: 26, d: 16, wall: '#f1ead8', trim: '#e4d9bf'
     crowns.add(x + (hsh(k + 5) - .5) * 1.6 * s, th + cr * 1.2, z + (hsh(k + 9) - .5) * 1.6 * s, cr * .7, cr * .7, cr * .7, hsh(k + 11) * 6, cols[(k + 1) % cols.length]);
     addCol(x - .3 * s, z - .3 * s, x + .3 * s, z + .3 * s);
   };
-  const tuya = (x, z, h, k) => { trunks.add(x, 0, z, .25, .8, .25, 0, '#5b4632'); crowns.add(x, h * .42 + .3, z, 1.25, h * .45, 1.25, hsh(k) * 6, '#4f7a35'); crowns.add(x + .2, h * .75, z - .1, .85, h * .25, .85, 1, '#5a8540'); addCol(x - .4, z - .4, x + .4, z + .4); };
+  const tuya = (x, z, h, k) => { trunks.add(x, 0, z, .25, .8, .25, 0, '#5b4632'); crowns.add(x, h * .42 + .3, z, 1.25 + hsh(k + 20) * .4, h * .45, 1.25 + hsh(k + 21) * .4, hsh(k) * 6, '#4f7a35'); crowns.add(x + .2, h * .75, z - .1, .85, h * .25, .85, 1, '#5a8540'); addCol(x - .4, z - .4, x + .4, z + .4); };
   const reja = (x0, x1, z, y0, h, col = '#2a2626') => { for (let x = x0 + .1; x < x1; x += .14) bx(g, x, y0, z, .03, h, .03, col); bx(g, (x0 + x1) / 2, y0 + h - .04, z, x1 - x0, .05, .05, col); };
   const farol = (p, x, y, z) => { bx(p, x, y, z, .28, .38, .28, '#2b2b2b'); bx(p, x, y + .05, z, .22, .28, .22, '#f3ead0'); bx(p, x, y + .38, z, .34, .06, .34, '#2b2b2b'); };
-  // piedras sueltas sobre una cara (a lo largo de x), para pilares y zócalos
   const PIEDRA = ['#b7a58c', '#c8b9a2', '#9c8a72', '#d4c6ae', '#a8957b', '#8c7a63'];
   const piedras = (x0, x1, z, y0, y1, k0, zs = -1) => {
     const n = Math.round((x1 - x0) * (y1 - y0) * 5);
@@ -5408,13 +5409,13 @@ civic(-33.5402056, -60.8084540, { w: 26, d: 16, wall: '#f1ead8', trim: '#e4d9bf'
 
   // vereda de pasto con caminitos de cemento (como en las fotos)
   flat.rect(XI, -43, -250, ZF, .2062, '#6f9a47');
-  for (const [a, b] of [[-269.8, -266.6], [-258.6, -257.2], [-256.4, -252.2]]) flat.rect(a, -43, b, ZF, .2072, '#c8c3b8');
+  for (const [a, b] of [[-265.8, -263.2], [-258.6, -257.2], [-256.4, -252.2]]) flat.rect(a, -43, b, ZF, .2072, '#c8c3b8');
   flat.rect(-270.5, -42.4, -250, -41.6, .2072, '#c8c3b8');
-  flat.rect(-284, ZF, XI, -8, .2062, '#6f9a47');
-  for (const [a, b] of [[-31.2, -28.2], [-37, -36]]) flat.rect(-284, a, XI, b, .2072, '#bdb3a2');
+  flat.rect(-284, ZF, XI, ZBk, .2062, '#6f9a47');
+  for (const [a, b] of [[-33.4, -30.2], [-22.8, -19.6]]) flat.rect(-284, a, XI, b, .2072, '#bdb3a2');
 
   // ---- casa blanca pegada a la escuela ----
-  { const a = -259.5, b = -250, c = (a + b) / 2, h = 3.4;
+  { const a = XB, b = -250, c = (a + b) / 2, h = 3.4;
     bx(g, c, 0, ZF + 7.5, b - a, h, 15, '#f3f2ee');
     bx(g, c, h, ZF + 7.5, b - a + .2, .25, 15.2, '#e7e5df');
     bx(g, -251.6, 0, ZF - .04, 2.8, 2.35, .05, '#f7f7f5'); bx(g, -251.6, 2.35, ZF - .06, 3.0, .08, .08, '#dcdcd8');   // portón de garaje
@@ -5425,8 +5426,7 @@ civic(-33.5402056, -60.8084540, { w: 26, d: 16, wall: '#f1ead8', trim: '#e4d9bf'
     crowns.add(-256.9, .6, ZF + .2, .35, .45, .3, 0, '#4f8a3a');
     farol(g, -255.5, 2.65, ZF - .25);
     bx(g, -258.8, 1.05, ZF - .05, 1.0, .9, .05, '#2f3a44'); bx(g, -258.8, .45, ZF - .07, .7, .2, .03, '#9a9a9a');   // ventana y buzón
-    // planta alta retirada con baranda de caños
-    bx(g, -255.2, h + .25, ZF + 5, 6.4, 2.7, 7, '#f3f2ee'); bx(g, -255.2, h + 2.95, ZF + 5, 6.6, .2, 7.2, '#e7e5df');
+    bx(g, -255.2, h + .25, ZF + 5, 6.4, 2.7, 7, '#f3f2ee'); bx(g, -255.2, h + 2.95, ZF + 5, 6.6, .2, 7.2, '#e7e5df');   // planta alta retirada
     bx(g, -256.3, h + 1.2, ZF + 1.48, 1.4, 1.1, .05, '#3a4148');
     for (const y of [h + .6, h + 1.0]) bx(g, c, y, ZF + .15, b - a - .4, .04, .04, '#9a9a96');
     for (let x = a + .3; x < b; x += 2) bx(g, x, h + .25, ZF + .15, .05, .85, .05, '#9a9a96');
@@ -5434,8 +5434,8 @@ civic(-33.5402056, -60.8084540, { w: 26, d: 16, wall: '#f1ead8', trim: '#e4d9bf'
     mapRects.push([a, ZF, b, ZF + 15, '#e8e8e8']);
   }
 
-  // ---- cerco de piedra y madera con el portón grande ----
-  { const PIL = [-276.5, -273.4, -270.3, -266.1, -263.0, -259.95], zf = ZF + .15;
+  // ---- terreno de la casa azul: frente sobre Brunet con el cerco de piedra y madera y el portón grande ----
+  { const PIL = [-269.05, -266.6, -262.85, -259.95], zf = ZF + .15;
     const pilar = (x, k) => { bx(g, x, 0, zf, .9, 2.55, .9, '#a8957b'); piedras(x - .45, x + .45, zf - .45, 0, 2.55, k); bx(g, x, 2.55, zf, 1.0, .1, 1.0, '#9c8a72'); addCol(x - .45, zf - .45, x + .45, zf + .45); };
     const tablas = (x0, x1, base, hMid, hEnd, col) => {   // paño de tablas verticales con remate curvo
       for (let x = x0 + .07; x < x1; x += .15){ const t = (x - x0) / (x1 - x0), hh = hEnd + (hMid - hEnd) * Math.sin(t * Math.PI);
@@ -5445,9 +5445,9 @@ civic(-33.5402056, -60.8084540, { w: 26, d: 16, wall: '#f1ead8', trim: '#e4d9bf'
     PIL.forEach((x, k) => pilar(x, k * 97));
     for (let i = 0; i < PIL.length - 1; i++){
       const x0 = PIL[i] + .45, x1 = PIL[i + 1] - .45;
-      if (i === 2){   // portón grande con placa y faroles en arco sobre los pilares
+      if (i === 1){   // portón grande con placa y faroles en arco sobre los pilares
         tablas(x0, x1, 0, 2.55, 2.3, '#8a6440'); bx(g, (x0 + x1) / 2, 1.9, zf - .06, .9, .25, .03, '#c9a46a'); bx(g, (x0 + x1) / 2, 1.96, zf - .08, .7, .12, .02, '#5a4026');   // placa
-        for (const x of [PIL[i], PIL[i + 1]]){ poleIn(g, [x, 2.65, zf], [x + (x === PIL[i] ? .4 : -.4), 3.15, zf], .02, '#e0e0dc'); farol(g, x + (x === PIL[i] ? .4 : -.4), 2.75, zf); }
+        for (const x of [PIL[i], PIL[i + 1]]){ const d = x === PIL[i] ? .4 : -.4; poleIn(g, [x, 2.65, zf], [x + d, 3.15, zf], .02, '#e0e0dc'); farol(g, x + d, 2.75, zf); }
         addCol(x0, zf - .1, x1, zf + .1);
       } else {
         bx(g, (x0 + x1) / 2, 0, zf, x1 - x0, .95, .35, '#a8957b'); piedras(x0, x1, zf - .18, 0, .95, 300 + i * 61);
@@ -5456,15 +5456,14 @@ civic(-33.5402056, -60.8084540, { w: 26, d: 16, wall: '#f1ead8', trim: '#e4d9bf'
       }
     }
     // casita de madera de techo azul sobre la vereda y el bolsón
-    { const c = group(-262.8, -41.9); bx(c, 0, 0, 0, .1, .5, .1, '#6a4a2c'); bx(c, 0, .5, 0, .75, .75, .55, '#8a5a36');
+    { const c = group(-261.4, -41.9); bx(c, 0, 0, 0, .1, .5, .1, '#6a4a2c'); bx(c, 0, .5, 0, .75, .75, .55, '#8a5a36');
       for (let y = .58; y < 1.2; y += .12) bx(c, 0, y, -.28, .75, .02, .02, '#6e4428');
-      for (const s of [-1, 1]) bx(c, s * .22, 1.25, 0, .55, .05, .7, '#2f5aa8', 0, -s * .6); addCol(-263.2, -42.2, -262.4, -41.6); }
-    { bx(g, -266.4, .2, -41.7, .95, .95, .95, '#f2f2ee'); for (const s of [-1, 1]) bx(g, -266.4 + s * .4, 1.15, -41.7, .06, .25, .06, '#e0e0dc'); bx(g, -266.4, .65, -42.18, .6, .25, .02, '#1f5aa8');
-      addCol(-266.9, -42.2, -265.9, -41.2); }
+      for (const s of [-1, 1]) bx(c, s * .22, 1.25, 0, .55, .05, .7, '#2f5aa8', 0, -s * .6); addCol(-261.8, -42.2, -261, -41.6); }
+    { bx(g, -267.9, .2, -41.7, .95, .95, .95, '#f2f2ee'); for (const s of [-1, 1]) bx(g, -267.9 + s * .4, 1.15, -41.7, .06, .25, .06, '#e0e0dc'); bx(g, -267.9, .65, -42.18, .6, .25, .02, '#1f5aa8');
+      addCol(-268.4, -42.2, -267.4, -41.2); }
   }
 
-  // ---- tapial blanco y esquina con murito de ladrillo y tejido ----
-  bx(g, -278.7, 0, ZF + .15, 3.6, 2.2, .25, '#f2f0ea'); addCol(-280.5, ZF, -276.95, ZF + .3);
+  // ---- cercos con murito de ladrillo y tejido, pilares de ladrillo y portones de hierro trabajado ----
   const tejidoMat = new THREE.MeshLambertMaterial({ color: 0xbfc5c2, transparent: true, opacity: .35, side: THREE.DoubleSide, depthWrite: false });
   const pilarL = (x, z) => { bx(g, x, 0, z, .45, 1.9, .45, '#b0704f'); for (let y = .12; y < 1.9; y += .2) bx(g, x, y, z, .47, .02, .47, '#d6c3b2'); addCol(x - .23, z - .23, x + .23, z + .23); };
   const tejidoZ = (x, z0, z1) => {   // murito de ladrillo con tejido a lo largo de z
@@ -5479,34 +5478,67 @@ civic(-33.5402056, -60.8084540, { w: 26, d: 16, wall: '#f1ead8', trim: '#e4d9bf'
     for (const [zz, y] of [[z0 + .45, 1.25], [z1 - .45, 1.25], [(z0 + z1) / 2, 1.3]]){ const t = new THREE.Mesh(new THREE.TorusGeometry(.18, .02, 5, 14), lam({ color: 0x3a3a36 })); t.position.set(x, y, zz); t.rotation.y = Math.PI / 2; scene.add(t); }
     addCol(x - .05, z0, x + .05, z1);
   };
-  // esquina sobre Brunet (pedacito) y todo el frente sobre Independencia
-  bx(g, (XI + -280.5) / 2, 0, ZF + .15, 1.5, .5, .22, '#c9c3b8');
-  { const m = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.35), tejidoMat); m.position.set((XI + -280.5) / 2, 1.18, ZF + .15); scene.add(m); addCol(XI, ZF, -280.5, ZF + .3); }
-  pilarL(-280.6, ZF + .15); pilarL(XI + .1, ZF + .15);
-  tejidoZ(XI + .1, ZF + .3, -33.6); pilarL(XI + .1, -33.4); portonHierro(XI + .1, -33.2, -30.4); pilarL(XI + .1, -30.2);
-  bx(g, XI + .28, 0, -31.8, .05, 1.8, .45, '#2f8a8a');   // tablita turquesa del pilar
-  tejidoZ(XI + .1, -30, -20.5); pilarL(XI + .1, -20.3); portonHierro(XI + .1, -20.1, -17.3); pilarL(XI + .1, -17.1); tejidoZ(XI + .1, -16.9, -8);
-  bx(g, -276.6, 0, -19.3, .25, 2.2, 5.5, '#f2f0ea'); addCol(-276.75, -22, -276.45, -16.6);   // tapial blanco detrás del segundo portón
-  // tuyas y árboles del jardín
-  [[-280.3, -37.6, 4.8], [-279.6, -35.2, 5.4], [-280.2, -27.6, 5.6], [-279.4, -24.8, 4.6], [-280.1, -22.4, 5.2], [-277.6, -37.4, 4.2], [-279.8, -13.2, 5]].forEach(([x, z, h], k) => tuya(x, z, h, k));
-  arbol(-275.5, -15.5, 1.3, ['#3f6b2a', '#4b7a30', '#38602a'], 1); arbol(-268, -14, 1.4, ['#466f2e', '#557f35'], 2); arbol(-261.5, -18.5, 1.2, ['#9c7a45', '#8a6a3a', '#6d843a'], 3);
-  arbol(-262.5, -33.5, 1.1, ['#4b7a30', '#5e8a3a'], 4); arbol(-276.5, -32.5, 1.0, ['#8e8c70', '#9a9678'], 5);
-  palmTrunks.add(-268.5, 0, -36.3, .35, 4.2, .35, 0, '#7a6a4a'); addCol(-268.7, -36.5, -268.3, -36.1);
-  for (let k = 0; k < 7; k++){ const a = k / 7 * Math.PI * 2; crowns.add(-268.5 + Math.cos(a) * 1.0, 4.4, -36.3 + Math.sin(a) * 1.0, 1.3, .18, .35, -a, '#4f7a35'); }
-  flat.rect(XI, ZF, -259.5, -8, .07, '#6e9a45');
 
-  // ---- chalet de madera con techo azul (a dos aguas, con el frente triangular mirando a Brunet) ----
-  { const a = -273.4, b = -264.7, z0 = -31.3, z1 = -23.9, cx = (a + b) / 2, cz = (z0 + z1) / 2, w = b - a, H = 2.6, rise = 2.1;
-    bx(g, cx, 0, cz, w, H, z1 - z0, '#7a5236');
-    for (let x = a + .2; x < b; x += .35) bx(g, x, 0, z0 - .03, .04, H, .02, '#5e3e28');
-    bx(g, cx, .2, z0 - .06, 1.0, 2.0, .04, '#3e2a1c'); for (const x of [cx - 2.6, cx + 2.6]) bx(g, x, 1.0, z0 - .06, 1.2, 1.0, .04, '#2b3138');
-    for (let k = 0; k < 7; k++){ const ww = w * (1 - (k + .5) / 7); for (const z of [z0 - .02, z1 + .02]) bx(g, cx, H + k * rise / 7, z, ww, rise / 7, .08, k % 2 ? '#6e4a2e' : '#7a5236'); }
-    const ang = Math.atan2(rise, w / 2), L = Math.hypot(rise, w / 2);
-    for (const s of [-1, 1]) bx(g, cx + s * w / 4, H + rise / 2 - .06, cz, L + .5, .12, z1 - z0 + 1.2, '#2f56b8', 0, -s * ang);
-    bx(g, cx, H - .05, z0 - 1.4, w * .9, .12, 2.6, '#6e4a2e'); for (const x of [a + .6, b - .6]) bx(g, x, 0, z0 - 2.5, .18, H - .05, .18, '#5e3e28');   // galería
-    addCol(a, z0, b, z1);
-    mapRects.push([a, z0, b, z1, '#2f56b8']);
-  }
+  // ---- terreno de la esquina (ajeno a la casa, medio abandonado) ----
+  // sobre Brunet: tejido desde la esquina y después el tapial blanco hasta el cerco de piedra
+  bx(g, (XI + -278.3) / 2, 0, ZF + .15, -278.3 - XI, .5, .22, '#c9c3b8');
+  { const m = new THREE.Mesh(new THREE.PlaneGeometry(-278.3 - XI, 1.35), tejidoMat); m.position.set((XI + -278.3) / 2, 1.18, ZF + .15); scene.add(m); addCol(XI, ZF, -278.3, ZF + .3); }
+  pilarL(XI + .1, ZF + .15); pilarL(-278.1, ZF + .15);
+  bx(g, (-277.9 + -269.5) / 2, 0, ZF + .15, 8.4, 2.2, .25, '#f2f0ea'); bx(g, (-277.9 + -269.5) / 2, 0, ZF + .02, 8.4, .25, .02, '#d8d2c4'); addCol(-277.9, ZF, -269.5, ZF + .3);
+  // sobre Independencia: tejido, portón de hierro con la tablita turquesa, tejido hasta el terreno de la casa
+  tejidoZ(XI + .1, ZF + .3, -33.6); pilarL(XI + .1, -33.4); portonHierro(XI + .1, -33.2, -30.4); pilarL(XI + .1, -30.2);
+  bx(g, XI + .28, 0, -31.8, .05, 1.8, .45, '#2f8a8a');
+  tejidoZ(XI + .1, -30, ZR - .2); pilarL(XI + .1, ZR);
+  // medianeras con el terreno de la casa (en L)
+  bx(g, (XI + XR) / 2, 0, ZR, XR - XI, 1.8, .2, '#a9a59c'); bx(g, XR, 0, (ZF + ZR) / 2, .2, 1.8, ZR - ZF, '#a9a59c');
+  addCol(XI, ZR - .1, XR, ZR + .1); addCol(XR - .1, ZF, XR + .1, ZR);
+  // yuyos, tuyas crecidas, ladrillos y un tambor viejo
+  flat.rect(XI, ZF, XR, ZR, .07, '#7a8f48');
+  for (let k = 0; k < 16; k++){ const x = XI + 1 + hsh(k + 60) * (XR - XI - 2), z = ZF + 1 + hsh(k + 80) * (ZR - ZF - 2); flat.rect(x, z, x + 1 + hsh(k) * 2, z + .8 + hsh(k + 3) * 1.6, .072, k % 3 ? '#8c9a50' : '#a39a62'); }
+  for (let k = 0; k < 22; k++){ const x = XI + .8 + hsh(k + 140) * (XR - XI - 1.6), z = ZF + .8 + hsh(k + 170) * (ZR - ZF - 1.6); crowns.add(x, .3, z, .45 + hsh(k + 7) * .4, .35 + hsh(k + 9) * .4, .45, hsh(k) * 6, k % 2 ? '#7f8f45' : '#96a058'); }
+  [[-280.3, -37.6, 4.8], [-279.6, -35.2, 5.4], [-280.2, -29.4, 5.6], [-277.6, -37.4, 4.2], [-274.6, -36.6, 5.0]].forEach(([x, z, h], k) => tuya(x, z, h, k));
+  bx(g, -276.2, 0, -33.2, 1.4, .5, .9, '#a65a3e'); cylIn(g, -272.8, .45, -34.8, .3, .9, '#7a4a32');
+  // tinglado de chapa en la esquinita contra la casa
+  { const t0 = -274.2, t1 = XR - .15, u0 = -31.6, u1 = ZR - .15;
+    for (const [x, z] of [[t0, u0], [t1, u0], [t0, u1], [t1, u1]]) bx(g, x, 0, z, .14, 2.4, .14, '#6a4a2c');
+    bx(g, (t0 + t1) / 2, 0, u1 - .05, t1 - t0, 2.3, .06, '#7a5236'); bx(g, t1 - .05, 0, (u0 + u1) / 2, .06, 2.3, u1 - u0, '#7a5236');
+    bx(g, (t0 + t1) / 2, 2.45, (u0 + u1) / 2, t1 - t0 + .6, .08, u1 - u0 + .6, '#2f5aa8', -.12);
+    addCol(t0 - .1, u0 - .1, t1 + .1, u1 + .1);
+    mapRects.push([t0, u0, t1, u1, '#2f5aa8']); }
+
+  // ---- terreno de la casa azul sobre Independencia: tejido y portón de hierro ----
+  tejidoZ(XI + .1, ZR + .2, -23); pilarL(XI + .1, -22.8); portonHierro(XI + .1, -22.6, -19.8); pilarL(XI + .1, -19.6); tejidoZ(XI + .1, -19.4, ZBk); pilarL(XI + .1, ZBk);
+  bx(g, (XI + XB) / 2, 0, ZBk, XB - XI, 1.9, .2, '#b9b2a4'); addCol(XI, ZBk - .1, XB, ZBk + .1);   // medianera del fondo
+  flat.rect(XR, ZF, XB, ZR, .07, '#6e9a45'); flat.rect(XI, ZR, XB, ZBk, .07, '#6e9a45');
+  flat.rect(-265.5, ZF, -263.9, -29.4, .072, '#b9b3a6'); flat.rect(XI, -22.4, -278.6, -20, .072, '#b9b3a6');   // caminitos a los portones
+
+  // ---- chalet de madera con techo azul: cuerpo principal con el frente triangular mirando a Brunet y ala hacia Independencia ----
+  const chaletVol = (a, b, z0, z1, H, rise, alongZ) => {   // alongZ: cumbrera a lo largo de z (hastiales al norte y al sur)
+    const cx = (a + b) / 2, cz = (z0 + z1) / 2, w = b - a, d = z1 - z0;
+    bx(g, cx, 0, cz, w, H, d, '#7a5236');
+    const span = alongZ ? w : d, ang = Math.atan2(rise, span / 2), L = Math.hypot(rise, span / 2);
+    for (let k = 0; k < 7; k++){ const ww = span * (1 - (k + .5) / 7), y = H + k * rise / 7;
+      if (alongZ) for (const z of [z0 - .02, z1 + .02]) bx(g, cx, y, z, ww, rise / 7, .08, k % 2 ? '#6e4a2e' : '#7a5236');
+      else for (const x of [a - .02, b + .02]) bx(g, x, y, cz, .08, rise / 7, ww, k % 2 ? '#6e4a2e' : '#7a5236'); }
+    for (const s of [-1, 1]){
+      if (alongZ) bx(g, cx + s * w / 4, H + rise / 2 - .06, cz, L + .5, .12, d + 1.0, '#2f56b8', 0, -s * ang);
+      else bx(g, cx, H + rise / 2 - .06, cz + s * d / 4, w + 1.0, .12, L + .5, '#2f56b8', s * ang, 0);
+    }
+    addCol(a, z0, b, z1); mapRects.push([a, z0, b, z1, '#2f56b8']);
+  };
+  chaletVol(-271.5, -260.5, -27, -18, 2.7, 2.4, true);
+  chaletVol(-279.5, -271.5, -25.5, -18.5, 2.5, 1.7, false);
+  for (let x = -271.3; x < -260.5; x += .35) bx(g, x, 0, -27.03, .04, 2.7, .02, '#5e3e28');
+  bx(g, -264.7, .1, -27.06, 1.1, 2.1, .04, '#3e2a1c'); for (const x of [-268.9, -262.2]) bx(g, x, 1.0, -27.06, 1.3, 1.0, .04, '#2b3138');
+  bx(g, -279.53, 1.0, -22, .04, 1.0, 1.3, '#2b3138');
+  bx(g, -265.2, 2.65, -28.4, 8.2, .12, 2.8, '#6e4a2e'); for (const x of [-268.9, -261.5]) bx(g, x, 0, -29.6, .18, 2.65, .18, '#5e3e28');   // galería hacia el portón
+  addCol(-269, -29.7, -268.8, -29.5); addCol(-261.6, -29.7, -261.4, -29.5);
+  // jardín: palmera, árboles y arbustos
+  palmTrunks.add(-267.3, 0, -35.8, .35, 4.2, .35, 0, '#7a6a4a'); addCol(-267.5, -36, -267.1, -35.6);
+  for (let k = 0; k < 7; k++){ const a = k / 7 * Math.PI * 2; crowns.add(-267.3 + Math.cos(a) * 1.0, 4.4, -35.8 + Math.sin(a) * 1.0, 1.3, .18, .35, -a, '#4f7a35'); }
+  arbol(-262, -34, 1.1, ['#4b7a30', '#5e8a3a'], 4); arbol(-260.6, -31.6, .8, ['#9c7a45', '#8a6a3a', '#6d843a'], 3); arbol(-275.5, -17.6, .9, ['#3f6b2a', '#4b7a30', '#38602a'], 1);
+  tuya(-280.4, -25.6, 4.6, 9); tuya(-280.3, -18, 5, 10);
+  crowns.add(-264, .6, -31.2, .8, .6, .7, 0, '#4b7a33'); crowns.add(-268.6, .55, -31.4, .7, .55, .6, 1, '#3e6a2e');
 
   // ---- cartel "Lomo de burro 50 mts" sobre Independencia ----
   { const sg = group(-283.4, -25.5); poleIn(sg, [0, 0, 0], [0, 2.2, 0], .035, '#7a7a76');
