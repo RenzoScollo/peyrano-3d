@@ -2491,19 +2491,21 @@ const PUMPS = [];
   marquesina(12.2, -613.4, 27.8, -604, 5.3, [[20, -613.58, Math.PI], [12.02, -608.7, -Math.PI / 2], [20, -603.82, 0]]);
   marquesina(27.8, -627, 35.4, -619.4, 4.9, [[31.6, -627.18, Math.PI], [35.58, -623.2, Math.PI / 2], [27.62, -623.2, -Math.PI / 2]]);
   // islas con surtidores (las columnas de la marquesina salen de las puntas de cada isla)
-  const isla = (x, z, len, h) => {
-    bx(g, x, 0, z, len, .22, 1.4, '#d9d5cd'); bx(g, x, 0, z, len + .2, .1, 1.6, '#f2c21b');
-    for (const dx of [-len / 2 + .45, len / 2 - .45]) bx(g, x + dx, .22, z, .4, h - .22, .4, '#f4f4f2');
-    for (const dx of (len > 7 ? [-1.7, 1.7] : [0])){
-      const px = x + dx;
-      bx(g, px, .22, z, 1.0, 1.95, .62, '#f4f4f2'); bx(g, px, .22, z, 1.02, .5, .64, '#f2c21b'); bx(g, px, 2.17, z, 1.04, .22, .66, '#d7261e');
-      for (const s of [-1, 1]){ bx(g, px, 1.05, z + s * .32, .55, .45, .03, '#1d2a33'); bx(g, px + .33, .75, z + s * .35, .08, .55, .08, '#2a2a2a'); }
+  // isla a lo largo del +x local; vert = a lo largo de z (paralela a la avenida), así los autos entran por un lado y salen por el otro
+  const isla = (x, z, len, h, vert) => {
+    const q = group(x, z, vert ? Math.PI / 2 : 0);
+    bx(q, 0, 0, 0, len, .22, 1.4, '#d9d5cd'); bx(q, 0, 0, 0, len + .2, .1, 1.6, '#f2c21b');
+    for (const dx of [-len / 2 + .45, len / 2 - .45]) bx(q, dx, .22, 0, .4, h - .22, .4, '#f4f4f2');
+    for (const dx of (len >= 7 ? [-1.7, 1.7] : [0])){
+      bx(q, dx, .22, 0, 1.0, 1.95, .62, '#f4f4f2'); bx(q, dx, .22, 0, 1.02, .5, .64, '#f2c21b'); bx(q, dx, 2.17, 0, 1.04, .22, .66, '#d7261e');
+      for (const s of [-1, 1]){ bx(q, dx, 1.05, s * .32, .55, .45, .03, '#1d2a33'); bx(q, dx + .33, .75, s * .35, .08, .55, .08, '#2a2a2a'); }
     }
-    bx(g, x - len / 2 + 1.05, .22, z, .45, .7, .45, '#3a3d40');   // cesto
-    addCol(x - len / 2, z - .8, x + len / 2, z + .8);
-    PUMPS.push([x, z - 2.6], [x, z + 2.6]);
+    bx(q, -len / 2 + 1.05, .22, 0, .45, .7, .45, '#3a3d40');   // cesto
+    const hx = vert ? .8 : len / 2, hz = vert ? len / 2 : .8;
+    addCol(x - hx, z - hz, x + hx, z + hz);
+    if (vert) PUMPS.push([x - 2.6, z], [x + 2.6, z]); else PUMPS.push([x, z - 2.6], [x, z + 2.6]);
   };
-  isla(19.8, -611, 9, 5.3); isla(19.8, -606.4, 9, 5.3); isla(31.6, -623.2, 6, 4.9);
+  isla(17, -608.7, 7.2, 5.3, true); isla(23, -608.7, 7.2, 5.3, true); isla(31.6, -623.2, 6, 4.9);
   // "Aire y Agua" junto a la marquesina grande
   bx(g, 14.2, 0, -601.5, .7, 1.25, .5, '#f2c21b'); signIn(g, 'Aire y Agua', 14.2, 1.0, -601.24, .66, .3, '#f2c21b', '#d7261e');
   addCol(13.8, -601.8, 14.6, -601.2);
