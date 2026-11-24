@@ -2276,8 +2276,8 @@ function frustumMesh(bot, top, y0, h, col){
     const a = group(XM, -386.1); a.add(new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 3, bevelEnabled: false }), lam({ color: BRICK })));
     for (let k = 0; k < 18; k++){ const u = (k + .5) / 18 * LW, s = Math.sqrt(Math.max(.02, 1 - (u / LW) ** 2)), v = HW * s, dv = -HW * (u / (LW * LW)) / s;
       boxIn(a, u, v, 3.04, LW / 18 * 1.15 * Math.hypot(1, dv), .26, .16, '#ece8e0', 0, Math.atan(dv)); }
-    for (let y = .2; y < HW; y += .2) { const half = y / HW; const ul = LW * Math.sqrt(Math.max(0, 1 - half * half)); bx(a, ul / 2, y, 3.02, ul, .015, .01, '#c9a99a'); }
-    const s2 = group(0, ZB, 0); bx(s2, -70.6, .9, .02, 1.5, 1.4, .05, '#b02a22'); bx(s2, -70.6, .95, .06, 1.35, 1.3, .02, '#3b4a55'); for (let k = 1; k < 5; k++) bx(s2, -71.27 + k * .27, .95, .08, .03, 1.3, .02, '#b02a22');
+    for (let y = .2; y < HW; y += .2) { const half = y / HW; const ul = LW * Math.sqrt(Math.max(0, 1 - half * half)); bx(a, ul / 2, y, 3.012, ul, .015, .008, '#c9a99a'); }
+    const s2 = group(0, ZB + .028, 0); bx(s2, -70.6, .9, .02, 1.5, 1.4, .05, '#b02a22'); bx(s2, -70.6, .95, .06, 1.35, 1.3, .02, '#3b4a55'); for (let k = 1; k < 5; k++) bx(s2, -71.27 + k * .27, .95, .08, .03, 1.3, .02, '#b02a22');
     bx(s2, -68.7, 0, .02, .95, 2.2, .05, '#ece8e0'); bx(s2, -68.7, .02, .06, .8, 2.1, .03, '#f2f2ee'); bx(s2, -67.6, 0, .02, 1.0, 1.0, .05, '#e6e1d6');
     flat.rect(XB, ZN, -63.5, ZB, .065, '#6f9a45'); flat.rect(XB, -392.6, -63.5, -391.6, .068, '#c9c4b8');
     // reja del patio (sigue la línea del sector beige hasta la esquina de Sagarduy): murito, reja negra, portón blanco de chapa calada y cerco de ligustro;
@@ -4138,40 +4138,49 @@ const GROUP_W = group, TREE_W = addTree, BUSH_W = addBush, FLAT_W = flat;
   // ---- 2) Casa esquina Bv. Lavalle × Entre Ríos (x = 75.5..89.6, z = -363.5..-350.5) ----
   {
     const g = group(0, 0);
-    // Cuerpo principal en L (deja hueco abierto en esquina SE x = 85.4..89.4, z = -355.2..-350.5 para la galería)
-    bx(g, 80.45, 0, -357.0, 9.9, 3.25, 13.0, REV);                   // x = 75.5..85.4, z = -363.5..-350.5
-    bx(g, 86.7, 0, -359.35, 2.6, 3.25, 8.3, REV);                    // x = 85.4..88.0, z = -363.5..-355.2
-    bx(g, 80.45, 3.25, -357.0, 10.0, .16, 13.1, REV_D);              // parapeto
-    bx(g, 86.7, 3.25, -359.35, 2.7, .16, 8.4, REV_D);
-    // Losa plana en voladizo cubriendo la galería de la esquina SE + columna redonda
-    bx(g, 87.4, 3.05, -352.85, 4.1, .28, 4.8, '#a69e90');            // x = 85.35..89.45, z = -355.25..-350.45
-    cylIn(g, 88.75, 1.52, -351.2, .16, 3.05, '#a8a296');             // columna esquinera
-    flat.rect(85.4, -355.2, 89.4, -350.5, .072, '#b9b2a4');          // piso galería
-    // Frente Bv. Lavalle (z = -350.5): garaje rojo óxido + 2 ventanales con reja + murito bajo + bicicleta
-    bx(g, 77.1, 0, -350.46, 2.55, 2.25, .08, '#9e3e30');             // portón garaje rojo
-    bx(g, 77.1, 0, -350.42, .05, 2.25, .04, '#6e261c');
-    for (const wx of [80.6, 83.8]){
-      bx(g, wx, .82, -350.46, 2.15, 1.45, .07, '#434d55');
-      for (let gy = .95; gy <= 2.15; gy += .28) bx(g, wx, gy, -350.40, 2.15, .03, .03, '#222222');
-      for (let gx = wx - .9; gx <= wx + .95; gx += .36) bx(g, gx, .82, -350.40, .03, 1.45, .03, '#222222');
-    }
-    bx(g, 82.8, 0, -350.15, 7.6, .62, .22, '#8c8478');               // murito bajo sobre Bv. Lavalle
-    addBush(80.6, -350.15, .45, 0);
-    // Bicicleta estacionada junto al murito en la esquina (sv1)
-    for (const dx of [-.52, .52]) bikeWheels.add(85.2 + dx, .34, -349.85, 1, 1, 1, 0, '#1d1d1d');
-    trims.add(85.2, .52, -349.85, 1.0, .05, .05, 0, '#2a4668');
-    // Entrada de cemento al garaje rojo + vereda con pasto sobre Bv. Lavalle
-    flat.rect(75.5, -350.5, 78.6, -348.5, .216, '#c8c3b8');
-    flat.rect(78.6, -350.5, 89.6, -348.5, .212, '#62883c');
-    flat.rect(78.6, -350.5, 89.6, -349.4, .216, '#c4bfb4');          // vereda embaldosada junto a la casa
-    addTree(82.4, -349.1, 1.15, false, PELADO);
-    // Frente Entre Ríos (x = 88.0..89.6, z = -350.5..-363.5): aire acondicionado, puerta en galería, gran ventana con persiana blanca y reja negra
-    bx(g, 88.06, 2.25, -353.8, .32, .52, .82, '#eceae4');            // aire acondicionado blanco
-    bx(g, 85.44, 0, -354.1, .08, 2.15, .92, '#5a3a28');              // puerta entrada en el fondo de la galería
-    bx(g, 88.04, .88, -359.6, .08, 1.55, 2.65, '#3b444b');           // ventana grande sobre Entre Ríos
-    bx(g, 88.08, 1.75, -359.6, .06, .68, 2.60, '#e8e5dc');           // persiana blanca semi-baja
-    for (let rz = -360.8; rz <= -358.4; rz += .18) bx(g, 88.14, .88, rz, .03, 1.55, .03, '#1e1e1e');
-    for (const ry of [.92, 1.65, 2.38]) bx(g, 88.14, ry, -359.6, .03, .04, 2.65, '#1e1e1e');
+    // Sector izquierdo adelantado sobre Bv. Lavalle (garaje rojo + ventana izq, x = 75.5..81.4, z = -363.5..-350.5)
+    bx(g, 78.45, 0, -357.0, 5.9, 3.05, 13.0, REV);
+    // Sector derecho remetido 1.8 m bajo la losa en voladizo (x = 81.4..87.8, z = -363.5..-352.3)
+    bx(g, 84.6, 0, -357.9, 6.4, 3.05, 11.2, REV);
+    // Losa plana continua cubriendo todo + alero/galería en voladizo sobre puerta, ventanal y esquina SE
+    bx(g, 82.45, 3.05, -357.0, 13.9, .28, 13.0, '#a69e90');
+    bx(g, 82.45, 3.33, -357.0, 14.0, .14, 13.1, REV_D);
+    // Columna esquinera + piso de galería bajo el voladizo (puerta + ventanal + esquina SE)
+    bx(g, 88.85, 0, -351.05, .30, 3.05, .30, '#a8a296');
+    flat.rect(81.4, -352.3, 89.4, -350.5, .072, '#b9b2a4');
+    flat.rect(87.8, -355.2, 89.4, -350.5, .072, '#b9b2a4');
+    // Chimenea chica de ladrillo sobre el techo
+    bx(g, 86.2, 3.45, -355.0, .65, .75, .65, '#8e5a44');
+    // Frente Bv. Lavalle (z = -350.5): garaje rojo óxido + ventana izquierda con persiana blanca
+    bx(g, 77.0, 0, -350.46, 2.45, 2.25, .08, '#9e3e30');             // portón garaje rojo
+    bx(g, 77.0, 0, -350.41, .05, 2.25, .04, '#6e261c');
+    bx(g, 79.8, .82, -350.46, 1.95, 1.48, .07, '#3d474f');           // ventana izquierda
+    bx(g, 79.8, 1.72, -350.42, 1.90, .58, .05, '#e8e5dc');           // persiana blanca arriba
+    for (let gx = 78.95; gx <= 80.65; gx += .24) bx(g, gx, .82, -350.39, .025, 1.48, .025, '#222222');
+    for (const gy of [.88, 1.55, 2.24]) bx(g, 79.8, gy, -350.39, 1.95, .03, .03, '#222222');
+    addBush(79.8, -350.0, .55, 0);
+    // Pared remetida bajo la losa (z = -352.3): puerta de entrada + gran ventanal con reja
+    bx(g, 82.25, 0, -352.26, .92, 2.15, .08, '#5a3a28');             // puerta entrada
+    bx(g, 85.1, .78, -352.26, 2.45, 1.52, .08, '#3b444c');           // ventanal ancho bajo galería
+    for (let gx = 84.0; gx <= 86.2; gx += .24) bx(g, gx, .78, -352.19, .025, 1.52, .025, '#222222');
+    for (const gy of [.84, 1.52, 2.24]) bx(g, 85.1, gy, -352.19, 2.45, .03, .03, '#222222');
+    // Murito bajo con pilares sobre Bv. Lavalle (corte frente a la puerta x = 81.6..82.8) + bicicleta
+    bx(g, 79.9, 0, -350.15, 3.2, .62, .22, '#8c8478');
+    bx(g, 86.1, 0, -350.15, 6.4, .62, .22, '#8c8478');
+    for (const px of [78.4, 81.5, 82.9, 89.2]) bx(g, px, 0, -350.15, .32, .96, .32, '#8c8478');
+    for (const dx of [-.52, .52]) bikeWheels.add(84.4 + dx, .34, -349.82, 1, 1, 1, 0, '#1d1d1d');
+    trims.add(84.4, .52, -349.82, 1.0, .05, .05, 0, '#2a4668');
+    // Entrada de cemento al garaje rojo + vereda embaldosada y pasto sobre Bv. Lavalle
+    flat.rect(75.5, -350.5, 78.4, -348.5, .216, '#c8c3b8');
+    flat.rect(78.4, -350.5, 89.6, -348.5, .212, '#62883c');
+    flat.rect(78.4, -350.5, 89.6, -349.2, .216, '#c4bfb4');
+    addTree(86.8, -349.1, .95, false, PELADO);
+    // Frente Entre Ríos (x = 87.8..89.6, z = -350.5..-363.5): aire acondicionado, ventana lateral + gran ventana con persiana blanca
+    bx(g, 87.92, 2.22, -353.3, .32, .52, .82, '#eceae4');            // aire acondicionado blanco
+    bx(g, 87.84, .88, -359.6, .08, 1.55, 2.65, '#3b444b');           // ventana grande sobre Entre Ríos
+    bx(g, 87.88, 1.75, -359.6, .06, .68, 2.60, '#e8e5dc');           // persiana blanca semi-baja
+    for (let rz = -360.8; rz <= -358.4; rz += .18) bx(g, 87.94, .88, rz, .03, 1.55, .03, '#1e1e1e');
+    for (const ry of [.92, 1.65, 2.38]) bx(g, 87.94, ry, -359.6, .03, .04, 2.65, '#1e1e1e');
     // Murito bajo delantero sobre Entre Ríos (x = 89.2) con pilares y pasito de entrada
     bx(g, 89.2, 0, -352.4, .22, .62, 3.6, REV_D);
     bx(g, 89.2, 0, -359.3, .22, .62, 8.2, REV_D);
@@ -4182,7 +4191,7 @@ const GROUP_W = group, TREE_W = addTree, BUSH_W = addBush, FLAT_W = flat;
       bx(g, cx0, .48, cz0, .58, .48, .82, '#8b684a'); }
     poleIn(g, [91.0, 0, -355.0], [91.0, 7.8, -355.0], .10, '#c85028');
     poleIn(g, [91.0, 2.8, -355.0], [91.0, 5.2, -355.0], .105, WH);
-    addCol(75.5, -363.5, 88.0, -350.5); mapRects.push([75.5, -363.5, 88.0, -350.5, REV]);
+    addCol(75.5, -363.5, 87.8, -350.5); mapRects.push([75.5, -363.5, 87.8, -350.5, REV]);
   }
 
   // ---- 3) Tapial de bloques + Portón de chapa gris + Tinglado oxidado (x = 75.5..89.6, z = -372.5..-363.5) ----
@@ -4206,68 +4215,93 @@ const GROUP_W = group, TREE_W = addTree, BUSH_W = addBush, FLAT_W = flat;
   // ---- 4) Casa blanca con techo de tejas rojas y jardincito delantero (x = 75.5..89.6, z = -386.8..-372.5) ----
   {
     const g = group(0, 0);
-    // Cuerpo principal retirado 3 m (x = 75.5..86.5, z = -384.4..-372.6)
-    bx(g, 81.0, 0, -378.5, 11.0, 3.05, 11.8, WH);
-    bx(g, 86.54, 0, -378.5, .10, .52, 11.8, '#9e7c64');              // zócalo de piedra/ladrillo
-    // Techo inclinado de tejas rojas + parapeto blanco + chimenea
-    boxIn(g, 84.5, 3.45, -378.5, 5.2, .16, 12.1, '#9b4634', 0, -.26);
-    bx(g, 79.0, 3.05, -378.5, 7.0, 1.05, 11.8, WH);
-    bx(g, 82.4, 3.85, -378.5, .35, .45, 11.9, '#9b4634');
-    bx(g, 85.4, 3.3, -379.5, .55, 1.15, .55, LAD);                   // chimenea delantera
-    bx(g, 80.5, 4.1, -379.8, .85, .85, .85, LAD_D);                  // chimenea trasera
-    // Aire acondicionado blanco a la izquierda
-    bx(g, 86.68, 2.25, -373.4, .30, .48, .78, '#eceae4');
-    // Dos ventanas con persiana blanca y reja negra + puerta madera central + garaje derecho
-    for (const wz of [-375.3, -379.5]){
-      bx(g, 86.54, .82, wz, .08, 1.50, 2.15, '#e8e5dc');
-      for (let rz = wz - .96; rz <= wz + .98; rz += .20) bx(g, 86.60, .82, rz, .025, 1.50, .025, '#2b2b2b');
-      for (const ry of [.86, 1.55, 2.28]) bx(g, 86.60, ry, wz, .025, .035, 2.15, '#2b2b2b');
+    // Cuerpo principal retirado 3 m con nicho central remetido para la puerta (x = 75.5..86.5, z = -384.4..-372.6)
+    bx(g, 80.5, 0, -378.5, 10.0, 2.95, 11.8, WH);                    // volumen trasero (x = 75.5..85.5)
+    bx(g, 86.0, 0, -374.6, 1.0, 2.95, 4.0, WH);                      // frente sur (ventana izq)
+    bx(g, 86.0, 0, -379.5, 1.0, 2.95, 2.6, WH);                      // frente centro (ventana der)
+    bx(g, 86.0, 0, -382.6, 1.0, 2.95, 3.6, WH);                      // frente norte (garaje)
+    bx(g, 86.0, 2.45, -377.4, 1.0, .50, 1.65, WH);                   // dintel del nicho de la puerta
+    bx(g, 86.54, 0, -374.6, .08, .54, 4.0, '#9e7c64');               // zócalo de ladrillo/piedra
+    bx(g, 86.54, 0, -379.5, .08, .54, 2.6, '#9e7c64');
+    // Alero horizontal blanco + faldón inclinado de tejas rojas con cumbrera, parapeto superior y chimeneas
+    bx(g, 86.75, 2.90, -378.5, .55, .18, 12.2, WH);                  // cenefa blanca del alero
+    boxIn(g, 84.4, 3.42, -378.5, 5.2, .16, 12.2, '#9b4634', 0, -.24);
+    for (let tz = -384.3; tz <= -372.7; tz += .55) boxIn(g, 84.4, 3.51, tz, 5.1, .03, .08, '#7a3324', 0, -.24);
+    bx(g, 79.0, 2.95, -378.5, 6.8, 1.15, 11.8, WH);                  // cuerpo superior blanco
+    bx(g, 82.42, 3.72, -378.5, .12, .26, 11.8, '#9b4634');           // franja de ladrillo bajo parapeto
+    bx(g, 82.46, 3.98, -378.5, .24, .14, 11.9, WH);                  // cornisa blanca superior
+    bx(g, 84.6, 3.35, -379.3, .55, .95, .55, LAD);                   // chimenea delantera con sombrerete
+    bx(g, 84.6, 4.30, -379.3, .72, .10, .72, WH);
+    bx(g, 80.2, 4.10, -383.6, .85, .90, .95, LAD_D);                 // chimenea trasera norte
+    // Costado norte (mirando al pasillo): 3 ventanitas altas + aire acondicionado blanco
+    for (const vx of [84.8, 83.2, 81.6]) bx(g, vx, 2.05, -384.44, .75, .52, .06, '#434d55');
+    bx(g, 85.4, 2.35, -384.56, .75, .48, .28, '#eceae4');
+    // Aire acondicionado blanco a la izquierda + 2 ventanas con persiana blanca y reja negra
+    bx(g, 86.68, 2.25, -373.2, .30, .48, .78, '#eceae4');
+    for (const wz of [-375.1, -379.5]){
+      bx(g, 86.54, .76, wz, .08, 1.54, 2.15, '#e8e5dc');
+      for (let rz = wz - .96; rz <= wz + .98; rz += .20) bx(g, 86.60, .76, rz, .025, 1.54, .025, '#2b2b2b');
+      for (const ry of [.82, 1.54, 2.26]) bx(g, 86.60, ry, wz, .025, .035, 2.15, '#2b2b2b');
     }
-    bx(g, 86.54, 0, -377.4, .08, 2.25, .95, '#6e3422');              // puerta madera
-    bx(g, 86.56, 0, -382.5, .10, 2.25, 2.65, '#643220');             // portón garaje madera oscura
-    for (let gz = -383.7; gz <= -381.3; gz += .35) bx(g, 86.62, 0, gz, .02, 2.22, .03, '#4c2416');
+    // Puerta de madera remetida en el nicho central + farolito
+    bx(g, 85.54, 0, -377.4, .08, 2.25, .95, '#6e3422');
+    bx(g, 85.85, 2.15, -376.8, .18, .22, .18, '#2b2b2b');
+    // Portón de garaje de madera con cuarterones en relieve
+    bx(g, 86.54, 0, -382.5, .10, 2.28, 2.65, '#5a2c1b');
+    for (let gz = -383.5; gz <= -381.5; gz += .65) for (const gy of [.35, 1.0, 1.65]) bx(g, 86.60, gy, gz, .03, .45, .48, '#6e3824');
     // 2 macetas terracota bajo la ventana derecha
-    for (const mz of [-379.0, -379.8]) cylIn(g, 86.85, .24, mz, .18, .48, '#b55638');
-    // Jardincito verde delantero + murito bajo de ladrillo + escaloncitos + entrada de garaje
+    for (const mz of [-378.9, -379.8]) cylIn(g, 86.85, .24, mz, .18, .48, '#b55638');
+    // Jardincito verde delantero + murito bajo de ladrillo con pilares + escaloncitos + doble huella al garaje
     flat.rect(86.5, -384.4, 89.5, -372.6, .064, '#668f40');
-    bx(g, 89.3, 0, -374.8, .22, .46, 4.4, '#a66b52');                // murito bajo sur
-    bx(g, 89.3, 0, -379.7, .22, .46, 3.2, '#a66b52');                // murito bajo centro
+    bx(g, 89.3, 0, -374.7, .22, .48, 4.2, '#a66b52');
+    bx(g, 89.3, 0, -379.6, .22, .48, 3.0, '#a66b52');
+    for (const pz of [-376.8, -378.1]) bx(g, 89.3, 0, pz, .30, .62, .30, '#a66b52');
     flat.rect(86.5, -378.1, 89.6, -376.7, .072, '#c8c3b8');          // pasillo a la puerta
-    flat.rect(86.5, -383.9, 89.6, -381.1, .072, '#c8c3b8');          // entrada al garaje
-    // Pasillo lateral norte entre la casa blanca y el comercio (z = -386.8..-384.4)
+    flat.rect(86.5, -383.6, 89.6, -382.9, .072, '#c8c3b8');          // huella norte garaje
+    flat.rect(86.5, -382.1, 89.6, -381.4, .072, '#c8c3b8');          // huella sur garaje
+    // Pasillo lateral norte entre la casa blanca y la pinturería (z = -386.8..-384.4)
     flat.rect(75.5, -386.8, 89.5, -384.4, .064, '#668f40');
-    bx(g, 89.3, 0, -385.6, .22, .46, 2.4, '#a66b52');
-    bx(g, 83.2, 0, -385.6, .24, 2.15, 2.4, LAD);                     // tapial interior del pasillo
+    bx(g, 89.3, 0, -385.6, .22, .48, 2.4, '#a66b52');
+    bx(g, 83.2, 0, -385.6, .24, 2.15, 2.4, LAD);
+    addBush(87.2, -385.5, .75, 0);
     addCol(75.5, -384.4, 86.5, -372.6); mapRects.push([75.5, -384.4, 86.5, -372.6, '#9b4634']);
-    // Poste de madera y arbolito en la vereda
     poleIn(g, [90.3, 0, -372.8], [90.3, 8.2, -372.8], .12, '#7d7366');
     addTree(90.6, -382.0, .95, false, PELADO);
   }
 
-  // ---- 5) Comercio/Pinturería + Galpón de ladrillo visto y revoque blanco envejecido (x = 75.5..89.6, z = -398.5..-386.8) ----
+  // ---- 5) Pinturería/Comercio + Galpón de ladrillo visto y revoque blanco envejecido (x = 75.5..89.6, z = -398.5..-386.8) ----
   {
     const g = group(0, 0);
-    // Paño sur (Comercio, z = -392.4..-386.8, h = 4.9 m)
-    bx(g, 82.55, 0, -389.6, 14.1, 2.95, 5.6, LAD);                   // planta baja ladrillo
-    bx(g, 82.55, 2.95, -389.6, 14.1, 1.95, 5.6, '#d6d2ca');          // parte superior revoque blanco manchado
-    bx(g, 89.62, 2.90, -389.6, .16, .16, 5.7, LAD_D);                // moldura divisoria
-    // Vidriera grande comercio + puerta vidriada derecha
-    bx(g, 89.64, .35, -389.1, .08, 2.20, 3.3, '#52626d');
-    bx(g, 89.68, .42, -389.1, .04, .75, 3.1, '#dcdad2');             // mercadería clara en vidriera
-    bx(g, 89.70, .42, -390.1, .03, .65, .75, '#4682b8');             // cartelito azul
-    bx(g, 89.64, 0, -391.4, .08, 2.45, .95, '#3b322c');              // puerta vidriada
-    bx(g, 89.68, 1.0, -391.4, .04, 1.25, .75, '#5b6c78');
-    // Celosía horizontal larga de barrotes verticales oscuros arriba (y = 3.15..3.95)
-    bx(g, 89.62, 3.15, -389.6, .08, .82, 4.7, '#2d3236');
-    for (let cz = -391.8; cz <= -387.4; cz += .24) bx(g, 89.67, 3.15, cz, .05, .82, .06, '#7a766e');
+    // Paño sur (Pinturería, z = -392.4..-386.8, h = 4.9 m)
+    bx(g, 82.55, 0, -389.6, 14.1, 2.85, 5.6, LAD);                   // planta baja ladrillo
+    bx(g, 82.55, 2.85, -389.6, 14.1, 2.05, 5.6, '#d6d2ca');          // parte superior revoque blanco manchado
+    bx(g, 89.70, 2.80, -389.6, .26, .20, 5.7, LAD_D);                // voladizo/moldura de ladrillo sobre la vidriera
+    // Vidriera grande con marcos oscuros, estantes con tachos de pintura y carteles Superboard / Knauf
+    bx(g, 89.64, .32, -389.1, .08, 2.25, 3.45, '#3b4852');
+    bx(g, 89.67, .38, -389.1, .04, .68, 3.30, '#e2e0d8');            // base clara de placas/tachos
+    for (const tz of [-387.9, -388.4, -388.9, -389.4, -389.9]){      // latas de pintura en estantes
+      bx(g, 89.69, 1.12, tz, .04, .32, .26, '#e6e4dc');
+      bx(g, 89.69, 1.56, tz, .04, .30, .24, tz > -389 ? '#d8c89a' : '#8cb2cf');
+    }
+    bx(g, 89.70, 1.72, -387.95, .04, .34, .88, '#dce6dc');           // cartel Superboard (izq arriba)
+    bx(g, 89.71, 1.80, -387.95, .02, .12, .75, '#3a7a42');
+    bx(g, 89.70, .42, -390.15, .04, .58, .85, '#3d82c4');            // cartel celeste Knauf (der abajo)
+    for (const mz of [-387.38, -388.55, -389.68, -390.82]) bx(g, 89.71, .32, mz, .04, 2.25, .05, '#262a2e');
+    // Puerta vidriada a la derecha de la vidriera
+    bx(g, 89.64, 0, -391.45, .08, 2.52, .95, '#3b322c');
+    bx(g, 89.68, .92, -391.45, .04, 1.40, .74, '#52626d');
+    // Celosía horizontal larga de barrotes verticales oscuros arriba (y = 3.18..3.98)
+    bx(g, 89.62, 3.18, -389.6, .08, .82, 4.7, '#262b2f');
+    for (let cz = -391.8; cz <= -387.4; cz += .22) bx(g, 89.67, 3.18, cz, .05, .82, .06, '#7a766e');
     // Paño norte (Galpón alto, z = -398.5..-392.4, h = 5.5 m)
     bx(g, 82.55, 0, -395.45, 14.1, 3.85, 6.1, LAD);
     bx(g, 82.55, 3.85, -395.45, 14.1, 1.65, 6.1, '#d6d2ca');
-    bx(g, 89.62, 3.80, -395.45, .16, .16, 6.2, LAD_D);
+    bx(g, 89.68, 3.80, -395.45, .20, .18, 6.2, LAD_D);
     // Portón gigante marrón rojizo con fila de 7 ventanitas cuadradas arriba
     bx(g, 89.64, 0, -395.45, .10, 3.65, 4.7, '#753121');
     for (let pz = -397.5; pz <= -393.3; pz += .42) bx(g, 89.70, 0, pz, .02, 3.15, .03, '#521f14');
     for (let k = 0; k < 7; k++) bx(g, 89.70, 3.18, -397.45 + k * .66, .04, .42, .52, '#2d363d');
+    addTree(90.6, -390.2, 1.15, false, PELADO);
     addCol(75.5, -398.5, 89.6, -386.8); mapRects.push([75.5, -398.5, 89.6, -386.8, LAD]);
   }
 
@@ -4330,7 +4364,7 @@ const GROUP_W = group, TREE_W = addTree, BUSH_W = addBush, FLAT_W = flat;
     bx(g, 91.0, 2.08, -430.5, .06, .20, .75, '#233b7a');
     addTree(90.5, -419.0, 1.15, false, PELADO);
 
-    // Lado Monguillot (z = -429.3, x = 41.2..89.4): tapial premoldeado continuo + Garaje Blanco (x = 57.8..63.2)
+    // Lado Monguillot (z = -429.3, x = 57.8..89.4): tapial premoldeado + Garaje Blanco; al lado de la Comuna (x = 41..57.8) queda el baldío abierto sin tapial
     premoldeadoX(-429.3, 63.2, 89.4, '#b5afa2', '#948e82');
     // Garaje blanco con portón acanalado blanco sobre Monguillot (sv8)
     bx(g, 60.5, 0, -425.7, 5.4, 3.15, 7.2, '#9a8678');               // cuerpo ladrillo/revoque
@@ -4338,7 +4372,8 @@ const GROUP_W = group, TREE_W = addTree, BUSH_W = addBush, FLAT_W = flat;
     bx(g, 60.5, 0, -429.46, 3.85, 2.42, .08, '#e6e8ea');             // portón blanco acanalado
     for (let px = 58.7; px <= 62.3; px += .20) bx(g, px, 0, -429.51, .03, 2.40, .02, '#c6cacd');
     addCol(57.8, -429.4, 63.2, -422.1); mapRects.push([57.8, -429.4, 63.2, -422.1, '#f0eee8']);
-    premoldeadoX(-429.3, 41.2, 57.8, '#b5afa2', '#948e82');
+    // Tapial divisorio perpendicular (x = 57.7) separando el garaje blanco y la casa N2 del baldío abierto de la Comuna
+    premoldeadoZ(57.7, -429.3, -415.8, '#b5afa2', '#948e82');
 
     // Interior del terreno esquinero (x = 66.5..89.3, z = -429.2..-414.6): ripio, camioneta blanca, galponcito y árboles
     flat.rect(74.0, -427.6, 89.2, -422.5, .068, '#b6b0a2');
@@ -8218,10 +8253,10 @@ const USE_REAL_BUILDINGS = REAL_BUILDINGS.length > 0;
   // subestación aérea (torre de dos postes de hormigón con plataforma y transformadores) en el pasto, poste de hormigón en la ochava
   {
     const ZS = -234.5, ZE = -217.5, XSL = 33.5, OCH = 2.2;   // línea de San Luis, fin del pasto (AMFAC), largo de la tapia por San Luis, catetos de la ochava
-    flat.rect(9, -238, FX, ZE, .205, '#6f8f45');                    // pasto en lugar de vereda sobre la avenida
-    flat.rect(9, -238, XSL, ZS, .205, '#6f8f45');                   // y sobre San Luis
-    flat.rect(10.3, -237.5, 11.1, ZE, .207, '#9a8466');             // huella de tierra pisada
-    for (let k = 0; k < 7; k++){ const av = k < 4, x = av ? R(9.3, 11.3) : R(16, 31), z = av ? R(-237, -222) : R(-237.6, -236); flat.rect(x, z, x + R(.8, 2.2), z + R(.5, 1.4), .207, pick(['#8f7a5a', '#a08a68', '#7d8f4c'])); }
+    flat.rect(9, ZS, FX, ZE, .208, '#6f8f45');                      // pasto en lugar de vereda sobre la avenida (sin solaparse con San Luis)
+    flat.rect(9, -237.8, XSL, ZS, .208, '#6f8f45');                 // y sobre San Luis (sin montar sobre el cordón)
+    flat.rect(10.3, -237.5, 11.1, ZE, .214, '#9a8466');             // huella de tierra pisada
+    for (let k = 0; k < 7; k++){ const av = k < 4, x = av ? R(9.3, 11.3) : R(16, 31), z = av ? R(-237, -222) : R(-237.4, -236); flat.rect(x, z, x + R(.8, 2.2), z + R(.5, 1.3), .214, pick(['#8f7a5a', '#a08a68', '#7d8f4c'])); }
     // ladrillo encalado (blanco gastado con ladrillos a la vista)
     const brickTex = (() => { const c = document.createElement('canvas'); c.width = 256; c.height = 128; const x = c.getContext('2d');
       x.fillStyle = '#e4ded2'; x.fillRect(0, 0, 256, 128);
@@ -9043,11 +9078,11 @@ const USE_REAL_BUILDINGS = REAL_BUILDINGS.length > 0;
       for (const [cx, cy, c] of [[260, 60, '#d9c34a'], [330, 90, '#e07a9a'], [400, 50, '#d9c34a'], [460, 85, '#6fae6a']]){ x.fillStyle = c; x.beginPath(); x.ellipse(cx, cy, 34, 16, .3, 0, 7); x.fill(); } }, 512, 128);
     bx(g, -.75, 0, -.15, 6.5, 2.0, .3, '#8f5a46'); plano(g, -.75, 1.0, .02, 6.5, 2.0, graf);
     colLocal(g, -w / 2, -.3, 2.5, 0, null);
-    bx(g, 3.25, 0, -.1, 1.5, 2.1, .06, '#8d9a9f'); plano(g, 3.25, 1.4, -.06, 1.3, .45, tex((x, W, H) => { x.fillStyle = '#8d9a9f'; x.fillRect(0, 0, W, H); x.fillStyle = '#e8e8e8'; x.font = 'bold 70px Arial'; x.fillText('ONE', 40, 95); }));
+    bx(g, 3.25, 0, -.1, 1.5, 2.1, .06, '#8d9a9f'); plano(g, 3.25, 1.4, -.045, 1.3, .45, tex((x, W, H) => { x.fillStyle = '#8d9a9f'; x.fillRect(0, 0, W, H); x.fillStyle = '#e8e8e8'; x.font = 'bold 70px Arial'; x.fillText('ONE', 40, 95); }));
     flat.rect(XL - 14, zc - 4, XL, zc + 4, .05, '#6f9a4a');
     body(g, -2.2, 2.4, 14, 21, 3.0, '#d8cfbd'); gableIn(g, .1, 3.0, -17.5, 5.2, 1.2, 7.6, '#7f878d', 0);
     bx(g, -1, 3.0, -16.5, .7, 1.6, .7, '#b9b2a4'); bx(g, 1.2, 1.4, -13.98, .7, .45, .25, '#efefec');
-    bx(g, 4.3, 0, -4, .5, 3.2, 8, '#7d4a38');                                              // medianera alta de ladrillo del almacén
+    bx(g, 3.96, 0, -4.08, .22, 3.2, 7.84, '#7d4a38');                                        // medianera alta de ladrillo del almacén (sin invadir su frente blanco)
     pasto(-215, -223); flat.rect(XL + .3, zc - 4, XL + 1.6, zc + 4, .205, '#6f8f45'); arbol(zc + .6, 1.0);
   }
   // E) almacén de la esquina: planta baja blanca (ventana con reja, cartel redondo, puerta con pizarrón) y planta alta de ladrillo viejo
