@@ -645,6 +645,7 @@ const CORREO_N_POLY =[[-48, -234.5], [-13.5, -234.5], [-13.5, -187.3], [-48, -18
 const MALV_POLY =[[-47, -185], [-13, -185], [-13, -152.5], [-47, -152.5]];   // Plaza Islas Malvinas (esquina Jujuy y Av. Centenario, lado oeste) + Correo Argentino (Av. Centenario 821)
 const CENT_EAST_POLY =[[13, -234.5], [53, -234.5], [53, -152.5], [13, -152.5]];   // Av. Centenario lado este, de la esquina de Jujuy hasta San Luis (incluye lote de naranjos y AMFAC)
 const AMFAC_INT_POLY = [[13, -234.5], [90, -234.5], [90, -152.5], [13, -152.5]];   // manzana completa de AMFAC / Peghi / Soc. Italiana (frentes e interior armados a mano)
+const ESC186_POLY = [[-89.6, -300], [-55.5, -300], [-55.5, -250.5], [-89.6, -250.5]];   // Escuela Primaria N° 186 + Escuela Taller N° 167 (sin cajas sueltas de Overture en el patio)
 function nearRuralRoad(x, z, m = 9){
   if (distToPolyline(x, z, RP20S_PTS) < m + 2 || distToPolyline(x, z, RP26S_PTS) < m + 2 || distToPolyline(x, z, RP10S_E) < m + 2 || distToPolyline(x, z, IRIONDO_TIERRA) < m - 2) return true;
   if (distToPolyline(x, z, ACC_PTS) < m + 4 || distToPolyline(x, z, R18_PTS) < m + 5 ||
@@ -1861,11 +1862,32 @@ function frustumMesh(bot, top, y0, h, col){
   flat.rect(EX, -294.6, -63.5, -292.2, .076, '#cbc5b8');                 // entrada de cemento
   addCol(-70.8, -294.5, EX, -282.2); mapRects.push([-70.8, -294.5, EX, -282.2, '#ece6d8']);
 
-  // ---- 5) Patio central rectangular con baldosas, líneas en cruz y mástil ----
-  flat.rect(-77.5, -291.0, -66.0, -260.5, .07, '#d4cfc4');
-  flat.rect(-72.0, -291.0, -71.5, -260.5, .074, '#ece8de');              // línea central N-S del patio
-  flat.rect(-77.5, -276.0, -66.0, -275.5, .074, '#ece8de');              // línea central E-O del patio
-  poleIn(g, [-71.75, 0, -275.75], [-71.75, 9.2, -275.75], .06, '#e8e8e8');
+  // ---- 5) Centro de la Escuela 186: claustro cerrado en 4 lados, galerías blancas perimetrales y patio gris con cruz y diagonales blancas (satélite) ----
+  // Ala este de aulas (techo a dos aguas gris-azulado) cerrando el lado este del patio (x = -68.2..-63.8, z = -275.5..-260.5)
+  wing(-68.2, -275.5, -63.8, -260.5, 4.1, 'gable', CREAM, '#c9bca0', '#75828c');
+  // Ala norte interna (techo a dos aguas gris-azulado) cerrando el lado norte del patio (x = -75.8..-68.2, z = -279.6..-275.5)
+  wing(-75.8, -279.6, -68.2, -275.5, 4.1, 'gable', CREAM, '#c9bca0', '#75828c');
+  // Galerías cubiertas blancas con columnas rodeando los lados oeste (x = -77.5..-75.3) y sur (z = -262.7..-260.5) del patio
+  bx(g, -76.4, 3.05, -269.1, 2.2, .28, 12.8, WH);
+  for (let pz = -274.8; pz <= -262.5; pz += 3.0) bx(g, -75.45, 0, pz, .26, 3.05, .26, WH);
+  bx(g, -71.8, 3.05, -261.6, 7.6, .28, 2.2, WH);
+  for (let px = -75.45; px <= -68.4; px += 3.4) bx(g, px, 0, -262.55, .26, 3.05, .26, WH);
+  // Patio central rectangular gris con borde oscuro, cruz + diagonales blancas en estrella y mástil central
+  flat.rect(-77.5, -275.5, -68.2, -260.5, .068, '#d4cfc4');                      // piso bajo las galerías
+  flat.rect(-75.3, -275.2, -68.3, -262.7, .074, '#8f9088');                      // borde oscuro del patio
+  flat.rect(-75.0, -274.9, -68.6, -263.0, .078, '#a8a79e');                      // patio central gris
+  const pcx = -71.8, pcz = -268.95;
+  flat.rect(pcx - .18, -274.8, pcx + .18, -263.1, .084, '#efece4');              // línea blanca N-S
+  flat.rect(-74.9, pcz - .18, -68.7, pcz + .18, .084, '#efece4');                // línea blanca E-O
+  for (const ang of [Math.atan2(11.6, 6.2), -Math.atan2(11.6, 6.2)]){            // diagonales blancas en estrella
+    const dm = new THREE.Mesh(new THREE.PlaneGeometry(.24, 12.6), lam({ color: 0xefece4 }));
+    dm.rotation.x = -Math.PI / 2; dm.rotation.z = ang; dm.position.set(pcx, .086, pcz); g.add(dm);
+  }
+  bx(g, pcx, 0, pcz, .75, .22, .75, '#e8e4da');                                  // base del mástil
+  poleIn(g, [pcx, .2, pcz], [pcx, 9.2, pcz], .06, '#f2f2ee');
+  // Patio embaldosado trasero entre el edificio blanco de 2 plantas y la Escuela Taller N° 167 (x = -63.8..-55.7, z = -268.0..-260.5)
+  flat.rect(-63.8, -268.0, -55.7, -260.5, .07, '#c8c3b8');
+  plazaRects.push([-89.6, -300.0, -55.5, -250.5]);                               // sin casas ni árboles aleatorios adentro de la escuela
 
   // ---- 6) Vereda embaldosada sobre Córdoba, murete bajo crema, baranda verde tubular de cordón, bicicleteros y lomo de burro ----
   flat.rect(-89.5, -299.5, -86.4, -251.0, .065, '#cec8bc');              // vereda embaldosada frente a la escuela
@@ -6012,7 +6034,7 @@ const USE_REAL_BUILDINGS = REAL_BUILDINGS.length > 0;
     if (pts.length < 3) continue;
     { const [qx, qz] = polyCenter(pts);   // la Cooperativa y la Plazoleta del Inmigrante se arman aparte
       if (inPoly(qx, qz, COOP_POLY)){ COOP_FP.push(pts); continue; }
-      if (inPoly(qx, qz, PLAZA_INM) || inPoly(qx, qz, AGUA_POLY) || inPoly(qx, qz, ESQ_AGUA_POLY) || inPoly(qx, qz, PLAZA_SE_SUR_POLY) || inPoly(qx, qz, CENT_EAST_POLY) || inPoly(qx, qz, AMFAC_INT_POLY) || inPoly(qx, qz, MALV_POLY) || inPoly(qx, qz, TERM_POLY) || inPoly(qx, qz, QUINTA_POLY) || inPoly(qx, qz, GALP26_POLY) || inPoly(qx, qz, SANLUIS_E_POLY) || inPoly(qx, qz, ENTRERIOS_O_POLY) || inPoly(qx, qz, JUJUY_S_POLY) || inPoly(qx, qz, CASITAS_COOP_POLY) || inPoly(qx, qz, CASA1070_POLY) || inPoly(qx, qz, CORREO_N_POLY) || inPoly(qx, qz, DIABLITO_S_POLY) || inPoly(qx, qz, COMISARIA_POLY) || inPoly(qx, qz, JUJUY_SO_POLY) || inPoly(qx, qz, JUJUY_N_POLY) || inPoly(qx, qz, AVC_O_POLY) || inPoly(qx, qz, BRUNET_N_POLY) || inPoly(qx, qz, MANZANA_BRUNET_POLY) || inPoly(qx, qz, ARIGA_POLY) || inPoly(qx, qz, BRUNET_S_POLY) || inPoly(qx, qz, CORDOBA_E_POLY) || inPoly(qx, qz, ESCEN_N_POLY) || inPoly(qx, qz, ESCEN_E_POLY) || inPoly(qx, qz, MONG_POLY) || inPoly(qx, qz, MONG_S_POLY) || inPoly(qx, qz, CORD_BOMB_POLY) || inPoly(qx, qz, MUSEO_POLY) || inPoly(qx, qz, BOMB_N_POLY) || inPoly(qx, qz, SAGARDUY_POLY) || inPoly(qx, qz, LAV25_POLY) || inPoly(qx, qz, LAV25_E_POLY) || inPoly(qx, qz, ACOPIO_POLY) || inPoly(qx, qz, HOGAR_POLY) || inPoly(qx, qz, SHELL_POLY) || inPoly(qx, qz, CENT_BOL_POLY) || inPoly(qx, qz, ESC_BRUNET_POLY) || inPoly(qx, qz, BRUNET_IND_POLY)){ skipped++; continue; } }
+      if (inPoly(qx, qz, PLAZA_INM) || inPoly(qx, qz, AGUA_POLY) || inPoly(qx, qz, ESQ_AGUA_POLY) || inPoly(qx, qz, PLAZA_SE_SUR_POLY) || inPoly(qx, qz, CENT_EAST_POLY) || inPoly(qx, qz, AMFAC_INT_POLY) || inPoly(qx, qz, ESC186_POLY) || inPoly(qx, qz, MALV_POLY) || inPoly(qx, qz, TERM_POLY) || inPoly(qx, qz, QUINTA_POLY) || inPoly(qx, qz, GALP26_POLY) || inPoly(qx, qz, SANLUIS_E_POLY) || inPoly(qx, qz, ENTRERIOS_O_POLY) || inPoly(qx, qz, JUJUY_S_POLY) || inPoly(qx, qz, CASITAS_COOP_POLY) || inPoly(qx, qz, CASA1070_POLY) || inPoly(qx, qz, CORREO_N_POLY) || inPoly(qx, qz, DIABLITO_S_POLY) || inPoly(qx, qz, COMISARIA_POLY) || inPoly(qx, qz, JUJUY_SO_POLY) || inPoly(qx, qz, JUJUY_N_POLY) || inPoly(qx, qz, AVC_O_POLY) || inPoly(qx, qz, BRUNET_N_POLY) || inPoly(qx, qz, MANZANA_BRUNET_POLY) || inPoly(qx, qz, ARIGA_POLY) || inPoly(qx, qz, BRUNET_S_POLY) || inPoly(qx, qz, CORDOBA_E_POLY) || inPoly(qx, qz, ESCEN_N_POLY) || inPoly(qx, qz, ESCEN_E_POLY) || inPoly(qx, qz, MONG_POLY) || inPoly(qx, qz, MONG_S_POLY) || inPoly(qx, qz, CORD_BOMB_POLY) || inPoly(qx, qz, MUSEO_POLY) || inPoly(qx, qz, BOMB_N_POLY) || inPoly(qx, qz, SAGARDUY_POLY) || inPoly(qx, qz, LAV25_POLY) || inPoly(qx, qz, LAV25_E_POLY) || inPoly(qx, qz, ACOPIO_POLY) || inPoly(qx, qz, HOGAR_POLY) || inPoly(qx, qz, SHELL_POLY) || inPoly(qx, qz, CENT_BOL_POLY) || inPoly(qx, qz, ESC_BRUNET_POLY) || inPoly(qx, qz, BRUNET_IND_POLY)){ skipped++; continue; } }
     const area = Math.abs(polyArea(pts));
     let bo = obb(pts);
     if (!cls && (area < 28 || !bo || Math.min(bo.len, bo.wid) < 3.4)){ skipped++; continue; }
