@@ -616,7 +616,7 @@ const PLAZA_INM = [[-433.3,-42],[-395.5,-42],[-395.5,-30.5]];   // Plazoleta del
 const COOP_FP = [];
 const AGUA_POLY = [[105.3, -329.7], [121.2, -329.7], [121.2, -295.8], [105.3, -295.8]];   // lote del tanque de agua potable (Entre Ríos 978 y Bv. Lavalle)
 const ESQ_AGUA_POLY = [[63.5, -329.5], [89.6, -329.5], [89.6, -276.5], [63.5, -276.5]];   // casa simétrica de la esquina Bv. Lavalle / Entre Ríos / Plaza SE y lote baldío lindante al sur (enfrente del tanque de agua)
-const PLAZA_SE_SUR_POLY = [[13.5, -279.5], [70.5, -279.5], [70.5, -259.5], [13.5, -259.5]];   // casas del lado sur de la calle perimetral de Plaza SE, esquina 2 plantas y Farmacia Carino sobre Av. Centenario
+const PLAZA_SE_SUR_POLY = [[13.5, -279.5], [89.6, -279.5], [89.6, -250.5], [13.5, -250.5]];   // mitad sur completa de la manzana de Plaza SE (calle de la plaza, esquina Av. Centenario/San Luis, San Luis y Entre Ríos hasta el baldío)
 const QUINTA_POLY = [[-70.4, 95.0], [-95.2, 87.3], [-97, 128], [-78.1, 128]];   // (retirada 5 m de las calles para la cuneta con vereda)   // quinta de la esquina de Maipú (curva) — cercada con enredaderas, invernadero y casetita
 const TERM_POLY =[[-56, 150], [15, 150], [15, 176], [-56, 176]];   // Terminal de Ómnibus "Lo del Tío", casita, Almacén de Arébalo y galpón (Av. Centenario y Catamarca, antes de la vía)
 const GALP26_POLY = [[-505, 80], [-505, 100.5], [-523.5, 100.5], [-523.5, 80]];   // galpón de ladrillo al arrancar la RP 26-S (entrada con alcantarilla) — se arma aparte
@@ -7665,7 +7665,188 @@ const USE_REAL_BUILDINGS = REAL_BUILDINGS.length > 0;
     mapLabels.push([19, -263.5, 'Farm. Carino']);
   }
 
-  plazaRects.push([13.5, -279.5, 70.5, -259.5]);   // sin árboles ni casas aleatorias en toda esta fila y esquina
+  // =========================================================================
+  // RESTO DE LA MANZANA DE PLAZA SE: esquina Av. Centenario y San Luis, todo San Luis hasta Entre Ríos,
+  // y Entre Ríos subiendo hasta el lote baldío + interior con pileta (según las 7 fotos de Street View y satélite)
+  // =========================================================================
+  const ZS = -250.5;   // línea municipal norte de San Luis (frente mirando al +z)
+  const XE = 89.5;     // línea municipal oeste de Entre Ríos (frente mirando al +x)
+  flat.rect(13.5, -264.5, 89.6, ZS, .048, '#628a3e');                            // césped interior del sector sur de la manzana
+
+  // --- 7) Casa baja crema vieja de la esquina Av. Centenario y San Luis (x = 13.5..28.2, z = -259.5..-250.5 — Fotos sv4_1 y sv4_2) ---
+  {
+    const CR = '#dcd4c4', CR2 = '#c9c0ae';
+    // Cuerpo en L dejando el patio/ochava de entrada retraído en la esquina (x = 13.5..18.5, z = -254.0..-250.5)
+    bx(g, 20.85, 0, -256.75, 14.7, 3.05, 5.5, CR);                               // cuerpo principal norte (pegado a Farmacia Carino)
+    bx(g, 23.35, 0, -252.25, 9.7, 3.05, 3.5, CR);                                // ala hacia San Luis
+    bx(g, 20.85, 3.05, -256.75, 14.9, .14, 5.65, CR2);
+    bx(g, 23.35, 3.05, -252.25, 9.85, .14, 3.65, CR2);
+    // Frente sobre Av. Centenario (x = 13.5, mirando al -x — sv4_1): 2 ventanas con rejas romboidales blancas + reja vertical en la esquina
+    for (const wz of [-258.2, -255.6]){
+      bx(g, XA - .04, 1.05, wz, .08, 1.15, 1.45, '#e8e4dc');
+      bx(g, XA - .08, 1.12, wz, .04, 1.0, 1.32, '#5a5852');
+      for (let dz = -.55; dz <= .55; dz += .22) bx(g, XA - .1, 1.12, wz + dz, .03, 1.0, .03, '#f2f0ea');
+      for (let dy = 1.25; dy <= 1.95; dy += .24) bx(g, XA - .1, dy, wz, .03, .03, 1.32, '#f2f0ea');
+    }
+    // Reja blanca vertical cerrando el patio de la esquina (x = 15.2, z = -254.0..-250.5)
+    bx(g, 15.2, 2.25, -252.25, .08, .08, 3.5, '#e6e4de');
+    for (let rz = -253.9; rz <= -250.6; rz += .18) bx(g, 15.2, 0, rz, .04, 2.25, .04, '#e6e4de');
+    // Frente sobre San Luis (z = ZS, mirando al +z — sv4_2): ventanal con persiana blanca + 2 ventanitas con reja + puertita blanca + tanque en techo
+    bx(g, 20.4, 1.05, ZS + .04, 2.2, 1.2, .08, '#e6e2da');
+    bx(g, 24.4, 1.15, ZS + .04, 1.1, 1.05, .08, '#dedad0');
+    bx(g, 26.0, 1.15, ZS + .04, 1.1, 1.05, .08, '#dedad0');
+    bx(g, 28.65, 0, ZS + .04, .95, 2.1, .08, '#f4f4f0');                         // puertita blanca lateral (sv4_2)
+    bx(g, 26.8, 3.15, -253.5, 1.1, 1.0, 1.1, '#cfc8ba'); cylIn(g, 26.8, 4.7, -253.5, .52, 1.0, '#787e84');
+    // Vereda ancha rojiza de la esquina, señal "Loma de burro 50 mts" y cartel azul Av. Centenario (sv4_1)
+    flat.rect(10.0, -259.5, XA, ZS + 2.6, .206, '#b88272');
+    flat.rect(10.0, ZS, 28.2, ZS + 2.6, .206, '#b88272');
+    {
+      const s1 = group(11.4, -255.8); poleIn(s1, [0, 0, 0], [0, 2.1, 0], .04, '#7d8286');
+      const dm = new THREE.Mesh(new THREE.BoxGeometry(.05, .62, .62), lam({ color: 0xebd128 })); dm.position.set(0, 1.85, 0); dm.rotation.x = Math.PI / 4; s1.add(dm);
+      const s2 = group(11.0, -250.2); poleIn(s2, [0, 0, 0], [0, 2.8, 0], .05, '#253b7a');
+      signIn(s2, 'Av. Centenario', -.04, 2.55, 0, 1.15, .26, '#1f3a8a', '#ffffff', -Math.PI / 2);
+      signIn(s2, 'San Luis', 0, 2.25, .04, .9, .26, '#1f3a8a', '#ffffff', 0);
+    }
+    poleIn(g, [21.5, 0, ZS + 2.2], [21.5, 7.0, ZS + 2.2], .09, '#c46232');
+    addTree(11.4, -258.2, 1.2, false, ['#8d7858', '#7a684a']);
+    addTree(26.5, ZS + 2.4, 1.15, false, ['#8d7858', '#7a684a']);
+    addCol(13.5, -259.5, 28.2, ZS);
+    mapRects.push([13.5, -259.5, 28.2, ZS, CR]);
+  }
+
+  // --- 8) Tapial largo, portón corredizo gris y cerco vivo sobre San Luis (x = 28.2..57.5, z = ZS — Fotos sv4_2, sv4_3 y sv4_4 izq) ---
+  // Muro gris revocado (28.2..31.6) + portón corredizo gris oscuro entre 2 pilares blancos con faroles (31.6..36.4)
+  bx(g, 29.9, 0, ZS, 3.4, 2.15, .24, '#a69e92');
+  bx(g, 31.8, 0, ZS, .45, 2.4, .45, '#f2f1ed'); bx(g, 36.2, 0, ZS, .45, 2.4, .45, '#f2f1ed');
+  bx(g, 34.0, 0, ZS, 4.0, 2.1, .12, '#4a5256');                                  // portón corredizo gris oscuro
+  for (const py of [.5, 1.05, 1.6]) bx(g, 34.0, py, ZS + .07, 3.9, .05, .03, '#343a3e');
+  flat.rect(31.6, ZS, 36.4, ZS + 3.5, .206, '#cbc6bc');                          // entrada de hormigón al portón
+  // Tapial largo de ladrillo visto con columnas de hormigón (x = 36.4..47.5 — sv4_3)
+  bx(g, 41.95, 0, ZS, 11.1, 2.22, .22, '#b09884');
+  for (let px = 36.6; px <= 47.4; px += 2.7) bx(g, px, 0, ZS, .22, 2.26, .28, '#9a968e');
+  // Cerco vivo alto y tupido de enredadera verde oscura con columnas de hormigón y puertita blanca (x = 47.5..57.5 — sv4_4 izq)
+  bx(g, 52.5, 0, ZS, 10.0, 2.45, .48, '#3f5a2c');
+  for (let px = 49.0; px <= 56.5; px += 2.5) bx(g, px, 0, ZS + .2, .16, 2.15, .16, '#969288');
+  bx(g, 48.2, 0, ZS + .22, .85, 2.05, .08, '#f4f4f0');                           // puertita blanca en el cerco vivo
+  addCol(28.2, ZS - .25, 57.5, ZS + .25);
+  for (const tx of [39.5, 44.5, 50.0, 56.2]) addTree(tx, ZS + 2.2, 1.05, false, ['#8d7858', '#7a684a']);
+  // Pileta interior del gran jardín verde detrás del tapial y cerco vivo (visible en satélite media_1795480981763)
+  flat.rect(45.5, -261.0, 53.5, -255.0, .06, '#ece8de');
+  flat.rect(46.2, -260.3, 52.8, -255.7, .072, '#34a4de');
+  mapRects.push([46.2, -260.3, 52.8, -255.7, '#34a4de']);
+
+  // --- 9) Casa del medio sobre San Luis + portón ancho blanco (x = 57.5..75.5, z = -263.0..ZS — Fotos sv4_4 der y sv4_5 izq) ---
+  {
+    const TAN = '#bda68c', CRM = '#e2d8c5';
+    // Cuerpo de la casa retirado 2,4 m detrás de un murito crema con reja negra (x = 57.5..69.5)
+    bx(g, 63.5, 0, -257.8, 12.0, 3.25, 9.8, TAN);
+    bx(g, 63.5, 2.85, -252.86, 12.05, .42, .1, CRM);                             // franja superior crema
+    bx(g, 63.5, 3.25, -257.8, 12.15, .16, 9.95, '#cfc6b4');
+    // Porche retraído izquierdo + gran ventana con reja negra y aire acondicionado a la derecha (sv4_4)
+    bx(g, 60.2, .95, -252.84, 2.1, 1.35, .08, '#dfe4e8');
+    for (let xx = 59.3; xx <= 61.1; xx += .24) bx(g, xx, .95, -252.8, .03, 1.35, .02, '#222');
+    bx(g, 65.8, .9, -252.84, 2.8, 1.55, .08, '#e8ecee');
+    for (let xx = 64.5; xx <= 67.1; xx += .22) bx(g, xx, .9, -252.8, .03, 1.55, .02, '#222');
+    bx(g, 68.1, 1.1, -252.7, .85, .55, .42, '#dedcd4');                          // aire acondicionado de ventana
+    cylIn(g, 68.4, 4.1, -254.0, .55, 1.0, '#969ca2');                            // tanque de agua en el techo
+    // Murito bajo crema con reja negra y portoncito al frente (z = ZS)
+    bx(g, 60.2, 0, ZS, 5.2, .65, .22, CRM); bx(g, 66.4, 0, ZS, 6.0, .65, .22, CRM);
+    bx(g, 63.0, 0, ZS, .38, 1.1, .38, CRM);
+    for (let rx = 57.8; rx <= 69.2; rx += .22) bx(g, rx, .65, ZS, .03, .5, .03, '#222629');
+    flat.rect(57.5, -252.9, 69.5, ZS, .06, '#c4b8a6');
+    flat.rect(62.8, ZS, 64.2, ZS + 3.5, .206, '#c8c3b8');
+    // Portón ancho de chapa blanca acanalada entre muros de ladrillo (x = 69.5..75.5 — sv4_5 izq)
+    bx(g, 72.5, 0, ZS, 4.4, 2.15, .12, '#e8e6df');
+    for (let px = 70.5; px <= 74.5; px += .35) bx(g, px, 0, ZS + .07, .04, 2.15, .03, '#c4c2ba');
+    bx(g, 69.9, 0, ZS, .8, 2.2, .24, '#b8a898'); bx(g, 75.1, 0, ZS, .8, 2.2, .24, '#b8a898');
+    flat.rect(70.0, ZS, 75.0, ZS + 3.5, .206, '#c8c3b8');
+    addTree(61.5, ZS + 2.2, 1.15, false, ['#8d7858', '#7a684a']);
+    addTree(74.8, ZS + 2.2, 1.15, false, ['#8d7858', '#7a684a']);
+    addCol(57.5, -263.0, 75.5, ZS);
+    mapRects.push([57.5, -263.0, 69.5, -252.9, TAN]);
+  }
+
+  // --- 10) Chalet crema con alero de tejas y chimenea de piedra en la esquina San Luis y Entre Ríos (x = 75.5..89.5, z = -262.0..ZS — Fotos sv4_5 der y sv4_6 izq) ---
+  {
+    const CH = '#efe8d8', TEJA = '#b85436', LADR = '#a8523a';
+    bx(g, 82.0, 0, -257.2, 11.2, 3.05, 8.8, CH);
+    bx(g, 82.0, 3.05, -257.2, 11.4, .16, 9.0, '#ddd6c6');
+    // Alero inclinado de tejas rojas sobre San Luis (+z) y sobre Entre Ríos (+x)
+    const eS = new THREE.Mesh(new THREE.BoxGeometry(11.8, .18, 1.05), lam({ color: 0xb85436 }));
+    eS.position.set(82.0, 2.95, -252.4); eS.rotation.x = .32; g.add(eS);
+    const eE = new THREE.Mesh(new THREE.BoxGeometry(1.05, .18, 9.4), lam({ color: 0xb85436 }));
+    eE.position.set(87.9, 2.95, -257.2); eE.rotation.z = -.32; g.add(eE);
+    // Frente sobre San Luis (z = -252.8 — sv4_5): 2 persianas, puerta de madera oscura, columna blanca y ventanal con persiana
+    for (const wx of [78.4, 80.7, 85.4]){
+      bx(g, wx, 1.05, -252.76, wx > 84 ? 2.4 : 1.55, 1.25, .08, '#c8c6be');
+      for (let yy = 1.15; yy < 2.25; yy += .12) bx(g, wx, yy, -252.71, wx > 84 ? 2.34 : 1.5, .02, .02, '#9e9c94');
+    }
+    bx(g, 82.8, 0, -252.76, 1.05, 2.25, .08, '#5a3622');                         // puerta madera oscura
+    bx(g, 87.3, 0, -252.1, .28, 2.95, .28, '#f4f3ef');                           // columna de la esquina
+    // Frente sobre Entre Ríos (x = 87.6 — sv4_6 izq): gran CHIMENEA DE PIEDRA GRIS entre 2 ventanales con persianas
+    bx(g, 87.85, 0, -255.8, .95, 4.45, 1.45, '#9ea2a6');                         // chimenea exterior de piedra gris
+    bx(g, 87.85, 4.45, -255.8, 1.15, .16, 1.65, '#b8bcc0');                      // sombrerete de la chimenea
+    for (const wz of [-254.2, -258.5]){
+      bx(g, 87.64, 1.0, wz, .08, 1.35, 2.15, '#c8c6be');
+      for (let yy = 1.1; yy < 2.3; yy += .12) bx(g, 87.69, yy, wz, .02, .02, 2.1, '#9e9c94');
+    }
+    // Murito bajo de ladrillo visto rojo con pilares y reja baja rodeando la esquina (z = ZS y x = XE)
+    bx(g, 82.5, 0, ZS, 13.8, .62, .22, LADR); bx(g, XE, 0, -256.2, .22, .62, 11.4, LADR);
+    for (let px = 76.2; px <= 89.2; px += 3.2) bx(g, px, 0, ZS, .38, 1.05, .38, LADR);
+    for (let pz = -261.6; pz <= -251.0; pz += 3.4) bx(g, XE, 0, pz, .38, 1.05, .38, LADR);
+    for (let rx = 76.4; rx <= 89.0; rx += .24) bx(g, rx, .62, ZS, .03, .45, .03, '#3c4246');
+    for (let rz = -261.4; rz <= -250.8; rz += .24) bx(g, XE, .62, rz, .03, .45, .03, '#3c4246');
+    poleIn(g, [78.6, 0, ZS + 2.2], [78.6, 7.2, ZS + 2.2], .09, '#c46232');
+    addTree(82.4, ZS + 2.2, 1.2, false, ['#8d7858', '#7a684a']);
+    addTree(88.8, ZS + 2.2, 1.1, false, ['#8d7858', '#7a684a']);
+    addTree(XE + 2.2, -256.5, 1.1, false, ['#8d7858', '#7a684a']);
+    addCol(75.5, -262.0, XE, ZS);
+    mapRects.push([76.4, -261.6, 87.6, -252.8, TEJA]);
+  }
+
+  // --- 11) Casa terracota-naranja y ladrillo con garaje de 4 arcos y auto gris sobre Entre Ríos (x = 76.0..89.5, z = -273.5..-262.0 — Fotos sv4_6 der y sv4_7) ---
+  {
+    const NARANJA = '#cf6344', LADR_O = '#7c4c3a';
+    // Tramo sur (z = -268.5..-262.0 — sv4_6 der): muro naranja con bloques calados + puerta blanca + porche ladrillo con reja verde y techo de tejas
+    bx(g, 83.2, 0, -265.25, 11.4, 3.05, 6.5, LADR_O);
+    const roofT = new THREE.Mesh(new THREE.BoxGeometry(11.8, .18, 6.8), lam({ color: 0xb55034 }));
+    roofT.position.set(83.2, 3.35, -265.25); roofT.rotation.z = -.12; g.add(roofT);
+    bx(g, 89.2, 0, -263.1, .3, 2.35, 2.2, NARANJA);                              // muro frontal naranja con calados arriba
+    bx(g, 89.2, 2.35, -263.1, .28, .45, 2.2, '#6b3828');
+    bx(g, 89.1, 0, -264.6, .12, 2.15, .85, '#f2f1ed');                           // puerta blanca
+    bx(g, 89.1, 2.75, -266.8, .35, .3, 3.6, NARANJA);                            // viga naranja del porche
+    for (let rz = -268.2; rz <= -265.2; rz += .22) bx(g, 89.0, 0, rz, .04, 2.65, .04, '#2f5c3a');   // reja verde oscura
+    // Tramo norte (z = -273.5..-268.5 — sv4_7 centro): garaje terracota-naranja con puerta blanca, ventana con reja y portón blanco con 4 arcos
+    bx(g, 83.5, 0, -271.0, 12.0, 3.45, 5.0, NARANJA);
+    bx(g, 89.54, 0, -269.0, .08, 2.15, .85, '#f2f1ed');                          // puertita blanca
+    bx(g, 89.54, 1.05, -270.15, .08, .95, 1.05, '#dfe6ea');                      // ventana con reja blanca
+    for (let rz = -270.6; rz <= -269.7; rz += .18) bx(g, 89.59, 1.05, rz, .03, .95, .03, '#3c4246');
+    // Portón blanco de 4 paneles con 4 ventanitas en arco (z = -272.1)
+    bx(g, 89.54, 0, -272.1, .08, 2.4, 2.55, '#f4f3ef');
+    for (const dz of [-.9, -.3, .3, .9]){
+      const ar = new THREE.Mesh(new THREE.CircleGeometry(.24, 12, 0, Math.PI), lam({ color: 0x2f3b44 }));
+      ar.position.set(89.59, 1.88, -272.1 + dz); ar.rotation.y = Math.PI / 2; g.add(ar);
+    }
+    flat.rect(XE, -273.4, 92.85, -269.0, .205, '#c9c4ba');                       // entrada vehicular de hormigón (hasta el cordón)
+    // Auto sedán gris estacionado en la entrada del garaje (Foto sv4_7)
+    {
+      const car = group(90.9, -271.8, Math.PI / 2);
+      bx(car, 0, .28, 0, 1.72, .65, 3.85, '#c4c9ce');
+      bx(car, 0, .92, -.15, 1.48, .52, 2.0, '#d2d7dc');
+      bx(car, 0, .96, -.15, 1.5, .42, 1.7, '#2d3942');
+      for (const [wx, wz] of [[-.88, 1.2], [.88, 1.2], [-.88, -1.2], [.88, -1.2]]){
+        const wh = cylIn(car, wx, .28, wz, .28, .18, '#1e2022'); wh.rotation.z = Math.PI / 2;
+      }
+    }
+    // Jardincito norte (z = -276.5..-273.5) conectando con el tapial de ladrillo del lote baldío (sv4_7 der)
+    addTree(XE + 2.2, -264.5, 1.1, false, ['#8d7858', '#7a684a']);
+    addTree(XE + 2.2, -267.8, 1.15, false, ['#8d7858', '#7a684a']);
+    addTree(XE + 2.2, -274.8, 1.2, false, ['#8d7858', '#7a684a']);
+    addCol(76.0, -273.5, XE, -262.0);
+    mapRects.push([76.0, -273.5, XE, -262.0, NARANJA]);
+  }
+
+  plazaRects.push([13.5, -279.5, 89.6, -250.5]);   // toda la mitad sur de la manzana de Plaza SE armada a mano
 }
 
 // Av. Centenario, lado este entre San Luis y Jujuy (video + fotos + plano satelital del usuario):
