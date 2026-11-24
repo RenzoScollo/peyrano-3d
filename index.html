@@ -616,7 +616,7 @@ const PLAZA_INM = [[-433.3,-42],[-395.5,-42],[-395.5,-30.5]];   // Plazoleta del
 const COOP_FP = [];
 const AGUA_POLY = [[105.3, -329.7], [121.2, -329.7], [121.2, -295.8], [105.3, -295.8]];   // lote del tanque de agua potable (Entre Ríos 978 y Bv. Lavalle)
 const ESQ_AGUA_POLY = [[63.5, -329.5], [89.6, -329.5], [89.6, -276.5], [63.5, -276.5]];   // casa simétrica de la esquina Bv. Lavalle / Entre Ríos / Plaza SE y lote baldío lindante al sur (enfrente del tanque de agua)
-const PLAZA_SE_SUR_POLY = [[13.5, -279.5], [70.5, -279.5], [70.5, -261.0], [13.5, -261.0]];   // casas del lado sur de la calle perimetral de Plaza SE (desde el baldío hasta Av. Centenario)
+const PLAZA_SE_SUR_POLY = [[13.5, -279.5], [70.5, -279.5], [70.5, -259.5], [13.5, -259.5]];   // casas del lado sur de la calle perimetral de Plaza SE, esquina 2 plantas y Farmacia Carino sobre Av. Centenario
 const QUINTA_POLY = [[-70.4, 95.0], [-95.2, 87.3], [-97, 128], [-78.1, 128]];   // (retirada 5 m de las calles para la cuneta con vereda)   // quinta de la esquina de Maipú (curva) — cercada con enredaderas, invernadero y casetita
 const TERM_POLY =[[-56, 150], [15, 150], [15, 176], [-56, 176]];   // Terminal de Ómnibus "Lo del Tío", casita, Almacén de Arébalo y galpón (Av. Centenario y Catamarca, antes de la vía)
 const GALP26_POLY = [[-505, 80], [-505, 100.5], [-523.5, 100.5], [-523.5, 80]];   // galpón de ladrillo al arrancar la RP 26-S (entrada con alcantarilla) — se arma aparte
@@ -7384,175 +7384,271 @@ const USE_REAL_BUILDINGS = REAL_BUILDINGS.length > 0;
 }
 
 // =========================================================================
-// Lado sur de la calle perimetral de Plaza SE (z = -277.0, mirando al norte -z hacia la plaza):
-// De este (al lado del lote baldío) a oeste (hacia Av. Centenario), según las 4 fotos de Street View:
-// 1) Esquina al lado del baldío: camioneta utilitaria roja, acopladito negro, cerco premoldeado bajo y galpón de chapa oxidada con portón doble
-// 2) Casa baja blanca (51.5..60.0) con puertita vidriada, dos ventanas con persianas/rejas, puerta de madera y torre ocre con tanque gris + antena
-// 3) Casa italiana alta blanca y verde-oliva (39.2..51.5) con zócalo y friso con medallones, 2 ventanales y puerta doble de madera con banderola y faroles
-// 4) Casa moderna de hormigón visto (17.5..39.2): garaje blanco con portón de madera, banco y perro; cuerpo de hormigón con persianas horizontales;
-//    galería cubierta con puerta de madera y maceteros; garaje de hormigón con portón gris y franja baja roja; y garaje abierto blanco llegando a Av. Centenario
+// Lado sur de la calle perimetral de Plaza SE (z = -276.8, mirando al norte -z hacia la plaza) y esquina con Av. Centenario (Farmacia Carino):
+// De este (al lado del lote baldío) a oeste (esquina Av. Centenario), ajustando anchos para que entren todas las casas de Street View:
+// 1) Esquina al lado del baldío (61.5..69.5): camioneta roja, acopladito negro, cerco bajo y galpón de chapa oxidada
+// 2) Casa baja blanca con torre ocre y tanque gris (54.0..61.5)
+// 3) Casa italiana alta blanca y verde-oliva (44.2..54.0)
+// 4) Casa moderna de hormigón visto (27.5..44.2) con garaje blanco de madera, persianas horizontales, galería cubierta y portón gris con franja roja
+// 5) Casa de la esquina 2 plantas (13.5..27.5): garaje blanco abierto con enredadera, zócalo de ladrillo, terraza con baranda de madera y 3 arcos de ladrillo arriba
+// 6) FARMACIA CARINO sobre Av. Centenario (x = 13.5, z = -267.5..-259.5): frente blanco con cenefa y cruz verde, cartel, puerta con reja y persiana gris
 // =========================================================================
 {
   const g = group(0, 0);
   const ZF = -276.8;   // línea municipal sur de la calle de la plaza (frente mirando al -z)
-  // Vereda verde con pasto a lo largo de toda la cuadra (entre la calle z = -279.5 y las casas z = -276.8)
+  const XA = 13.5;     // línea municipal este de Av. Centenario (frente mirando al -x)
+  // Vereda verde con pasto a lo largo de toda la cuadra de la plaza
   flat.rect(13.5, -279.5, 70.5, ZF, .204, '#6b8f42');
-  flat.rect(13.5, ZF, 70.5, -261.0, .048, '#668840');
+  flat.rect(13.5, ZF, 70.5, -259.5, .048, '#668840');
 
-  // --- 1) Esquina al lado del baldío (x = 59.8..70.2): camioneta roja, acoplado negro, cerco bajo y galpón de chapa oxidada ---
-  // Entrada de tierra hacia el cerco y galpón
-  flat.rect(64.5, -279.5, 68.5, ZF, .205, '#9e8e74');
-  // Cerco premoldeado gris bajo con portoncito entre el baldío y el galpón oxidado (x = 66.2..70.0)
-  bx(g, 68.2, 0, ZF + .15, 3.6, 1.05, .14, '#9a9892');
-  for (const px of [66.5, 68.2, 69.9]) bx(g, px, 0, ZF + .15, .14, 1.7, .16, '#86847e');
-  // Galpón de chapa acanalada oxidada con portón doble (x = 60.0..66.2, z = -276.8..-266.5)
-  bx(g, 63.1, 0, -271.7, 6.2, 3.05, 10.2, '#9a948a');
-  bx(g, 63.1, 3.05, -271.7, 6.35, .14, 10.35, '#7e634e');                        // techo inclinado oxidado
-  // Franjas verticales simulando chapa acanalada con manchas de óxido en el frente (-z)
-  for (let px = 60.2; px <= 66.0; px += .35){
-    const ox = (px < 61.0 || px > 65.2) ? '#8a4f30' : '#a8a49c';
+  // --- 1) Esquina al lado del baldío (x = 61.5..69.5): camioneta roja, acoplado negro, cerco bajo y galpón oxidado ---
+  flat.rect(65.5, -279.5, 68.8, ZF, .205, '#9e8e74');
+  bx(g, 67.6, 0, ZF + .15, 3.2, 1.05, .14, '#9a9892');
+  for (const px of [66.1, 67.6, 69.1]) bx(g, px, 0, ZF + .15, .14, 1.7, .16, '#86847e');
+  // Galpón de chapa acanalada oxidada con portón doble (x = 61.5..65.9, w = 4.4 m)
+  bx(g, 63.7, 0, -271.7, 4.4, 3.05, 10.2, '#9a948a');
+  bx(g, 63.7, 3.05, -271.7, 4.55, .14, 10.35, '#7e634e');
+  for (let px = 61.7; px <= 65.7; px += .35){
+    const ox = (px < 62.3 || px > 65.1) ? '#8a4f30' : '#a8a49c';
     bx(g, px, 0, ZF - .04, .18, 3.0, .06, ox);
   }
-  bx(g, 63.1, 0, ZF - .07, 3.6, 2.45, .08, '#b2afa8');                           // portón doble de chapa
-  bx(g, 63.1, 2.48, ZF - .08, 3.7, .12, .08, '#8a4f30');                         // dintel oxidado
-  addCol(60.0, -276.8, 66.2, -266.5);
-  mapRects.push([60.0, -276.8, 66.2, -266.5, '#9a948a']);
-  // Camioneta utilitaria roja estacionada en el pasto al lado del baldío (x ≈ 68.5, z ≈ -278.0) + acoplado negro con bolsas
+  bx(g, 63.7, 0, ZF - .07, 2.8, 2.45, .08, '#b2afa8');
+  bx(g, 63.7, 2.48, ZF - .08, 2.9, .12, .08, '#8a4f30');
+  addCol(61.5, -276.8, 65.9, -266.5);
+  mapRects.push([61.5, -276.8, 65.9, -266.5, '#9a948a']);
+  // Camioneta utilitaria roja + acoplado negro en el pasto al lado del baldío
   {
-    const v = group(68.8, -277.9, -.25);
-    bx(v, -.4, .32, 0, 2.1, 1.38, 1.48, '#c83424');                              // caja trasera furgón roja
-    bx(v, 1.1, .32, 0, 1.15, .78, 1.44, '#c83424');                              // trompa roja
-    bx(v, .65, 1.05, 0, .75, .52, 1.38, '#2d3942');                              // parabrisas
-    for (const [wx, wz] of [[-.9, .75], [1.1, .75], [-.9, -.75], [1.1, -.75]]){
+    const v = group(68.2, -277.9, -.25);
+    bx(v, -.4, .32, 0, 2.0, 1.38, 1.44, '#c83424');
+    bx(v, 1.05, .32, 0, 1.1, .78, 1.4, '#c83424');
+    bx(v, .62, 1.05, 0, .72, .52, 1.34, '#2d3942');
+    for (const [wx, wz] of [[-.85, .72], [1.05, .72], [-.85, -.72], [1.05, -.72]]){
       const wh = cylIn(v, wx, .32, wz, .3, .18, '#1e2022'); wh.rotation.x = Math.PI / 2;
     }
-    const tr = group(71.2, -278.6, .35);                                         // acoplado/carretilla negra con bolsas
-    bx(tr, 0, .42, 0, 1.65, .62, 1.1, '#232629');
-    bx(tr, 0, .82, 0, 1.2, .35, .85, '#3b4a5e');
-    for (const wz of [-.6, .6]){ const wh = cylIn(tr, 0, .3, wz, .28, .14, '#1b1d1f'); wh.rotation.x = Math.PI / 2; }
+    const tr = group(70.4, -278.6, .35);
+    bx(tr, 0, .42, 0, 1.6, .6, 1.05, '#232629');
+    bx(tr, 0, .8, 0, 1.15, .34, .82, '#3b4a5e');
+    for (const wz of [-.58, .58]){ const wh = cylIn(tr, 0, .3, wz, .28, .14, '#1b1d1f'); wh.rotation.x = Math.PI / 2; }
   }
-  addTree(66.5, -273.5, .95, false, ['#8d7858', '#7a684a']);
+  addTree(66.5, -273.5, .9, false, ['#8d7858', '#7a684a']);
 
-  // --- 2) Casa baja blanca con tanque elevado (x = 51.5..60.0, z = -276.8..-265.0 — Fotos sv2_1 y sv2_2) ---
-  bx(g, 55.75, 0, -270.9, 8.5, 3.08, 11.8, '#f5f4ef');
-  bx(g, 55.75, 3.08, -270.9, 8.65, .2, 11.95, '#e8e4d8');
-  bx(g, 55.75, 2.95, ZF - .06, 8.54, .18, .08, '#d4b878');                       // filete superior crema-ocre
-  // Puerta blanca chica con vidrios junto al galpón (x = 59.3), ventana izq (57.3), puerta de madera (55.2), ventana der (53.1)
-  bx(g, 59.35, 0, ZF - .05, .95, 2.1, .08, '#ffffff');
-  bx(g, 59.35, 1.4, ZF - .09, .55, .45, .04, '#36444e');
-  for (const wx of [57.35, 53.05]){
-    bx(g, wx, .85, ZF - .05, 1.75, 1.25, .08, '#e8e6e0');
-    for (let yy = .95; yy < 1.5; yy += .12) bx(g, wx, yy, ZF - .09, 1.65, .02, .02, '#4a4e52');
-    for (let xx = wx - .72; xx <= wx + .74; xx += .18) bx(g, xx, .85, ZF - .1, .025, .62, .02, '#dcdad4');
-    bx(g, wx, 1.5, ZF - .08, 1.65, .55, .04, '#f2f1ec');                         // persiana blanca a media altura
+  // --- 2) Casa baja blanca con torre ocre y tanque gris (x = 54.0..61.5, w = 7.5 m) ---
+  bx(g, 57.75, 0, -270.9, 7.5, 3.08, 11.8, '#f5f4ef');
+  bx(g, 57.75, 3.08, -270.9, 7.65, .2, 11.95, '#e8e4d8');
+  bx(g, 57.75, 2.95, ZF - .06, 7.54, .18, .08, '#d4b878');
+  bx(g, 60.95, 0, ZF - .05, .85, 2.1, .08, '#ffffff');
+  bx(g, 60.95, 1.4, ZF - .09, .5, .45, .04, '#36444e');
+  for (const wx of [59.15, 55.35]){
+    bx(g, wx, .85, ZF - .05, 1.55, 1.25, .08, '#e8e6e0');
+    for (let yy = .95; yy < 1.5; yy += .12) bx(g, wx, yy, ZF - .09, 1.45, .02, .02, '#4a4e52');
+    for (let xx = wx - .62; xx <= wx + .64; xx += .18) bx(g, xx, .85, ZF - .1, .025, .62, .02, '#dcdad4');
+    bx(g, wx, 1.5, ZF - .08, 1.45, .55, .04, '#f2f1ec');
   }
-  bx(g, 55.25, 0, ZF - .04, 1.05, 2.25, .12, '#e6e3dc');
-  bx(g, 55.25, 0, ZF - .08, .88, 2.15, .06, '#b8764a');                          // puerta de madera clara
-  bx(g, 55.25, 2.42, ZF - .12, .14, .2, .12, '#2a2a2a');                         // farolito
-  // Torre ocre de tanque de agua + tanque cilíndrico gris + antena satelital (x = 57.6)
-  bx(g, 57.6, 3.25, -274.8, 1.55, 1.35, 1.55, '#c49648');
-  cylIn(g, 57.6, 5.2, -274.8, .66, 1.25, '#8a9096');
-  // Veredita de cemento + senderito al cordón + poste de madera
-  flat.rect(51.5, ZF - .9, 60.0, ZF, .206, '#d6d2c8');
-  flat.rect(55.0, -279.5, 56.1, ZF - .9, .206, '#c9c4ba');
-  poleIn(g, [54.6, 0, ZF - .5], [54.6, 7.6, ZF - .5], .12, '#7d6850');
-  addCol(51.5, -276.8, 60.0, -265.0);
-  mapRects.push([51.5, -276.8, 60.0, -265.0, '#f5f4ef']);
+  bx(g, 57.25, 0, ZF - .04, .98, 2.25, .12, '#e6e3dc');
+  bx(g, 57.25, 0, ZF - .08, .82, 2.15, .06, '#b8764a');
+  bx(g, 57.25, 2.42, ZF - .12, .14, .2, .12, '#2a2a2a');
+  bx(g, 59.3, 3.25, -274.8, 1.45, 1.35, 1.45, '#c49648');
+  cylIn(g, 59.3, 5.2, -274.8, .62, 1.25, '#8a9096');
+  flat.rect(54.0, ZF - .9, 61.5, ZF, .206, '#d6d2c8');
+  flat.rect(56.8, -279.5, 57.8, ZF - .9, .206, '#c9c4ba');
+  poleIn(g, [56.6, 0, ZF - .5], [56.6, 7.6, ZF - .5], .12, '#7d6850');
+  addCol(54.0, -276.8, 61.5, -265.0);
+  mapRects.push([54.0, -276.8, 61.5, -265.0, '#f5f4ef']);
 
-  // --- 3) Casa italiana alta blanca y verde-oliva (x = 39.2..51.5, z = -276.8..-264.0 — Foto sv2_2) ---
+  // --- 3) Casa italiana alta blanca y verde-oliva (x = 44.2..54.0, w = 9.8 m) ---
   const OLIVA = '#a69e6a', CAOB = '#8a4626';
-  bx(g, 45.35, 0, -270.4, 12.3, 4.65, 12.8, '#f5f4f0');
-  bx(g, 45.35, 4.65, -270.4, 12.45, .18, 12.95, '#e2dfd6');
-  bx(g, 45.35, 0, ZF - .05, 12.34, .65, .08, OLIVA);                             // zócalo verde-oliva
-  bx(g, 45.35, 3.65, ZF - .06, 12.38, .22, .12, OLIVA);                          // friso inferior
-  bx(g, 45.35, 4.18, ZF - .06, 12.38, .32, .14, OLIVA);                          // friso superior
-  // Paños verticales color oliva detrás de cada abertura + 3 medallones blancos
-  for (const bxX of [48.7, 45.35, 42.0]){
-    bx(g, bxX, .65, ZF - .03, 1.95, 2.95, .04, '#b8b07e');
-    bx(g, bxX, 3.12, ZF - .06, 1.25, .28, .06, '#f6f5f0');                       // frontón/medallón blanco sobre cada vano
-    bx(g, bxX, 4.34, ZF - .1, .3, .24, .06, '#f6f5f0');                          // roseta blanca en el friso
+  bx(g, 49.1, 0, -270.4, 9.8, 4.65, 12.8, '#f5f4f0');
+  bx(g, 49.1, 4.65, -270.4, 9.95, .18, 12.95, '#e2dfd6');
+  bx(g, 49.1, 0, ZF - .05, 9.84, .65, .08, OLIVA);
+  bx(g, 49.1, 3.65, ZF - .06, 9.88, .22, .12, OLIVA);
+  bx(g, 49.1, 4.18, ZF - .06, 9.88, .32, .14, OLIVA);
+  for (const bxX of [51.9, 49.1, 46.3]){
+    bx(g, bxX, .65, ZF - .03, 1.75, 2.95, .04, '#b8b07e');
+    bx(g, bxX, 3.12, ZF - .06, 1.15, .28, .06, '#f6f5f0');
+    bx(g, bxX, 4.34, ZF - .1, .28, .24, .06, '#f6f5f0');
   }
-  // 2 ventanales altos de madera caoba con rejas (x = 48.7 y 42.0)
-  for (const wx of [48.7, 42.0]){
-    bx(g, wx, .78, ZF - .06, 1.15, 2.05, .08, CAOB);
-    bx(g, wx, .86, ZF - .1, .95, 1.88, .04, '#2d453a');
+  for (const wx of [51.9, 46.3]){
+    bx(g, wx, .78, ZF - .06, 1.08, 2.05, .08, CAOB);
+    bx(g, wx, .86, ZF - .1, .88, 1.88, .04, '#2d453a');
     bx(g, wx, .86, ZF - .12, .05, 1.88, .03, CAOB);
-    for (let yy = 1.2; yy < 2.6; yy += .38) bx(g, wx, yy, ZF - .12, .95, .04, .03, CAOB);
+    for (let yy = 1.2; yy < 2.6; yy += .38) bx(g, wx, yy, ZF - .12, .88, .04, .03, CAOB);
   }
-  // Puerta doble central de madera caoba con vidrios verdes, banderola de hierro, 2 faroles y 2 macetones barril
-  bx(g, 45.35, 0, ZF - .06, 1.22, 2.85, .08, CAOB);
-  for (const s of [-.24, .24]) bx(g, 45.35 + s, 1.05, ZF - .1, .32, 1.2, .04, '#366846');
-  bx(g, 45.35, 2.48, ZF - .1, 1.05, .36, .04, '#252a2e');                        // banderola de hierro
-  for (const s of [-.85, .85]){
-    bx(g, 45.35 + s, 2.45, ZF - .12, .14, .24, .14, '#2d3b2d');                  // faroles laterales
-    cylIn(g, 45.35 + s * 1.1, .35, ZF - .35, .26, .7, '#756648');                // macetones barril
+  bx(g, 49.1, 0, ZF - .06, 1.18, 2.85, .08, CAOB);
+  for (const s of [-.22, .22]) bx(g, 49.1 + s, 1.05, ZF - .1, .3, 1.2, .04, '#366846');
+  bx(g, 49.1, 2.48, ZF - .1, 1.0, .36, .04, '#252a2e');
+  for (const s of [-.78, .78]){
+    bx(g, 49.1 + s, 2.45, ZF - .12, .14, .24, .14, '#2d3b2d');
+    cylIn(g, 49.1 + s * 1.1, .35, ZF - .35, .24, .7, '#756648');
   }
-  flat.rect(39.2, ZF - 1.1, 51.5, ZF, .206, '#d4cec2');
-  flat.rect(44.5, -279.5, 46.2, ZF - 1.1, .206, '#cbc6bc');                      // vereda recta al cordón
-  for (const tx of [48.9, 40.3]) addTree(tx, -278.4, .55, false, ['#9c7a45', '#8a6a3a']);
-  addCol(39.2, -276.8, 51.5, -264.0);
-  mapRects.push([39.2, -276.8, 51.5, -264.0, '#f5f4f0']);
+  flat.rect(44.2, ZF - 1.1, 54.0, ZF, .206, '#d4cec2');
+  flat.rect(48.3, -279.5, 49.9, ZF - 1.1, .206, '#cbc6bc');
+  for (const tx of [52.2, 45.0]) addTree(tx, -278.4, .52, false, ['#9c7a45', '#8a6a3a']);
+  addCol(44.2, -276.8, 54.0, -264.0);
+  mapRects.push([44.2, -276.8, 54.0, -264.0, '#f5f4f0']);
 
-  // --- 4) Casa moderna de hormigón visto (x = 17.5..39.2, z = -276.8..-263.0 — Fotos sv2_3 y sv2_4) ---
+  // --- 4) Casa moderna de hormigón visto (x = 27.5..44.2, w = 16.7 m) ---
   const HORM = '#9f9d96', HORM2 = '#8c8a84';
-  // a) Patio lateral derecho de la casa italiana con portón de madera (x = 36.8..39.2) y garaje blanco (x = 33.4..36.8)
-  bx(g, 38.0, 0, ZF + 2.2, 2.3, 2.2, .14, '#7d4628');                            // portón doble de tablas de madera al fondo del pasillo
-  bx(g, 35.1, 0, -271.0, 3.4, 3.25, 11.4, '#f2f1ed');                            // volumen blanco del garaje
-  bx(g, 34.8, 0, ZF - .05, 2.55, 2.35, .08, '#6e3a20');                          // portón doble de madera con tableros
-  for (let px = 33.8; px <= 35.8; px += .5) bx(g, px, .1, ZF - .09, .04, 2.15, .02, '#4e2815');
-  for (let py = .45; py < 2.2; py += .45) bx(g, 34.8, py, ZF - .09, 2.45, .04, .02, '#4e2815');
-  // Banco de madera y hierro + perro negro acostado frente al portón de madera (sv2_3 izquierda)
-  bx(g, 36.9, .45, ZF - .55, 1.35, .08, .42, '#8a6242');
-  bx(g, 36.9, .78, ZF - .38, 1.35, .28, .06, '#8a6242');
-  for (const s of [-.6, .6]) bx(g, 36.9 + s, 0, ZF - .55, .08, .55, .42, '#282b2e');
-  bx(g, 35.3, 0, ZF - .5, .75, .42, .42, '#1b1d1f');
-  flat.rect(33.4, -279.5, 39.2, ZF, .206, '#cbc6bc');
+  // a) Patio lateral con portón de madera (42.4..44.2) y garaje blanco con portón de madera + banco + perro (40.0..42.4)
+  bx(g, 43.3, 0, ZF + 2.0, 1.8, 2.2, .14, '#7d4628');
+  bx(g, 41.2, 0, -271.0, 2.5, 3.25, 11.4, '#f2f1ed');
+  bx(g, 41.2, 0, ZF - .05, 2.15, 2.3, .08, '#6e3a20');
+  for (let px = 40.3; px <= 42.1; px += .45) bx(g, px, .1, ZF - .09, .04, 2.1, .02, '#4e2815');
+  for (let py = .45; py < 2.2; py += .45) bx(g, 41.2, py, ZF - .09, 2.05, .04, .02, '#4e2815');
+  bx(g, 42.9, .45, ZF - .55, 1.25, .08, .4, '#8a6242');
+  bx(g, 42.9, .78, ZF - .38, 1.25, .26, .06, '#8a6242');
+  for (const s of [-.55, .55]) bx(g, 42.9 + s, 0, ZF - .55, .07, .55, .4, '#282b2e');
+  bx(g, 41.5, 0, ZF - .5, .72, .4, .4, '#1b1d1f');
+  flat.rect(40.0, -279.5, 44.2, ZF, .206, '#cbc6bc');
 
-  // b) Cuerpo saliente de hormigón visto (x = 27.0..33.4, z = -276.8..-264.0, h = 3.55 m — Foto sv2_3 centro)
-  bx(g, 30.2, 0, -270.4, 6.4, 3.55, 12.8, HORM);
-  bx(g, 30.2, 3.55, -270.4, 6.5, .14, 12.9, HORM2);
-  for (const wx of [31.9, 28.5]){
-    bx(g, wx, 1.15, ZF - .05, 1.85, 1.25, .08, '#dfe3e6');
-    for (let yy = 1.22; yy < 2.38; yy += .1) bx(g, wx, yy, ZF - .09, 1.78, .03, .02, '#5c6266');  // persianas horizontales
+  // b) Cuerpo saliente de hormigón visto (x = 35.0..40.0, w = 5.0 m)
+  bx(g, 37.5, 0, -270.4, 5.0, 3.55, 12.8, HORM);
+  bx(g, 37.5, 3.55, -270.4, 5.1, .14, 12.9, HORM2);
+  for (const wx of [38.8, 36.2]){
+    bx(g, wx, 1.15, ZF - .05, 1.55, 1.2, .08, '#dfe3e6');
+    for (let yy = 1.22; yy < 2.32; yy += .1) bx(g, wx, yy, ZF - .09, 1.48, .03, .02, '#5c6266');
   }
-  bx(g, 30.2, 2.0, ZF - .07, .14, .28, .08, '#222');                             // aplique negro central
-  addTree(32.0, -278.4, .65, false, ['#8d7452', '#7a6445']);
-  poleIn(g, [27.3, 0, -278.5], [27.3, 7.2, -278.5], .07, '#b55842');             // poste metálico rojizo
+  bx(g, 37.5, 2.0, ZF - .07, .14, .28, .08, '#222');
+  addTree(39.0, -278.4, .62, false, ['#8d7452', '#7a6445']);
+  poleIn(g, [35.3, 0, -278.5], [35.3, 7.2, -278.5], .07, '#b55842');
 
-  // c) Galería cubierta retraída de hormigón visto con alero corrido y entrada principal (x = 21.6..27.0 — Foto sv2_4 centro)
-  bx(g, 24.3, 0, -269.2, 5.4, 3.95, 10.6, HORM);                                 // volumen principal más alto atrás
-  bx(g, 24.3, 2.85, ZF - .95, 5.6, .35, 2.3, HORM2);                             // alero horizontal de hormigón visto
-  bx(g, 25.8, 0, ZF - .95, .45, 2.85, .45, HORM);                                // columna cuadrada de hormigón
-  bx(g, 26.4, 0, -274.5, .12, 2.55, 1.15, '#b86832');                            // puerta de madera natural en el ingreso lateral
-  bx(g, 24.3, 1.15, -274.55, 2.35, 1.25, .08, '#dfe3e6');                        // ventanal horizontal con persianas
-  for (let yy = 1.22; yy < 2.38; yy += .1) bx(g, 24.3, yy, -274.59, 2.28, .03, .02, '#5c6266');
-  bx(g, 22.3, 1.75, -274.55, 1.2, .65, .08, '#dfe3e6');                          // ventanita horizontal alta
-  for (const mx of [24.9, 23.9]){                                                // 2 maceteros cuadrados con arbustos redondos
-    bx(g, mx, 0, -275.3, .36, .52, .36, '#b8b6ae');
-    const mb = new THREE.Mesh(new THREE.SphereGeometry(.22, 8, 6), lam({ color: 0x3f6e2e }));
-    mb.position.set(mx, .64, -275.3); g.add(mb);
+  // c) Galería cubierta retraída de hormigón visto (x = 30.8..35.0, w = 4.2 m)
+  bx(g, 32.9, 0, -269.2, 4.2, 3.95, 10.6, HORM);
+  bx(g, 32.9, 2.85, ZF - .95, 4.4, .35, 2.3, HORM2);
+  bx(g, 34.2, 0, ZF - .95, .42, 2.85, .42, HORM);
+  bx(g, 34.7, 0, -274.5, .12, 2.55, 1.1, '#b86832');
+  bx(g, 32.8, 1.15, -274.55, 2.1, 1.2, .08, '#dfe3e6');
+  for (let yy = 1.22; yy < 2.32; yy += .1) bx(g, 32.8, yy, -274.59, 2.02, .03, .02, '#5c6266');
+  for (const mx of [33.4, 32.5]){
+    bx(g, mx, 0, -275.3, .34, .5, .34, '#b8b6ae');
+    const mb = new THREE.Mesh(new THREE.SphereGeometry(.2, 8, 6), lam({ color: 0x3f6e2e }));
+    mb.position.set(mx, .62, -275.3); g.add(mb);
   }
-  bx(g, 23.6, 3.95, -270.0, 1.8, 1.15, 1.2, '#e8e6de');                          // volumen blanco de chimenea/tanque en la azotea
-  flat.rect(25.8, -279.5, 27.1, ZF, .206, '#c9c4ba');                            // sendero de acceso a la puerta
-  addTree(22.2, -278.4, .65, false, ['#8d7452', '#7a6445']);
+  bx(g, 32.5, 3.95, -270.0, 1.65, 1.15, 1.15, '#e8e6de');
+  flat.rect(34.0, -279.5, 35.1, ZF, .206, '#c9c4ba');
+  addTree(31.5, -278.4, .62, false, ['#8d7452', '#7a6445']);
 
-  // d) Garaje derecho de hormigón visto con portón levadizo gris y franja baja roja (x = 17.5..21.6 — Foto sv2_4 derecha)
-  bx(g, 19.55, 0, -270.6, 4.1, 3.45, 12.2, HORM);
-  bx(g, 19.55, 0, ZF - .05, 3.35, 2.55, .08, '#8a9096');                         // portón levadizo gris
-  bx(g, 19.55, 0, ZF - .09, 3.3, .32, .04, '#a63426');                           // franja baja rojo óxido (sv2_4)
-  for (let py = .55; py < 2.4; py += .5) bx(g, 19.55, py, ZF - .09, 3.3, .04, .02, '#62686e');
-  flat.rect(17.5, -279.5, 21.6, ZF, .206, '#cbc6bc');                            // entrada vehicular de hormigón
+  // d) Garaje derecho de hormigón visto con portón levadizo gris y franja baja roja (x = 27.5..30.8, w = 3.3 m)
+  bx(g, 29.15, 0, -270.6, 3.3, 3.45, 12.2, HORM);
+  bx(g, 29.15, 0, ZF - .05, 2.75, 2.5, .08, '#8a9096');
+  bx(g, 29.15, 0, ZF - .09, 2.7, .32, .04, '#a63426');
+  for (let py = .55; py < 2.35; py += .5) bx(g, 29.15, py, ZF - .09, 2.7, .04, .02, '#62686e');
+  flat.rect(27.5, -279.5, 30.8, ZF, .206, '#cbc6bc');
+  addCol(27.5, -276.8, 44.2, -263.0);
+  mapRects.push([27.5, -276.8, 42.5, -263.0, HORM]);
 
-  // e) Tramo final blanco llegando a Av. Centenario (x = 13.5..17.5 — borde derecho de sv2_4)
-  bx(g, 15.5, 0, -269.5, 4.0, 2.95, 10.5, '#f2f1ed');
-  bx(g, 15.5, 0, ZF - .04, 3.1, 2.35, .08, '#282c30');                           // boca de garaje abierta
-  bx(g, 15.5, 3.15, ZF + .1, 3.9, .14, .14, '#7d5638');                          // baranda de madera en terraza
-  bx(g, 15.5, 3.5, ZF + .1, 3.9, .14, .14, '#7d5638');
-  flat.rect(13.5, -279.5, 17.5, ZF, .206, '#c8c3b8');
+  // --- 5) CASA DE LA ESQUINA DE 2 PLANTAS (x = 13.5..27.5, z = -276.8..-267.5 — Fotos sv3_1 y sv3_2) ---
+  const LAD_E = '#b45a3e', CREMA_E = '#ece9e0', MAD_B = '#7d5b40';
+  // a) Garaje blanco abierto + pared con portón blanco ranurado y enredadera colgante (x = 22.8..27.5 — izquierda de sv3_1)
+  bx(g, 25.15, 0, -271.5, 4.7, 2.95, 10.6, '#f4f3ef');
+  bx(g, 26.0, 0, ZF - .04, 2.55, 2.35, .14, '#24272a');                           // boca oscura del garaje abierto
+  bx(g, 23.8, 0, ZF - .04, 1.9, 2.35, .08, '#ffffff');                           // hojas blancas del portón
+  for (const px of [23.4, 24.2]) bx(g, px, .1, ZF - .09, .12, 2.15, .03, '#4a4e52');
+  // Baranda de tablas de madera sobre el techo del garaje + tanque negro atrás
+  for (const ry of [3.2, 3.6]) bx(g, 25.15, ry, ZF + .15, 4.6, .14, .12, MAD_B);
+  for (const rx of [23.0, 25.15, 27.3]) bx(g, rx, 2.95, ZF + .15, .14, .85, .14, MAD_B);
+  cylIn(g, 24.4, 3.65, -274.2, .52, 1.05, '#1d2024');
+  // Enredadera verde frondosa cayendo sobre la pared blanca (sv3_1)
+  for (const [ex, ey, ez, es] of [[24.3, 2.75, ZF - .18, .65], [23.5, 2.55, ZF - .18, .7], [22.7, 2.45, ZF - .18, .65], [22.1, 2.6, ZF - .15, .55]]){
+    const vn = new THREE.Mesh(new THREE.DodecahedronGeometry(es, 0), lam({ color: 0x3b6e28 }));
+    vn.position.set(ex, ey, ez); vn.scale.set(1.2, .75, .55); g.add(vn);
+  }
+  flat.rect(22.8, -279.5, 27.5, ZF, .206, '#cbc6bc');                            // entrada de hormigón al garaje
 
-  addCol(13.5, -276.8, 39.2, -263.0);
-  mapRects.push([17.5, -276.8, 36.8, -263.0, HORM], [13.5, -276.8, 17.5, -264.0, '#f2f1ed']);
-  plazaRects.push([13.5, -279.5, 70.5, -261.0]);   // sin árboles ni casas aleatorias en esta fila
+  // b) Cuerpo principal de la esquina (x = 13.5..22.8, z = -276.8..-267.5, 9.3 m x 9.3 m — sv3_1 derecha y sv3_2 izquierda)
+  // Planta baja crema con zócalo de ladrillo a la vista y franja superior de ladrillo sobre Av. Centenario
+  bx(g, 18.15, 0, -272.15, 9.3, 3.02, 9.3, CREMA_E);
+  bx(g, 18.15, 0, ZF - .04, 9.34, .65, .08, LAD_E);                              // zócalo de ladrillo sobre calle de la plaza
+  bx(g, XA - .04, 0, -272.15, .08, .78, 9.34, LAD_E);                            // zócalo de ladrillo sobre Av. Centenario
+  bx(g, XA - .05, 2.25, -272.15, .1, .78, 9.36, LAD_E);                          // franja superior de ladrillo sobre Av. Centenario (sv3_2)
+  // Aberturas frente norte (calle de la plaza, z = ZF — sv3_1)
+  bx(g, 21.6, 0, ZF - .04, 1.15, 2.15, .08, '#ffffff');                          // portoncito blanco de reja
+  for (let px = 21.15; px <= 22.05; px += .22) bx(g, px, .1, ZF - .09, .04, 1.95, .02, '#4a4e52');
+  bx(g, 19.6, 1.05, ZF - .05, 1.85, 1.35, .08, LAD_E);                           // marco de ladrillo de la ventana
+  bx(g, 19.6, 1.18, ZF - .09, 1.5, 1.1, .04, '#dfe6ea');
+  for (let xx = 19.0; xx <= 20.2; xx += .24) bx(g, xx, 1.18, ZF - .12, .03, 1.1, .02, '#3a3e42');
+  bx(g, 16.5, 0, ZF - .05, 1.35, 2.35, .08, LAD_E);                              // marco de ladrillo de la puerta
+  bx(g, 16.5, 0, ZF - .09, 1.0, 2.2, .05, '#c9b898');
+  // Aberturas frente oeste (Av. Centenario, x = XA — sv3_2)
+  bx(g, XA - .06, 0, -272.8, .1, 2.2, 1.15, '#5a94c4');                          // entrada celeste/blanca retraída
+  bx(g, XA - .06, .95, -269.6, .08, 1.25, 1.85, '#e8e6e0');                      // ventana blanca con reja
+  // Baranda de tablas de madera rodeando la terraza en L (sobre calle de la plaza y sobre Av. Centenario)
+  for (const ry of [3.28, 3.68]){
+    bx(g, 18.15, ry, ZF + .15, 9.2, .14, .12, MAD_B);
+    bx(g, XA + .15, ry, -272.15, .12, .14, 9.2, MAD_B);
+  }
+  for (let rx = 13.7; rx <= 22.6; rx += 2.2) bx(g, rx, 3.02, ZF + .15, .14, .88, .14, MAD_B);
+  for (let rz = -276.6; rz <= -267.7; rz += 2.2) bx(g, XA + .15, 3.02, rz, .14, .88, .14, MAD_B);
+  // Planta alta retraída blanca con 3 arcos de ladrillo mirando a la plaza y balcón de madera hacia Av. Centenario (sv3_1 y sv3_2)
+  bx(g, 18.4, 3.02, -271.2, 7.6, 2.65, 5.2, '#f5f4f0');
+  gableIn(g, 18.4, 5.67, -271.2, 8.2, 1.15, 5.8, '#4a5056', 0);                  // techo de chapa gris oscuro a dos aguas
+  bx(g, 17.6, 5.8, -272.8, .55, 1.25, .55, LAD_E);                               // chimenea de ladrillo
+  // 3 arcos decorativos de ladrillo en la fachada norte de planta alta (sv3_1)
+  for (const ax of [20.9, 18.4, 15.9]){
+    const ar = new THREE.Mesh(new THREE.TorusGeometry(.85, .12, 6, 16, Math.PI), lam({ color: 0xb45a3e }));
+    ar.position.set(ax, 4.15, -273.85); g.add(ar);
+    bx(g, ax - .85, 3.05, -273.85, .24, 1.12, .12, LAD_E);
+    bx(g, ax + .85, 3.05, -273.85, .24, 1.12, .12, LAD_E);
+  }
+  // Pilastras de ladrillo y persiana blanca de balcón mirando a Av. Centenario (sv3_2)
+  for (const pz of [-272.6, -269.8]) bx(g, 14.58, 3.02, pz, .12, 2.35, .42, LAD_E);
+  bx(g, 14.56, 3.15, -271.2, .1, 2.1, 2.15, '#eae8e2');
+  // Jardín de la esquina: arbusto con flores naranjas, macetitas de colores y árbol grande en la esquina (sv3_1 y sv3_2)
+  addBush(20.6, -278.0, .85, 0);
+  for (const [fx, fz, fc] of [[18.6, -278.0, '#e85d3a'], [18.1, -278.1, '#f2c21b'], [16.5, -278.0, '#e85d3a'], [15.9, -278.1, '#48a842']]){
+    bx(g, fx, .35, fz, .22, .22, .22, fc);
+  }
+  addTree(14.5, -278.0, 1.15, false, ['#3f6a28', '#4f7a32', '#355c22']);
+  addTree(11.4, -274.2, 1.1, false, ['#8d7858', '#7a684a']);
+  addCol(13.5, -276.8, 27.5, -267.5);
+  mapRects.push([13.5, -276.8, 27.5, -267.5, CREMA_E]);
+
+  // --- 6) FARMACIA CARINO (sobre Av. Centenario, pegada al sur de la casa de la esquina: x = 13.5..24.5, z = -267.5..-259.5 — Foto sv3_2) ---
+  {
+    const FC_G = '#26a65b';
+    bx(g, 19.0, 0, -263.5, 11.0, 3.65, 8.0, '#f3f2ee');
+    bx(g, 19.0, 3.65, -263.5, 11.15, .14, 8.15, '#e2e0d8');
+    // Cenefa y visera verde esmeralda + pilastra verde derecha + cruz 3D verde en el frente sobre Av. Centenario (-x)
+    bx(g, XA - .08, 3.48, -263.5, .16, .18, 8.06, FC_G);
+    bx(g, XA - .32, 2.55, -263.5, .68, .18, 8.08, FC_G);                         // visera verde saliente
+    bx(g, XA - .06, 0, -259.75, .24, 3.65, .48, FC_G);                           // pilastra derecha verde
+    bx(g, XA - .45, 2.75, -259.75, .14, .88, .28, FC_G);                         // cruz verde saliente (brazo vertical)
+    bx(g, XA - .45, 3.05, -259.75, .14, .28, .88, FC_G);                         // cruz verde saliente (brazo horizontal)
+    // Cartel "FARMACIA CARINO · Perfumería y Accesorios" sobre la visera
+    {
+      const cv = document.createElement('canvas'); cv.width = 512; cv.height = 128;
+      const cx2 = cv.getContext('2d');
+      cx2.fillStyle = '#f3f2ee'; cx2.fillRect(0, 0, 512, 128);
+      // cruz verde estilizada a la izquierda
+      cx2.fillStyle = '#26a65b'; cx2.beginPath(); cx2.arc(108, 62, 34, 0, Math.PI * 2); cx2.fill();
+      cx2.fillStyle = '#f3f2ee'; cx2.fillRect(101, 40, 14, 44); cx2.fillRect(86, 55, 44, 14);
+      cx2.textAlign = 'left'; cx2.fillStyle = '#1f5a9a'; cx2.font = 'bold 20px Arial'; cx2.fillText('FARMACIA', 155, 40);
+      cx2.fillStyle = '#26a65b'; cx2.font = 'bold 52px Arial'; cx2.fillText('CARINO', 152, 86);
+      cx2.fillStyle = '#1f5a9a'; cx2.font = 'bold 17px Arial'; cx2.fillText('Perfumería y Accesorios', 165, 110);
+      const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+      const sm = new THREE.Mesh(new THREE.PlaneGeometry(6.6, .88), lam({ map: tex }));
+      sm.position.set(XA - .08, 3.12, -263.5); sm.rotation.y = -Math.PI / 2; g.add(sm);
+    }
+    // Puerta doble blanca con rejas a la izquierda (z = -266.0) + persiana metálica gris ancha con zócalo verde a la derecha (z = -262.6)
+    bx(g, XA - .05, 0, -266.0, .08, 2.45, 1.75, '#f6f6f4');
+    bx(g, XA - .09, .1, -266.0, .04, 2.25, 1.55, '#3b4a55');
+    for (let pz = -266.7; pz <= -265.3; pz += .22) bx(g, XA - .12, .1, pz, .03, 2.25, .03, '#f6f6f4');
+    bx(g, XA - .06, .35, -262.5, .08, 2.15, 3.8, '#9aa0a6');                     // persiana metálica gris
+    for (let yy = .45; yy < 2.45; yy += .14) bx(g, XA - .1, yy, -262.5, .03, .02, 3.76, '#7d8389');
+    bx(g, XA - .08, 0, -262.5, .1, .38, 3.85, FC_G);                             // zócalo verde debajo de la persiana
+    // Vereda ancha de baldosas claras + canasto y bicicletero sobre Av. Centenario
+    flat.rect(9.0, -267.5, XA, -262.2, .206, '#d6d2c8');
+    flat.rect(10.5, -262.2, XA, -259.5, .206, '#d6d2c8');
+    {
+      const bg = group(10.0, -260.8);
+      poleIn(bg, [0, 0, 0], [0, .85, 0], .03, '#3a3a3a');
+      bx(bg, 0, .85, 0, .55, .42, .85, '#5a6066');
+    }
+    addCol(XA, -267.5, 24.5, -259.5);
+    mapRects.push([XA, -267.5, 24.5, -259.5, FC_G]);
+    mapLabels.push([19, -263.5, 'Farm. Carino']);
+  }
+
+  plazaRects.push([13.5, -279.5, 70.5, -259.5]);   // sin árboles ni casas aleatorias en toda esta fila y esquina
 }
 
 // Av. Centenario, lado este entre San Luis y Jujuy (video + fotos + plano satelital del usuario):
