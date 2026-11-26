@@ -2647,62 +2647,81 @@ function frustumMesh(bot, top, y0, h, col){
     flat.rect(-19, z0, XF, z1, .076, '#a7a397');
   }
 
-  // ---- galpón viejo de techo curvo ----
-  { const a = -31, b = -17.4, z0 = -568.3, z1 = -556.2, H = 3.1, rise = 2.6, zc = (z0 + z1) / 2, R = (z1 - z0) / 2;
+  // ---- galpón viejo de techo curvo (frente abierto, costado sur de tablas, techo oxidado adelante) ----
+  { const a = -31, b = -17.4, z0 = -568.5, z1 = -559.8, H = 3.1, rise = 2.5, zc = (z0 + z1) / 2, R = (z1 - z0) / 2;
     for (const z of [z0 + .1, z1 - .1]) bx(g, (a + b) / 2, 0, z, b - a, H, .1, '#8a8478');
-    bx(g, a + .05, 0, zc, .1, H, z1 - z0, '#8a8478');
+    bx(g, a + .05, 0, zc, .1, H + rise * .95, z1 - z0, '#4a443c');   // fondo
     for (let k = 0; k < 14; k++){   // arco del techo en tramos
       const t0 = k / 14 * Math.PI, t1 = (k + 1) / 14 * Math.PI, y0 = H + rise * Math.sin(t0), y1 = H + rise * Math.sin(t1), za = zc + R * Math.cos(t0), zb = zc + R * Math.cos(t1);
       const L = Math.hypot(zb - za, y1 - y0), ang = Math.atan2(y1 - y0, zb - za);
-      const m = new THREE.Mesh(new THREE.BoxGeometry(b - a + .6, .08, L + .05), lam({ color: k % 3 === 1 ? 0x8a6a4e : 0x9c9284 }));
-      m.position.set((a + b) / 2, (y0 + y1) / 2, (za + zb) / 2); m.rotation.x = -ang; m.castShadow = m.receiveShadow = true; scene.add(m);
+      for (const [xa, xb, col] of [[a, b - 3, k % 3 === 1 ? 0x8a8276 : 0x9c9284], [b - 3, b + .8, k % 2 ? 0x8a5a3a : 0x9a6a46]]){   // atrás gris, adelante oxidado
+        const m = new THREE.Mesh(new THREE.BoxGeometry(xb - xa, .08, L + .05), lam({ color: col }));
+        m.position.set((xa + xb) / 2, (y0 + y1) / 2, (za + zb) / 2); m.rotation.x = -ang; m.castShadow = m.receiveShadow = true; scene.add(m);
+      }
     }
-    // frente con el arco abierto: tablas viejas a los costados, interior oscuro con trastos
-    bx(g, b - .6, 0, zc, .05, H + rise * .9, z1 - z0 - 3.4, '#2e2a26');
-    for (const s of [-1, 1]) bx(g, b, 0, zc + s * (R - .9), .1, H + .6, 1.8, '#8d7a62');
-    for (let k = 0; k < 7; k++) bx(g, b - 1.5 - hsh(k) * 4, 0, zc + (hsh(k + 9) - .5) * 8, .8 + hsh(k + 3), .5 + hsh(k + 5) * 1.2, .8, ['#6a5a48', '#8a3a2a', '#5a6a6e'][k % 3]);
-    addCol(a, z0, b, z0 + .2); addCol(a, z1 - .2, b, z1); addCol(a, z0, a + .2, z1);
+    for (let x = a + 2; x < b; x += 3.2) for (const s of [-1, 1]) bx(g, x, 0, zc + s * (R - .4), .2, H, .2, '#6e5a44');   // postes
+    // costado sur del frente cerrado con tablas verticales; el resto abierto con trastos adentro
+    bx(g, b + .05, 0, z1 - 1.6, .1, H + 1.2, 3.0, '#9c8a6e'); for (let z = z1 - 3; z < z1; z += .25) bx(g, b + .11, 0, z, .02, H + 1.2, .03, '#7a6a52');
+    bx(g, b + .05, 0, z0 + .5, .1, H, .9, '#8d7a62');
+    for (let k = 0; k < 9; k++) bx(g, b - 1.2 - hsh(k) * 9, 0, zc + (hsh(k + 9) - .5) * 6, .8 + hsh(k + 3), .5 + hsh(k + 5) * 1.3, .8, ['#6a5a48', '#8a3a2a', '#5a6a6e', '#c9b23a'][k % 4]);
+    addCol(a, z0, b, z0 + .2); addCol(a, z1 - .2, b, z1); addCol(a, z0, a + .2, z1); addCol(b, z1 - 3.1, b + .1, z1);
     mapRects.push([a, z0, b, z1, '#9c9284']);
-    // murito bajo de ladrillo con media sombra verde, palos y yuyos sobre la línea municipal
-    bx(g, XF - .2, 0, zc - 2.5, .3, .9, z1 - z0 - 5, '#8a6a52');
-    const ms = new THREE.Mesh(new THREE.PlaneGeometry(z1 - z0, .9), new THREE.MeshLambertMaterial({ color: 0x3fa38a, side: THREE.DoubleSide })); ms.position.set(XF - .1, .75, zc); ms.rotation.y = Math.PI / 2; scene.add(ms);
-    for (let z = z0 + .3; z < z1; z += .5 + hsh(z) * .4) bx(g, XF - .1, 0, z, .07, 1.3 + hsh(z + 1) * .6, .07, '#7a6a50');
-    for (let k = 0; k < 14; k++) crowns.add(XF - .6 - hsh(k + 30) * 3, .6, z0 + .5 + hsh(k + 40) * (z1 - z0 - 1), .6 + hsh(k) * .5, .5 + hsh(k + 2) * .5, .6, hsh(k + 4) * 6, k % 2 ? '#7f8f45' : '#a39a62');
-    addCol(XF - .35, z0, XF, z1);
-    bx(g, -11.6, 0, -563.5, .55, .75, .55, '#7a5a3e'); addCol(-11.9, -563.8, -11.3, -563.2);   // tronco cortado
     flat.rect(b, z0, XF, z1, .075, '#7b8f48');
   }
+  // ---- murito bajo de ladrillo, cerco de palos con media sombra verde y yuyos: del galpón al lote de al lado ----
+  { const z0 = -568.5, z1 = -554.8, zc = (z0 + z1) / 2;
+    bx(g, XF - .9, 0, -564.2, .3, 1.3, 8.6, '#8a6a52');
+    const ms = new THREE.Mesh(new THREE.PlaneGeometry(z1 - z0, .8), new THREE.MeshLambertMaterial({ color: 0x3fa38a, side: THREE.DoubleSide })); ms.position.set(XF - .12, .55, zc); ms.rotation.y = Math.PI / 2; scene.add(ms);
+    for (let z = z0 + .2; z < z1; z += .25 + hsh(z) * .25) bx(g, XF - .1, 0, z, .07, 1.1 + hsh(z + 1) * .8, .07, '#7a6a50');
+    bx(g, XF - .1, .9, zc, .05, .05, z1 - z0, '#6a5a44');
+    for (let k = 0; k < 16; k++) crowns.add(XF - .6 - hsh(k + 30) * 2.5, .6, z0 + .5 + hsh(k + 40) * (z1 - z0 - 1), .6 + hsh(k) * .5, .5 + hsh(k + 2) * .6, .6, hsh(k + 4) * 6, k % 2 ? '#7f8f45' : '#a39a62');
+    addCol(XF - .35, z0, XF, z1);
+    bx(g, XF - .2, 0, -554.6, .5, 1.9, .5, '#a0634a');   // pilar de ladrillo
+    bx(g, -11.6, 0, -563.5, .55, .75, .55, '#7a5a3e'); addCol(-11.9, -563.8, -11.3, -563.2);   // tronco cortado
+  }
+  // ---- lote con vegetación frondosa entre el galpón y la casa de la esquina ----
+  { flat.rect(-31, -559.8, XF, -554.8, .075, '#4f7a35');
+    trunks.add(-20.5, 0, -557.3, .7, 2.6, .7, 0, '#4a3a2c');
+    crowns.add(-20.5, 5.2, -557.3, 3.6, 2.8, 3.3, 0, '#2f5a2a'); crowns.add(-18.4, 4.2, -556.2, 2.4, 2.2, 2.2, 1, '#3a6530'); crowns.add(-23, 4.6, -558.4, 2.6, 2.4, 2.2, 2, '#2c5228');
+    for (let k = 0; k < 14; k++) crowns.add(-15 - hsh(k + 70) * 15, .9 + hsh(k + 71) * .8, -559.3 + hsh(k + 72) * 4, 1.0 + hsh(k + 73) * .8, .8 + hsh(k + 74) * .8, 1.0 + hsh(k + 75) * .6, hsh(k) * 6, ['#3f6a2e', '#4f7a35', '#355e2a'][k % 3]);
+    addCol(-21, -557.8, -20, -556.8);
+    for (const z of [-559.8, -554.8]) bx(g, -24, 0, z, 14, 1.8, .2, '#a9a59c'); addCol(-31, -559.9, -17, -559.7); addCol(-31, -554.9, -17, -554.7);
+  }
 
-  // ---- casa de la esquina con techo a dos aguas muy empinado y frente triangular ----
-  { const a = -24, b = -16, z0 = -555.2, z1 = -546.6, W = 1.3, rise = 5.3, zc = (z0 + z1) / 2, half = (z1 - z0) / 2;
+  // ---- casa de la esquina con techo a dos aguas muy empinado de chapa oxidada y frente triangular ----
+  { const a = -24, b = -16, z0 = -554.4, z1 = -546.2, W = 1.3, rise = 5.3, zc = (z0 + z1) / 2, half = (z1 - z0) / 2;
     bx(g, (a + b) / 2, 0, zc, b - a, W, z1 - z0, '#cfcac0');
     const ang = Math.atan2(rise, half), L = Math.hypot(rise, half);
-    for (const s of [-1, 1]) bx(g, (a + b) / 2, W + rise / 2 - .07, zc + s * half / 2, b - a + .5, .14, L + .5, '#5d6062', s * ang, 0);
+    for (const s of [-1, 1]){
+      bx(g, (a + b) / 2, W + rise / 2 - .07, zc + s * half / 2, b - a + .5, .14, L + .5, '#9a5e3c', s * ang, 0);
+      for (let x = a - .2; x < b + .2; x += .35) bx(g, x, W + rise / 2 - .02 + .03, zc + s * half / 2, .05, .04, L + .4, '#7e4a2e', s * ang, 0);   // ondas de la chapa
+    }
     for (let k = 0; k < 12; k++){ const ww = (z1 - z0) * (1 - (k + .5) / 12); for (const x of [b + .02, a - .02]) bx(g, x, W + k * rise / 12, zc, .1, rise / 12, ww, '#a9aaa6'); }   // hastiales grises
     bx(g, b + .05, 0, zc, .1, W, z1 - z0, '#9a9488');
     for (let k = 0; k < 30; k++) bx(g, b + .11, .05 + hsh(k) * 1.1, z0 + .2 + hsh(k + 60) * (z1 - z0 - .4), .03, .22, .3 + hsh(k + 8) * .3, hsh(k + 2) > .5 ? '#b4ad9f' : '#857d70');   // zócalo de piedra
     bx(g, b + .08, 3.2, zc, .05, .55, .9, '#f2f2ee');                                                       // tablero blanco
-    bx(g, b + .1, .55, -552.6, .06, 1.1, 1.9, '#f4f4f2'); for (let y = .65; y < 1.6; y += .12) bx(g, b + .14, y, -552.6, .02, .02, 1.8, '#d4d4d0');   // persiana blanca
-    bx(g, b + .1, 0, -550.2, .06, 2.0, .9, '#f4f4f2');                                                      // puerta blanca
-    bx(g, -18.2, 0, -545.7, 1.0, 7.8, 1.0, '#a0523a'); for (let y = .2; y < 7.8; y += .25) bx(g, -18.2, y, -545.7, 1.02, .02, 1.02, '#c9876e');   // chimenea
-    bx(g, -18.6, 0, -557.3, 4.6, 2.4, 3.6, '#b3aca0'); bx(g, -18.6, 2.4, -557.3, 4.8, .12, 3.8, '#8a8a86');   // piecita del costado
-    addCol(a, z0, b, z1); addCol(-18.7, -546.2, -17.7, -545.2); addCol(-20.9, -559.1, -16.3, -555.5);
-    mapRects.push([a, z0, b, z1, '#5d6062']);
+    bx(g, b + .1, .55, -551.8, .06, 1.1, 1.9, '#f4f4f2'); for (let y = .65; y < 1.6; y += .12) bx(g, b + .14, y, -551.8, .02, .02, 1.8, '#d4d4d0');   // persiana blanca
+    bx(g, b + .1, 0, -549.4, .06, 2.0, .9, '#f4f4f2');                                                      // puerta blanca
+    bx(g, -18.2, 0, -545.4, 1.0, 7.8, 1.0, '#a0523a'); for (let y = .2; y < 7.8; y += .25) bx(g, -18.2, y, -545.4, 1.02, .02, 1.02, '#c9876e');   // chimenea
+    // piecita blanca de atrás con la celosía de bloques arriba
+    bx(g, -26.2, 0, -550.2, 3.6, 2.6, 4, '#f2f1ec'); for (let z = -551.9; z < -548.5; z += .4) bx(g, -24.38, 2.25, z, .05, .3, .3, '#9a9a96');
+    addCol(a, z0, b, z1); addCol(-18.7, -545.9, -17.7, -544.9); addCol(-28, -552.2, -24.4, -548.2);
+    mapRects.push([a, z0, b, z1, '#9a5e3c']);
     // canteros bajos de ladrillo con celosía y caminito a la puerta
-    for (const [za, zb] of [[-555.4, -550.9], [-549.5, -545.4]]){
+    for (const [za, zb] of [[-554.4, -550.1], [-548.7, -545]]){
       bx(g, -14.3, 0, (za + zb) / 2, .35, .75, zb - za, '#8a5a42');
       for (let z = za + .2; z < zb; z += .3) for (const r of [-.75, .75]) bx(g, -14.12, .4, z, .02, .45, .02, '#5a3a2a', r, 0);
       crowns.add(-14.9, .7, (za + zb) / 2, .5, .35, (zb - za) / 2 - .2, 0, '#7a8f45');
       addCol(-14.5, za, -14.1, zb);
     }
-    flat.rect(-16, -550.6, XF, -549.8, .078, '#c9c4b8'); flat.rect(XF, -550.6, -9.2, -549.8, .2072, '#c9c4b8');
-    flat.rect(-28, -555.4, XF, -543, .075, '#6f9a47');
-    crowns.add(-26.5, 1.6, -549, 1.8, 1.6, 1.8, 0, '#3f6a2e'); addCol(-27, -549.5, -26, -548.5);
+    flat.rect(-16, -549.8, XF, -549, .078, '#c9c4b8'); flat.rect(XF, -549.8, -9.2, -549, .2072, '#c9c4b8');
+    flat.rect(-28, -554.6, XF, -543, .075, '#6f9a47');
+    crowns.add(-29.5, 1.6, -547, 1.8, 1.6, 1.8, 0, '#3f6a2e'); addCol(-30, -547.5, -29, -546.5);
   }
   // fondos de pasto y algún árbol
   flat.rect(-52, -590, -25, -543, .07, '#6e9a45');
   for (const [x, z, s, c] of [[-40, -580, 1.2, '#4b7a30'], [-44, -561, 1.3, '#2f5a2e'], [-36, -548, 1.1, '#557f35']]){ trunks.add(x, 0, z, .45 * s, 2.4 * s, .45 * s, 0, '#5b4330'); crowns.add(x, 2.4 * s + 1.7 * s, z, 2.4 * s, 2.2 * s, 2.4 * s, 1, c); addCol(x - .3, z - .3, x + .3, z + .3); }
-  for (const z of [-573.4, -555.8]) bx(g, -38.5, 0, z, 27, 1.8, .2, '#b9b2a4');   // medianeras
+  for (const z of [-573.4]) bx(g, -38.5, 0, z, 27, 1.8, .2, '#b9b2a4');   // medianeras
 }
 
 // Estación de servicio Shell (Ruano Hnos), esquina Av. Centenario e Iriondo, hasta la esquina de Entre Ríos
