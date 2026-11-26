@@ -604,6 +604,7 @@ const LAV25_E_POLY = [[-449, -386], [-437, -386], [-437, -350.4], [-449, -350.4]
 const ACOPIO_POLY = [[-437.5, -405.5], [-398.5, -405.5], [-398.5, -350.4], [-437.5, -350.4]];   // planta de acopio de Bv. Lavalle y Buenos Aires: galpón, silos y maquinaria (armada a mano)
 const BRUNET_IND_POLY = [[-282, -39.5], [-257, -39.5], [-257, -16.5], [-282, -16.5]];   // Dr. Brunet lado sur, de la escuela a la esquina de Bv. Independencia (cerco de piedra, chalet de techo azul, esquina con tuyas)
 const ESC_BRUNET_POLY = [[-257, -39.5], [-203, -39.5], [-203, -25.5], [-231, -25.5], [-231, -8], [-257, -8]];   // Escuela Secundaria sobre Dr. Brunet y casas hasta la esquina de Santa Fe (armadas a mano)
+const CASA_IRI_POLY = [[-52, -624.5], [-13.5, -624.5], [-13.5, -590], [-52, -590]];   // casa grande de ladrillo de Av. Centenario e Iriondo, enfrente de la Shell (armada a mano)
 const CENT_BOL_POLY = [[13.5, -582], [47, -582], [47, -543], [13.5, -543]];   // Av. Centenario lado este, de la Shell a la esquina de Bolívar (casas armadas a mano)
 const SHELL_POLY = [[12, -628], [89.5, -628], [89.5, -582], [12, -582]];   // Shell de Av. Centenario e Iriondo y patio de camiones hasta Entre Ríos (armado a mano)
 const HOGAR_POLY = [[398, -624.5], [428, -624.5], [436, -629], [479.5, -680], [479.5, -543], [398, -543]];   // cuadra San Juan / Iriondo-RP 10-S / Av. 9 de Julio / Bolívar: Hogar de Ancianos y casas de Bolívar (armada a mano)
@@ -736,6 +737,7 @@ const ST = {
 };
 // rebajes de cordón: zonas [x0, z0, x1, z1] donde la vereda no frena al auto (entrada a la Shell)
 const CAR_OPEN = [[8.8, -624.5, 13.7, -586],
+  [-14, -604.6, -8.5, -600.2], [-14, -615, -8.5, -612.2], [-45.6, -629, -41, -624],   // garajes y portón de la casa de ladrillo de enfrente de la Shell
   [13.5, -630, 67, -624],   // playón de la Shell abierto sobre Iriondo
   [8.5, -584.9, 13.7, -579.2],   // portón de chapa al lado de la Shell sobre Av. Centenario
   [-214.8, -43.5, -211.6, -39.5], [-253.1, -43.5, -250.1, -39.5], [-266.2, -43.5, -263.2, -39.5],   // portones de Dr. Brunet: chapa blanco cerca de Santa Fe, garaje de la casa blanca y portón de madera   // portón de chapa blanco de Dr. Brunet, cerca de la esquina de Santa Fe
@@ -2444,6 +2446,147 @@ function frustumMesh(bot, top, y0, h, col){
   }
   mapRoads.push({ pts: R18_PTS, w: 9, col: '#8a8a8a', y: .11 });
   mapLabels.push([68.4, -2710, 'Ruta 18']);
+}
+
+// Casa grande de ladrillo de la esquina Av. Centenario e Iriondo, lado oeste (enfrente de la Shell, a la derecha apenas termina el acceso)
+// (fotos de Street View del usuario; medidas de las huellas de edificios):
+//  · sobre la avenida, de la esquina hacia el sur: cuerpo principal de dos plantas con planta baja elevada, escalera al frente, garaje en el
+//    semisótano, losas con borde blanco, balcón corrido arriba y aire acondicionado · cuerpo bajo con techo de tejas coloradas y chimenea ·
+//    cuerpo de dos plantas con techo de tejas, portón de garaje de madera de dos hojas, entrada metida y repisa con la vasija de barro
+//  · sobre Iriondo: semisótano con ventanas bajas de madera y ojo de buey, persianas de madera, losa volada con columna redonda,
+//    puertita en el muro de ladrillo con alerito y escalera, y el muro de ladrillo con pilastras y portón de madera
+//  · jardín al frente con palmera, arbusto redondo y cantero de ladrillo; caminos de adoquines al garaje
+{
+  const g = group(0, 0), XF = -13.5, ZI = -624.5;   // líneas municipales de Av. Centenario (lado oeste) y de Iriondo (lado sur)
+  const LAD = '#b98a70', LADO = '#a9785f', MAD = '#a8643a', BLANCO = '#efeee9', TEJA = '#b5462e';
+  const rayas = (x0, x1, y0, y1, fixed, alongZ) => {   // juntas horizontales de ladrillo sobre una cara
+    for (let y = y0 + .2; y < y1; y += .24) alongZ ? bx(g, fixed, y, (x0 + x1) / 2, .02, .02, x1 - x0, LADO) : bx(g, (x0 + x1) / 2, y, fixed, x1 - x0, .02, .02, LADO);
+  };
+  // persiana de madera (abertura) sobre la cara +x (frente a la avenida) o -z (Iriondo)
+  const persX = (x, z, y, w, h) => { bx(g, x + .03, y, z, .06, h, w + .2, '#8a5232'); bx(g, x + .07, y + .05, z, .03, h - .1, w, MAD); for (let yy = y + .15; yy < y + h - .1; yy += .14) bx(g, x + .09, yy, z, .02, .02, w, '#8a5232'); };
+  const persZ = (x, z, y, w, h) => { bx(g, x, y, z - .03, w + .2, h, .06, '#8a5232'); bx(g, x, y + .05, z - .07, w, h - .1, .03, MAD); for (let yy = y + .15; yy < y + h - .1; yy += .14) bx(g, x, yy, z - .09, w, .02, .02, '#8a5232'); };
+  const tejas = (cx, cz, w, d, y, rise, alongX) => {   // techo de tejas a dos aguas; alongX = cumbrera a lo largo de x
+    const span = alongX ? d : w, ang = Math.atan2(rise, span / 2), L = Math.hypot(rise, span / 2);
+    for (const s of [-1, 1]){
+      if (alongX) bx(g, cx, y + rise / 2 - .07, cz + s * d / 4, w + .6, .14, L + .6, TEJA, s * ang, 0);
+      else bx(g, cx + s * w / 4, y + rise / 2 - .07, cz, L + .6, .14, d + .6, TEJA, 0, -s * ang);
+    }
+    for (let k = 0; k < 6; k++){ const ww = span * (1 - (k + .5) / 6);   // hastiales de ladrillo
+      if (alongX) for (const x of [cx - w / 2, cx + w / 2]) bx(g, x, y + k * rise / 6, cz, .1, rise / 6, ww, LAD);
+      else for (const z of [cz - d / 2, cz + d / 2]) bx(g, cx, y + k * rise / 6, z, ww, rise / 6, .1, LAD); }
+  };
+
+  // ---- jardín al frente, caminos y vereda ----
+  flat.rect(XF - 4.2, ZI, XF, -595, .075, '#6fa046');
+  flat.rect(-16, -604.4, XF, -600.4, .078, '#8d8f93'); flat.rect(XF, -604.4, -9.2, -600.4, .2072, '#8d8f93');   // adoquines al garaje de dos hojas
+  flat.rect(-17.5, -614.8, XF, -612.4, .078, '#b9b4a8'); flat.rect(XF, -614.8, -9.2, -612.4, .2072, '#b9b4a8');  // al garaje del semisótano
+  flat.rect(XF, -617.3, -9.2, -615.9, .2072, '#c9c4b8');                                                         // caminito a la escalera
+  flat.rect(-52, ZI - 3.5, XF, ZI, .2062, '#7a9a4a');                                                             // vereda de pasto sobre Iriondo
+  bx(g, -15.6, 0, -622, 2.4, .45, 4.2, LAD); bx(g, -15.6, .45, -622, 2.5, .06, 4.3, BLANCO);                    // cantero de ladrillo con pasto
+  crowns.add(-15.6, .55, -622, 1.1, .25, 1.9, 0, '#6fa046');
+  addCol(-16.8, -624.1, -14.4, -619.9);
+  palmTrunks.add(-15.2, 0, -618.3, .38, 6.2, .38, 0, '#7a6a4a'); addCol(-15.4, -618.5, -15, -618.1);
+  for (let k = 0; k < 8; k++){ const a = k / 8 * Math.PI * 2; crowns.add(-15.2 + Math.cos(a) * 1.3, 6.4 - (k % 2) * .25, -618.3 + Math.sin(a) * 1.3, 1.7, .2, .4, -a, '#5f8a3c'); }
+  crowns.add(-14.8, 1.0, -597.4, 1.35, 1.05, 1.35, 0, '#4f7f35'); addCol(-15.8, -598.4, -13.8, -596.4);   // arbusto redondo
+  crowns.add(-16.6, .6, -606.4, .9, .6, .8, 0, '#3e6a2e'); crowns.add(-16.4, .6, -598.8, .7, .5, .7, 1, '#3e6a2e');
+  { const p = group(-15.3, -605.8); bx(p, 0, 0, 0, .18, 1.5, .18, '#9a7a56'); bx(p, 0, 1.5, 0, .6, .12, .12, '#9a7a56'); bx(p, 0, 1.62, 0, .14, .3, .14, '#9a7a56'); addCol(-15.4, -605.9, -15.2, -605.7); }   // poste tallado
+
+  // ---- A) cuerpo principal en la esquina: dos plantas con planta baja elevada ----
+  { const a = -29.2, b = -17.5, z0 = -624, z1 = -612.3, P = 1.3, H1 = 4.2, cx = (a + b) / 2, cz = (z0 + z1) / 2;
+    bx(g, cx, 0, cz, b - a, H1, z1 - z0, LAD); rayas(z0, z1, 0, H1, b + .01, true); rayas(a, b, 0, H1, z0 - .01, false);
+    bx(g, cx, P - .08, cz, b - a + .3, .16, z1 - z0 + .3, BLANCO);                       // borde blanco a la altura de la planta baja
+    // losa del balcón, volada 1,2 m al frente y sobre Iriondo, con parapeto de ladrillo y baranda de caño
+    const sx0 = a, sx1 = b + 1.2, sz0 = z0 - 1.2, sz1 = z1, scx = (sx0 + sx1) / 2, scz = (sz0 + sz1) / 2;
+    bx(g, scx, H1, scz, sx1 - sx0, .22, sz1 - sz0, BLANCO);
+    bx(g, sx1 - .12, H1 + .22, scz, .25, .45, sz1 - sz0, LAD); bx(g, scx, H1 + .22, sz0 + .12, sx1 - sx0, .45, .25, LAD);
+    bx(g, sx1 - .12, H1 + .95, scz, .05, .05, sz1 - sz0, '#3a3a36'); bx(g, scx, H1 + .95, sz0 + .12, sx1 - sx0, .05, .05, '#3a3a36');
+    for (let z = sz0 + .2; z < sz1; z += 1.6) bx(g, sx1 - .12, H1 + .6, z, .04, .4, .04, '#3a3a36');
+    for (let x = sx0 + .2; x < sx1; x += 1.6) bx(g, x, H1 + .6, sz0 + .12, .04, .4, .04, '#3a3a36');
+    // planta alta retirada, con borde verde
+    const ua = a + .3, ub = b - 1.4, uz0 = z0 + 1.1, uz1 = z1;
+    bx(g, (ua + ub) / 2, H1 + .22, (uz0 + uz1) / 2, ub - ua, 2.8, uz1 - uz0, LAD); rayas(uz0, uz1, H1 + .22, H1 + 3, ub + .01, true); rayas(ua, ub, H1 + .22, H1 + 3, uz0 - .01, false);
+    bx(g, (ua + ub) / 2, H1 + 3.02, (uz0 + uz1) / 2, ub - ua + 1.2, .25, uz1 - uz0 + 1.2, '#e9e7e0'); bx(g, (ua + ub) / 2, H1 + 3.0, (uz0 + uz1) / 2, ub - ua + 1.25, .12, uz1 - uz0 + 1.25, '#3d6b45');
+    bx(g, -22, H1 + 3.27, -617, 2.2, .9, 1.6, LAD);   // tanque / sala de máquinas
+    // frente a la avenida
+    persX(b, -620.6, P + .45, 2.0, 1.6); persX(b, -613.6, P + .45, 1.5, 1.6);
+    bx(g, b + .03, P, -616.4, .06, 2.2, 1.5, '#8a5232'); bx(g, b + .07, P + .05, -616.8, .03, 2.1, .65, MAD); bx(g, b + .07, P + .05, -616, .03, 2.1, .65, MAD);   // puerta doble
+    bx(g, b + .1, P + 2.35, -616.4, .05, .25, .25, '#f2eccc');   // aplique
+    bx(g, b + .03, 0, -613.5, .06, 1.15, 2.1, '#7a4428');         // portón del semisótano
+    for (const [y, z] of [[P + .3, -617.8], [P + .3, -615]]) crowns.add(b + .5, y + .3, z, .4, .35, .4, 0, '#4f7f35');   // macetas
+    // escalera de la entrada con baranda
+    for (let k = 0; k < 6; k++){ const h = P * (k + 1) / 6; bx(g, b + 2.7 - k * .45, 0, -616.4, .45, h, 1.6, k % 2 ? '#bdb7ab' : '#c8c2b6'); }
+    poleIn(g, [b + 2.9, .9, -617.25], [b + .2, P + .9, -617.25], .03, '#e6e6e2'); poleIn(g, [b + 2.9, .9, -615.55], [b + .2, P + .9, -615.55], .03, '#e6e6e2');
+    bx(g, b + 1.3, 0, -614.15, 2.6, P, .3, LAD); bx(g, b + 1.3, P, -614.15, 2.7, .08, .4, BLANCO);   // murito al costado de la rampa del garaje
+    // arriba al frente: ventanales con persianas y el aire acondicionado
+    persX(ub, -620.4, H1 + .6, 2.4, 1.9); persX(ub, -616.4, H1 + .6, 1.4, 1.9); bx(g, ub + .25, H1 + 2.25, -614.2, .4, .5, .85, '#f2f2f0');
+    // sobre Iriondo
+    for (const x of [-27, -25]) { bx(g, x, .25, z0 - .03, 1.5, .75, .06, '#8a5232'); bx(g, x, .3, z0 - .07, 1.35, .65, .03, MAD); }
+    { const o = new THREE.Mesh(new THREE.TorusGeometry(.33, .07, 6, 18), lam({ color: 0x6f4a32 })); o.position.set(-21.2, .7, z0 - .05); scene.add(o); bx(g, -21.2, .4, z0 - .03, .5, .6, .02, '#3a3430'); }
+    persZ(-26.4, z0, P + .45, 1.9, 1.7); persZ(-22.4, z0, P + .45, 1.5, 1.4); persZ(-19, z0, P + .3, 2.0, 1.9);
+    for (const x of [-26.2, -23.8]){ bx(g, x, H1 + .9, uz0 - .03, 1.0, 1.6, .06, '#f2f0ea'); bx(g, x, H1 + .95, uz0 - .07, .8, 1.5, .03, '#3a4148'); }   // ventanitas de arco
+    persZ(-20.6, uz0, H1 + .6, 1.6, 1.9);
+    crowns.add(-24, H1 + .55, z0 - 1.1, 1.8, .3, .3, 0, "#5d8a3e"); crowns.add(-19.5, H1 + .55, z0 - 1.1, 1.2, .3, .3, 0, "#5d8a3e");   // plantas colgando del balcón
+    addCol(a, z0, b, z1); addCol(b, -617.3, b + 2.95, -615.5);
+    mapRects.push([a, z0, b, z1, '#b98a70']);
+    // losa volada con columna redonda en la punta oeste y puertita en el muro con alerito
+    bx(g, -31, H1, -622.4, 3.8, .22, 3.6, BLANCO); cylIn(g, -32.4, H1 / 2, -623.6, .17, H1, '#efeee9'); addCol(-32.6, -623.8, -32.2, -623.4);
+    bx(g, -31.6, 0, ZI + .15, 3.4, 2.5, .3, LAD); rayas(-33.3, -29.9, 0, 2.5, ZI - .01, false);
+    bx(g, -31.6, 2.5, ZI - .1, 3.8, .14, .9, BLANCO); bx(g, -31, 0, ZI - .02, 1.0, 2.15, .06, '#8a5232'); bx(g, -31, .1, ZI - .06, .8, 1.95, .03, MAD);
+    poleIn(g, [-29.8, 0, ZI - .6], [-29.3, 1.3, ZI - .2], .04, '#f0f0ec');   // borde blanco de la escalera que baja al semisótano
+    bx(g, -27.6, .3, ZI - 1.0, .45, .8, .3, '#4a4a46');                       // cesto de basura
+    addCol(-33.3, ZI, -29.2, ZI + .3);
+  }
+
+  // ---- B) cuerpo bajo con techo de tejas coloradas y chimenea ----
+  { const a = -24, b = -15.5, z0 = -612.3, z1 = -605.5, H = 3.0;
+    bx(g, (a + b) / 2, 0, (z0 + z1) / 2, b - a, H, z1 - z0, LAD); rayas(z0, z1, 0, H, b + .01, true);
+    tejas((a + b) / 2, (z0 + z1) / 2, b - a, z1 - z0, H, 1.6, true);
+    persX(b, -609.6, .9, 1.2, 1.5); bx(g, b + .05, .75, -609.6, .12, .1, 1.5, BLANCO);
+    bx(g, b + .6, 0, -608.6, 1.0, .4, 5.2, LAD); crowns.add(b + .6, .7, -609.8, .55, .45, 1.4, 0, '#3f6a2e');   // cantero
+    bx(g, -24.6, 0, -608.6, 1.0, 8.4, 1.0, LAD); bx(g, -24.6, 8.4, -608.6, 1.2, .15, 1.2, '#8f6a55');           // chimenea
+    addCol(a, z0, b, z1); addCol(-25.1, -609.1, -24.1, -608.1);
+    mapRects.push([a, z0, b, z1, '#b5462e']);
+  }
+
+  // ---- C) cuerpo de dos plantas con techo de tejas: portón de garaje de dos hojas, entrada metida y repisa con la vasija ----
+  { const a = -27, b = -16, z0 = -605.5, z1 = -595.5, H = 5.8, F = 2.9;
+    bx(g, (a + b) / 2, 0, (z0 + z1) / 2, b - a, H, z1 - z0, LAD); rayas(z0, z1, 0, H, b + .01, true);
+    tejas((a + b) / 2, (z0 + z1) / 2, b - a, z1 - z0, H, 2.0, false);
+    bx(g, b + .4, F, (z0 + z1) / 2, .9, .25, z1 - z0 + .2, LAD); bx(g, b + .4, F - .06, (z0 + z1) / 2, .95, .08, z1 - z0 + .25, BLANCO);   // repisa
+    for (let y = F + .3; y < F + .75; y += .15) bx(g, b + .82, y, (z0 + z1) / 2, .04, .05, z1 - z0, LADO);
+    // portón de dos hojas con tableros
+    bx(g, b + .03, 0, -602.4, .06, 2.35, 3.6, '#8a5232');
+    for (const zz of [-603.3, -601.5]) for (let r = 0; r < 4; r++) for (let c = 0; c < 2; c++) bx(g, b + .07, .2 + r * .52, zz + (c - .5) * .82, .03, .42, .72, MAD);
+    bx(g, b - .3, 0, -599.6, .1, 2.3, 1.2, '#3a3430'); for (const z of [-600.25, -598.95]) bx(g, b + .02, 0, z, .12, 2.4, .1, LADO);   // entrada metida
+    persX(b, -597.4, .5, 1.5, 1.7);
+    persX(b, -603.2, F + .6, 1.4, 1.6); bx(g, b + .03, F + 1.35, -599.4, .06, .55, 1.0, '#f2f0ea'); bx(g, b + .06, F + 1.4, -599.4, .03, .45, .85, '#3a4148');
+    { const v = new THREE.Mesh(new THREE.SphereGeometry(.38, 12, 10), lam({ color: 0xb5603a })); v.scale.set(1, 1.15, 1); v.position.set(b + .45, F + .55, -601.4); scene.add(v);
+      for (const s of [-1, 1]) poleIn(g, [b + .45, F + .8, -601.4], [b + .45 + s * .15, F + 1.6, -601.4 + s * .35], .015, '#b8a46a'); }
+    addCol(a, z0, b, z1);
+    mapRects.push([a, z0, b, z1, '#b5462e']);
+  }
+  // muro de ladrillo al costado del garaje, sobre la avenida
+  bx(g, XF - .15, 0, -592.6, .3, 1.9, 5.8, LAD); rayas(-595.5, -589.7, 0, 1.9, XF + .01, true); addCol(XF - .3, -595.5, XF, -589.7);
+
+  // ---- muro de ladrillo con pilastras sobre Iriondo y portón de madera con cruces ----
+  { const x0 = -52, x1 = -33.3, zf = ZI + .15;
+    for (const [a, b] of [[x0, -45.4], [-41.2, x1]]){
+      bx(g, (a + b) / 2, 0, zf, b - a, 2.3, .25, LAD); rayas(a, b, 0, 2.3, zf - .14, false); bx(g, (a + b) / 2, 2.3, zf, b - a, .08, .32, LADO);
+      for (let x = a; x <= b + .01; x += 3.6) bx(g, Math.min(x, b), 0, zf - .08, .4, 2.5, .4, LAD);
+      addCol(a, zf - .2, b, zf + .2);
+    }
+    bx(g, -43.3, 0, zf, 4.2, 2.2, .08, '#c2a27a');
+    for (const s of [-1, 1]){ const cx = -43.3 + s * 1.05; bx(g, cx, 1.1, zf - .06, 2.6, .12, .04, '#a88a62', 0, s * .75); bx(g, cx, 1.1, zf - .06, 2.6, .12, .04, '#a88a62', 0, -s * .75); }
+    for (const x of [-45.4, -41.2]) bx(g, x, 0, zf - .08, .5, 2.6, .5, LAD);
+    addCol(-45.4, zf - .05, -41.2, zf + .05);
+    bx(g, (-52 + -29.2) / 2, 0, -590.2, 22.8, 1.8, .2, '#b9b2a4'); addCol(-52, -590.3, -29.2, -590.1);   // medianera del fondo
+    bx(g, -52, 0, (ZI + -590.2) / 2, .2, 1.8, -590.2 - ZI, '#b9b2a4'); addCol(-52.1, ZI, -51.9, -590.2);
+  }
+  // patio del fondo: pasto, araucaria y árboles
+  flat.rect(-52, ZI, -27, -590.2, .07, '#6e9a45');
+  trunks.add(-40, 0, -612, .5, 9, .5, 0, '#6b5240');
+  for (let k = 0; k < 5; k++) crowns.add(-40, 5.5 + k * 1.1, -612, 2.6 - k * .45, .45, 2.6 - k * .45, k, '#2f5a2e');
+  for (const [x, z, s, c] of [[-46, -600, 1.3, '#4b7a30'], [-34, -598, 1.1, '#9c7a45'], [-47.5, -617, 1.2, '#3f6b2a']]){ trunks.add(x, 0, z, .45 * s, 2.4 * s, .45 * s, 0, '#5b4330'); crowns.add(x, 2.4 * s + 2.4 * s * .7, z, 2.4 * s, 2.2 * s, 2.4 * s, 1, c); addCol(x - .3, z - .3, x + .3, z + .3); }
 }
 
 // Estación de servicio Shell (Ruano Hnos), esquina Av. Centenario e Iriondo, hasta la esquina de Entre Ríos
@@ -6345,7 +6488,7 @@ const USE_REAL_BUILDINGS = REAL_BUILDINGS.length > 0;
     if (pts.length < 3) continue;
     { const [qx, qz] = polyCenter(pts);   // la Cooperativa y la Plazoleta del Inmigrante se arman aparte
       if (inPoly(qx, qz, COOP_POLY)){ COOP_FP.push(pts); continue; }
-      if (inPoly(qx, qz, PLAZA_INM) || inPoly(qx, qz, AGUA_POLY) || inPoly(qx, qz, ESQ_AGUA_POLY) || inPoly(qx, qz, PLAZA_SE_SUR_POLY) || inPoly(qx, qz, CENT_EAST_POLY) || inPoly(qx, qz, AMFAC_INT_POLY) || inPoly(qx, qz, ESC186_POLY) || inPoly(qx, qz, MALV_POLY) || inPoly(qx, qz, TERM_POLY) || inPoly(qx, qz, QUINTA_POLY) || inPoly(qx, qz, GALP26_POLY) || inPoly(qx, qz, SANLUIS_E_POLY) || inPoly(qx, qz, ENTRERIOS_O_POLY) || inPoly(qx, qz, JUJUY_S_POLY) || inPoly(qx, qz, CASITAS_COOP_POLY) || inPoly(qx, qz, CASA1070_POLY) || inPoly(qx, qz, CORREO_N_POLY) || inPoly(qx, qz, DIABLITO_S_POLY) || inPoly(qx, qz, COMISARIA_POLY) || inPoly(qx, qz, JUJUY_SO_POLY) || inPoly(qx, qz, JUJUY_N_POLY) || inPoly(qx, qz, AVC_O_POLY) || inPoly(qx, qz, BRUNET_N_POLY) || inPoly(qx, qz, MANZANA_BRUNET_POLY) || inPoly(qx, qz, ARIGA_POLY) || inPoly(qx, qz, BRUNET_S_POLY) || inPoly(qx, qz, CORDOBA_E_POLY) || inPoly(qx, qz, ESCEN_N_POLY) || inPoly(qx, qz, ESCEN_E_POLY) || inPoly(qx, qz, LAV_ER_MONG_POLY) || inPoly(qx, qz, MONG_POLY) || inPoly(qx, qz, MONG_S_POLY) || inPoly(qx, qz, CORD_BOMB_POLY) || inPoly(qx, qz, MUSEO_POLY) || inPoly(qx, qz, BOMB_N_POLY) || inPoly(qx, qz, SAGARDUY_POLY) || inPoly(qx, qz, LAV25_POLY) || inPoly(qx, qz, LAV25_E_POLY) || inPoly(qx, qz, ACOPIO_POLY) || inPoly(qx, qz, HOGAR_POLY) || inPoly(qx, qz, SHELL_POLY) || inPoly(qx, qz, CENT_BOL_POLY) || inPoly(qx, qz, ESC_BRUNET_POLY) || inPoly(qx, qz, BRUNET_IND_POLY)){ skipped++; continue; } }
+      if (inPoly(qx, qz, PLAZA_INM) || inPoly(qx, qz, AGUA_POLY) || inPoly(qx, qz, ESQ_AGUA_POLY) || inPoly(qx, qz, PLAZA_SE_SUR_POLY) || inPoly(qx, qz, CENT_EAST_POLY) || inPoly(qx, qz, AMFAC_INT_POLY) || inPoly(qx, qz, ESC186_POLY) || inPoly(qx, qz, MALV_POLY) || inPoly(qx, qz, TERM_POLY) || inPoly(qx, qz, QUINTA_POLY) || inPoly(qx, qz, GALP26_POLY) || inPoly(qx, qz, SANLUIS_E_POLY) || inPoly(qx, qz, ENTRERIOS_O_POLY) || inPoly(qx, qz, JUJUY_S_POLY) || inPoly(qx, qz, CASITAS_COOP_POLY) || inPoly(qx, qz, CASA1070_POLY) || inPoly(qx, qz, CORREO_N_POLY) || inPoly(qx, qz, DIABLITO_S_POLY) || inPoly(qx, qz, COMISARIA_POLY) || inPoly(qx, qz, JUJUY_SO_POLY) || inPoly(qx, qz, JUJUY_N_POLY) || inPoly(qx, qz, AVC_O_POLY) || inPoly(qx, qz, BRUNET_N_POLY) || inPoly(qx, qz, MANZANA_BRUNET_POLY) || inPoly(qx, qz, ARIGA_POLY) || inPoly(qx, qz, BRUNET_S_POLY) || inPoly(qx, qz, CORDOBA_E_POLY) || inPoly(qx, qz, ESCEN_N_POLY) || inPoly(qx, qz, ESCEN_E_POLY) || inPoly(qx, qz, LAV_ER_MONG_POLY) || inPoly(qx, qz, MONG_POLY) || inPoly(qx, qz, MONG_S_POLY) || inPoly(qx, qz, CORD_BOMB_POLY) || inPoly(qx, qz, MUSEO_POLY) || inPoly(qx, qz, BOMB_N_POLY) || inPoly(qx, qz, SAGARDUY_POLY) || inPoly(qx, qz, LAV25_POLY) || inPoly(qx, qz, LAV25_E_POLY) || inPoly(qx, qz, ACOPIO_POLY) || inPoly(qx, qz, HOGAR_POLY) || inPoly(qx, qz, SHELL_POLY) || inPoly(qx, qz, CENT_BOL_POLY) || inPoly(qx, qz, ESC_BRUNET_POLY) || inPoly(qx, qz, BRUNET_IND_POLY) || inPoly(qx, qz, CASA_IRI_POLY)){ skipped++; continue; } }
     const area = Math.abs(polyArea(pts));
     let bo = obb(pts);
     if (!cls && (area < 28 || !bo || Math.min(bo.len, bo.wid) < 3.4)){ skipped++; continue; }
@@ -9563,7 +9706,7 @@ function buildBlockPatiosAndWalls(){
     [13, -432, 62, -398]      // Comuna extendida
   ];
   // lotes armados a mano (casa de 25 de Mayo 1070 con canchita y baldío, casas de San Luis / Entre Ríos / Jujuy): sin medianeras ni patios automáticos encima
-  const HAND_LOTS = [CASA1070_POLY, AMFAC_INT_POLY, ESQ_AGUA_POLY, PLAZA_SE_SUR_POLY, SANLUIS_E_POLY, ENTRERIOS_O_POLY, JUJUY_S_POLY, CORREO_N_POLY, DIABLITO_S_POLY, COMISARIA_POLY, JUJUY_SO_POLY, JUJUY_N_POLY, AVC_O_POLY, BRUNET_N_POLY, MANZANA_BRUNET_POLY, ARIGA_POLY, BRUNET_S_POLY, CORDOBA_E_POLY, ESCEN_N_POLY, ESCEN_E_POLY, LAV_ER_MONG_POLY, MONG_POLY, MONG_S_POLY, CORD_BOMB_POLY, MUSEO_POLY, BOMB_N_POLY, SAGARDUY_POLY, LAV25_POLY, LAV25_E_POLY, ACOPIO_POLY, HOGAR_POLY, SHELL_POLY, CENT_BOL_POLY, ESC_BRUNET_POLY, BRUNET_IND_POLY];
+  const HAND_LOTS = [CASA1070_POLY, AMFAC_INT_POLY, ESQ_AGUA_POLY, PLAZA_SE_SUR_POLY, SANLUIS_E_POLY, ENTRERIOS_O_POLY, JUJUY_S_POLY, CORREO_N_POLY, DIABLITO_S_POLY, COMISARIA_POLY, JUJUY_SO_POLY, JUJUY_N_POLY, AVC_O_POLY, BRUNET_N_POLY, MANZANA_BRUNET_POLY, ARIGA_POLY, BRUNET_S_POLY, CORDOBA_E_POLY, ESCEN_N_POLY, ESCEN_E_POLY, LAV_ER_MONG_POLY, MONG_POLY, MONG_S_POLY, CORD_BOMB_POLY, MUSEO_POLY, BOMB_N_POLY, SAGARDUY_POLY, LAV25_POLY, LAV25_E_POLY, ACOPIO_POLY, HOGAR_POLY, SHELL_POLY, CENT_BOL_POLY, ESC_BRUNET_POLY, BRUNET_IND_POLY, CASA_IRI_POLY];
   const inExcl = (x, z) => CIVIC_EXCL.some(r => x > r[0] && x < r[2] && z > r[1] && z < r[3]) || HAND_LOTS.some(p => inPoly(x, z, p));
   const ptFree = (x, z) => !!region(...AB(x, z), 0) && !pointOnRoad(x, z) && !inPlaza(x - .5, z - .5, x + .5, z + .5) && !inOsmPark(x, z) && !inRailZone(x, z) && !inExcl(x, z);
   const segClear = (x0, z0, x1, z1, pad) => ptFree((x0 + x1) / 2, (z0 + z1) / 2) && ptFree(x0, z0) && ptFree(x1, z1) && !overlap(x0 - pad, z0 - pad, x1 + pad, z1 + pad);
