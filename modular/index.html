@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PEYRANO</title>
+<link rel="stylesheet" href="./styles/main.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="hud">
+  <b>WASD</b> / flechas: moverse · <b>Shift</b>: correr · <b>Espacio</b>: saltar<br>
+  <b>Mouse</b>: cámara (click para capturar) · <b>Rueda</b>: zoom · <b>Esc</b>: pausa<br>
+  <b>M</b>: mapa grande · <b>E</b>: subir / bajar del auto
+</div>
+<div id="prompt"></div>
+<div id="street"></div>
+<div id="carhud">
+  <div><span id="spd">0</span> <small>km/h</small></div>
+  <div class="row">⛽ <div class="bar"><i id="fuel"></i></div></div>
+  <div class="row">🔥 <div class="bar"><i id="nitro" style="background:#5ec8ff"></i></div></div>
+  <small>W/S acelerar · A/D doblar · Shift turbo · Espacio freno de mano (derrape) · F cargar nafta · E bajar</small>
+</div>
+<canvas id="mini" width="200" height="200"></canvas>
+<div id="bigwrap"><canvas id="big"></canvas>
+  <div id="legend">
+    <div><i style="background:#e02020"></i>vías del tren</div>
+    <div><i style="background:#9a4fb0"></i>calles pavimentadas</div>
+    <div><i style="background:#b7bdc4"></i>calles de ripio / escoria</div>
+    <div><i style="background:#e8d23a"></i>calles de tierra</div>
+    <div><i style="background:#3b4fd0"></i>avenida principal</div>
+    <div><i style="background:#f0a8c0"></i>avenidas de tierra</div>
+    <div><i style="background:#ffffff;border:1px solid #999"></i>avenida pavimentada secundaria</div>
+  </div>
+</div>
+<div id="fade"></div>
+<div id="cineCap"></div>
+<div id="menu" class="title">
+  <div class="card" id="mainCard">
+    <h1>PEYRANO</h1><div class="sub">SANTA FE · ARGENTINA</div>
+    <button class="mb" id="mPlay">JUGAR</button>
+    <button class="mb" id="mOpts">OPCIONES</button>
+    <button class="mb" id="mExit">SALIR</button>
+  </div>
+  <div class="card" id="opts" style="display:none">
+    <h2>OPCIONES</h2>
+    <div class="row"><span>Sensibilidad del mouse</span><span><input type="range" id="oSens" min="0.3" max="3" step="0.1"> <span class="val" id="oSensV"></span></span></div>
+    <div class="row"><span>Invertir mouse (arriba/abajo)</span><input type="checkbox" id="oInv"></div>
+    <div class="row"><span>Campo de visión</span><span><input type="range" id="oFov" min="45" max="90" step="1"> <span class="val" id="oFovV"></span></span></div>
+    <div class="row"><span>Distancia de vista</span><span><input type="range" id="oView" min="400" max="2000" step="100"> <span class="val" id="oViewV"></span></span></div>
+    <div class="row"><span>Resolución</span><select id="oRes"><option value="0.6">Baja (más FPS)</option><option value="1">Media</option><option value="1.5">Alta</option><option value="2">Máxima</option></select></div>
+    <div class="row"><span>Sombras</span><select id="oSh"><option value="0">Apagadas (más FPS)</option><option value="1024">Bajas</option><option value="2048">Altas</option></select></div>
+    <div class="row"><span>Minimapa</span><input type="checkbox" id="oMini"></div>
+    <div class="row"><span>Ayuda de controles</span><input type="checkbox" id="oHelp"></div>
+    <div class="row"><span>Cartel con el nombre de la calle</span><input type="checkbox" id="oStreet"></div>
+    <div class="btns"><button class="mb sm" id="oReset">RESTAURAR</button><button class="mb sm" id="oBack">VOLVER</button></div>
+  </div>
+</div>
+<div id="bye"><div>¡Gracias por jugar en Peyrano!</div><small style="opacity:.7">Ya podés cerrar esta pestaña.</small><button id="byeBack">Volver al menú</button></div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
