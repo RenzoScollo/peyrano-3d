@@ -235,16 +235,20 @@ class Flat {
     else for (let cx = cx0; cx <= cx1; cx++) for (let cz = cz0; cz <= cz1; cz++){ const kk = cx * 65536 + cz; let l = this._cells.get(kk); if (!l) this._cells.set(kk, l = []); l.push(id); }
     return yr;
   }
+  _remapY(y){
+    // Baja veredas custom y canteros (0.195..0.25) en -0.105 para alinear con SW_Y = 0.095 y ROAD_Y = 0.015
+    return (y >= .195 && y <= .255) ? (y - .105) : y;
+  }
   tri(a, b, c, y, col){
-    const yr = this._resolveY(Math.min(a[0], b[0], c[0]), Math.min(a[1], b[1], c[1]), Math.max(a[0], b[0], c[0]), Math.max(a[1], b[1], c[1]), y);
+    const yr = this._resolveY(Math.min(a[0], b[0], c[0]), Math.min(a[1], b[1], c[1]), Math.max(a[0], b[0], c[0]), Math.max(a[1], b[1], c[1]), this._remapY(y));
     this._triRaw(a, b, c, yr, col);
   }
   quad(a, b, c, d, y, col){
-    const yr = this._resolveY(Math.min(a[0], b[0], c[0], d[0]), Math.min(a[1], b[1], c[1], d[1]), Math.max(a[0], b[0], c[0], d[0]), Math.max(a[1], b[1], c[1], d[1]), y);
+    const yr = this._resolveY(Math.min(a[0], b[0], c[0], d[0]), Math.min(a[1], b[1], c[1], d[1]), Math.max(a[0], b[0], c[0], d[0]), Math.max(a[1], b[1], c[1], d[1]), this._remapY(y));
     this._triRaw(a, b, c, yr, col); this._triRaw(a, c, d, yr, col);
   }
   rect(x0, z0, x1, z1, y, col){
-    const yr = this._resolveY(x0, z0, x1, z1, y);
+    const yr = this._resolveY(x0, z0, x1, z1, this._remapY(y));
     this._triRaw([x0,z0],[x0,z1],[x1,z1], yr, col); this._triRaw([x0,z0],[x1,z1],[x1,z0], yr, col);
   }
   ribbon(pts, width, y, col, off = 0){
@@ -287,7 +291,7 @@ class Flat {
 const flat = new Flat();
 
 // Capa de calzadas sin superposiciones: recorta calles de menor prioridad contra las de mayor prioridad en 2D
-const ROAD_Y = .12;
+const ROAD_Y = .015;
 class RoadLayer {
   constructor(){ this.items = []; this.sidewalks = []; }
   _area2(pts){
@@ -444,7 +448,7 @@ class RoadLayer {
           if (inPoly(cx, cz, RAIL_YARD_POLY)) continue;
           if (sw.clipRail === 'SO'){ const [ca, cb] = AB(cx, cz); if (ca > 165 && cb < chacabucoB(ca)) continue; }
         }
-        for (let i = 1; i < p.length - 1; i++) flat._triRaw(p[0], p[i], p[i + 1], .2, sw.col);
+        for (let i = 1; i < p.length - 1; i++) flat._triRaw(p[0], p[i], p[i + 1], .095, sw.col);
       }
       swCutters.push(sw);
     }

@@ -22,7 +22,7 @@ export function buildMissingCollisions(ctx) {
     return false;
   };
 
-  // 1) Registrar TODAS las veredas, cordones y canteros centrales de los bulevares (carHash) como pisos caminables a y = 0.22
+  // 1) Registrar TODAS las veredas, cordones y canteros centrales de los bulevares (carHash) como pisos caminables a y = 0.095
   let addedFloors = 0;
   {
     const seenCar = new Set();
@@ -30,7 +30,7 @@ export function buildMissingCollisions(ctx) {
       for (const b of arr) {
         if (seenCar.has(b)) continue;
         seenCar.add(b);
-        addFloor(b.x0, b.z0, b.x1, b.z1, 0.22);
+        addFloor(b.x0, b.z0, b.x1, b.z1, 0.095);
         addedFloors++;
       }
     }

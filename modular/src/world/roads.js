@@ -244,11 +244,11 @@ function drawSeg(s){
       const swExt = horiz ? 12 : 6;
       const sw0 = ext0 ? (u0 - swExt) : (u0 + (open0 ? (trim0 || crossH(Math.round(s.s0))) : 0));
       const sw1 = ext1 ? (u1 + swExt) : (u1 - (open1 ? (trim1 || crossH(Math.round(s.s1))) : 0));
-      // En Av. Centenario y Bv. Lavalle, dejar abiertas las bocacalles perimetrales de las plazas
+      // En Av. Centenario y Bv. Lavalle, dejar abiertas las bocacalles perimetrales de las plazas al ancho exacto del asfalto
       const swGaps = s.type === 'main'
-        ? [[-401.0, -392.5], [-287.5, -279.0]].filter(([g0, g1]) => g1 > sw0 && g0 < sw1)
+        ? [[-400.4, -393.1], [-286.9, -279.6]].filter(([g0, g1]) => g1 > sw0 && g0 < sw1)
         : (horiz && s.v === 117)
-          ? [[-64.2, -55.3], [55.3, 64.2]].filter(([g0, g1]) => g1 > sw0 && g0 < sw1)
+          ? [[-63.5, -56.0], [56.0, 63.5]].filter(([g0, g1]) => g1 > sw0 && g0 < sw1)
           : [];
       const pSw0 = open0 ? perpSw(n0, sg) : 0, pSw1 = open1 ? perpSw(n1, sg) : 0;
       const q0 = sw0 + pSw0, q1 = sw1 - pSw1;
@@ -265,11 +265,11 @@ function drawSeg(s){
           const ca0 = Math.max(a0, c0), ca1 = Math.min(a1, c1);
           if (sa1 > sa0 + .1) swStrip(sg * (st.w/2 + swW/2), swW, sa0, sa1, '#bdb6a8');
           if (ca1 > ca0 + .1){
-            curb(sg * (st.w/2 + .06), .12, .21, ca0, ca1, '#cbc5b8');
+            curb(sg * (st.w/2 + .06), .12, .10, ca0, ca1, '#cbc5b8');
             carBlock(oLo, oHi, ca0, ca1);
           }
-          if (endA) curbEnd(a0 + .1, oLo, oHi, .21, '#cbc5b8');
-          if (endB) curbEnd(a1 - .1, oLo, oHi, .21, '#cbc5b8');
+          if (endA) curbEnd(a0 + .1, oLo, oHi, .10, '#cbc5b8');
+          if (endB) curbEnd(a1 - .1, oLo, oHi, .10, '#cbc5b8');
         };
         let cur = sw0, afterGap = false;
         for (const [g0, g1] of swGaps){
@@ -285,14 +285,14 @@ function drawSeg(s){
     }
   }
   if (t1 - t0 < 6) return;
-  if (st.dash) for (let u = t0; u < t1 - 3; u += 8) strip(0, .25, u, u + 3, .19, '#e9e4d0');
+  if (st.dash) for (let u = t0; u < t1 - 3; u += 8) strip(0, .25, u, u + 3, ROAD_Y + .018, '#e9e4d0');
   if (st.blvd){
     // cantero central con cordón amarillo (en Bv. Lavalle deja hueco libre para las calles perimetrales de las plazas en x ≈ ±59.75)
     const mw = st.blvd, paved = s.type === 'pAve', ccol = paved ? '#d8b13a' : '#cfc8b8';
     const drawBlvdSpan = (a0, a1) => {
       if (a1 - a0 < 3) return;
       strip(0, mw, a0, a1, .22, paved ? '#5a7a3a' : '#617f3f');
-      for (const sg of [-1, 1]){ strip(sg * (mw/2 - .12), .25, a0, a1, .24, ccol); curb(sg * (mw/2 - .12), .25, .235, a0, a1, ccol); }
+      for (const sg of [-1, 1]){ strip(sg * (mw/2 - .12), .25, a0, a1, .24, ccol); curb(sg * (mw/2 - .12), .25, .13, a0, a1, ccol); }
       for (const u of [a0 + .1, a1 - .1]) curbEnd(u, -mw/2, mw/2, .235, ccol);
       carBlock(-mw/2, mw/2, a0, a1);
       for (let u = a0 + 3; u < a1 - 2; u += paved ? 3.2 : 14){
@@ -316,7 +316,7 @@ function drawSeg(s){
     if (s.s1 <= 117.5){
       // del mástil hacia afuera: cantero angosto con bolas de luz repartidas de forma pareja
       strip(0, 1.6, t0, t1, .24, '#d6d1c6');
-      for (const sg of [-1, 1]) curb(sg * .74, .12, .235, t0, t1, '#cfc9bd');
+      for (const sg of [-1, 1]) curb(sg * .74, .12, .13, t0, t1, '#cfc9bd');
       for (const u of [t0 + .1, t1 - .1]) curbEnd(u, -.8, .8, .235, '#cfc9bd');
       carBlock(-.8, .8, t0, t1);
       const nb = Math.max(1, Math.round((t1 - t0 - 2) / 5.6));
@@ -333,7 +333,7 @@ function drawSeg(s){
         const L = a1 - a0;
         if (L < 6) return;
         strip(0, 3, a0, a1, .22, '#5d7f3c');
-        for (const sg of [-1, 1]) curb(sg * 1.44, .12, .215, a0, a1, '#cfc9bd');
+        for (const sg of [-1, 1]) curb(sg * 1.44, .12, .115, a0, a1, '#cfc9bd');
         for (const u of [a0 + .1, a1 - .1]) curbEnd(u, -1.5, 1.5, .215, '#cfc9bd');
         carBlock(-1.5, 1.5, a0, a1);
         const n = Math.max(1, Math.round(L / 13));

@@ -142,9 +142,12 @@ function updateCar(dt){
 }
 CAR.g.position.set(car.x, ROAD_Y, car.z); CAR.g.rotation.y = car.h;
 
-// Altura del suelo caminable bajo (x, z): calles (ROAD_Y = 0.12), patios/plazas (0.07), veredas/canteros (0.20..0.22) y escaleras con step-up automático
+// Altura del suelo caminable bajo (x, z): calles (ROAD_Y = 0.015), veredas y edificios/manzanas al mismo nivel (0.095), escaleras con step-up automático
 function groundY(x, z, curY = 0){
-  let gy = (pointOnRoad && pointOnRoad(x, z)) ? ROAD_Y : .07;
+  let gy;
+  if (pointOnRoad && pointOnRoad(x, z)) gy = ROAD_Y;
+  else if (inTownBox(x, z, 15) && !inRailZone(x, z)) gy = .095;
+  else gy = .04;
   const maxStep = curY + .55;
   const pad = .22;
   const ci = Math.floor(x / CELL), cj = Math.floor(z / CELL);
