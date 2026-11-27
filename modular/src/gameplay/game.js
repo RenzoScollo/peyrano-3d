@@ -106,15 +106,27 @@ function updateCar(dt){
   vL -= dl; vF += Math.sign(vF || 1) * Math.abs(dl) * .7;
   car.vx = fx * vF + lx * vL; car.vz = fz * vF + lz * vL;
   car.h += yaw * dt;
-  car.x += car.vx * dt; car.z += car.vz * dt;
-  car.speed = vF; car.slip = vL;
   // nafta: tanque lleno ≈ 9 km, el turbo gasta más
   car.fuel = Math.max(0, car.fuel - Math.abs(vF) * dt / 9000 * (turbo ? 2.5 : 1));
   if (nearPump() && Math.abs(vF) < 1.5 && keys.KeyF) car.fuel = Math.min(1, car.fuel + dt * .2);
-  // choques
-  let hit = false;
   if (ADMIN.on && ADMIN.inf){ car.fuel = 1; car.nitro = 1; }
-  if (!(ADMIN.on && ADMIN.noclip)) for (const p of carCircles()){ const ox = p.x, oz = p.z; const h1 = pushOut(p, .95), h2 = pushOut(p, .95, carHash); if (h1 || h2){ hit = true; car.x += p.x - ox; car.z += p.z - oz; } }   // edificios + cordones de veredas y canteros
+  // Sub-pasos de movimiento y choques (máx 0.45 m por paso para que el auto nunca atraviese tapiales ni paredes a alta velocidad)
+  const stepDist = Math.hypot(car.vx * dt, car.vz * dt);
+  const nSteps = (ADMIN.on && ADMIN.noclip) ? 1 : Math.max(1, Math.ceil(stepDist / .45));
+  let hit = false;
+  for (let stp = 0; stp < nSteps; stp++){
+    car.x += car.vx * dt / nSteps;
+    car.z += car.vz * dt / nSteps;
+    if (!(ADMIN.on && ADMIN.noclip)){
+      for (const p of carCircles()){
+        const ox = p.x, oz = p.z;
+        const h1 = pushOut(p, .95), h2 = pushOut(p, .95, carHash);
+        if (h1 || h2){ hit = true; car.x += p.x - ox; car.z += p.z - oz; }
+      }
+      if (hit) break;
+    }
+  }
+  car.speed = vF; car.slip = vL;
   if (hit){ const f = Math.hypot(car.vx, car.vz) > 3 ? -.25 : .5; car.vx *= f; car.vz *= f; }
   // marcas de las ruedas traseras
   if ((Math.abs(vL) > 2.2 || drifting) && Math.abs(vF) > 3){
@@ -139,16 +151,42 @@ function collide(){
 let camDist = dist;
 function insideCol(x, z){
   const l = hash.get(hk(Math.floor(x / CELL), Math.floor(z / CELL))); if (!l) return false;
-  for (const b of l) if (b.x1 - b.x0 > 1.5 && b.z1 - b.z0 > 1.5 && x > b.x0 && x < b.x1 && z > b.z0 && z < b.z1) return true;
+  for (const b of l){
+    if (b.obb){
+      if (b.hx * 2 > 1.5 && b.hz * 2 > 1.5){
+        const dx = x - b.cx, dz = z - b.cz;
+        const lx = dx * b.c - dz * b.s, lz = dx * b.s + dz * b.c;
+        if (Math.abs(lx) < b.hx && Math.abs(lz) < b.hz) return true;
+      }
+    } else if (b.x1 - b.x0 > 1.5 && b.z1 - b.z0 > 1.5 && x > b.x0 && x < b.x1 && z > b.z0 && z < b.z1) return true;
+  }
   return false;
 }
 function pushOut(pos, r, H = hash){
   let hit = false;
-  for (let iter = 0; iter < 2; iter++){
+  for (let iter = 0; iter < 3; iter++){
     const ci = Math.floor(pos.x / CELL), cj = Math.floor(pos.z / CELL);
     for (let i = ci - 1; i <= ci + 1; i++) for (let j = cj - 1; j <= cj + 1; j++){
       const l = H.get(hk(i, j)); if (!l) continue;
       for (const b of l){
+        if (b.obb){
+          // Resolver en espacio local de la caja orientada (OBB 2D)
+          const dx = pos.x - b.cx, dz = pos.z - b.cz;
+          const lx = dx * b.c - dz * b.s, lz = dx * b.s + dz * b.c;
+          const qx = Math.max(-b.hx, Math.min(lx, b.hx)), qz = Math.max(-b.hz, Math.min(lz, b.hz));
+          const ux = lx - qx, uz = lz - qz, d2 = ux * ux + uz * uz;
+          if (d2 >= r * r) continue;
+          hit = true;
+          let px = 0, pz = 0;
+          if (d2 > 1e-8){ const d = Math.sqrt(d2), f = (r - d) / d; px = ux * f; pz = uz * f; }
+          else {
+            const o = [lx + b.hx, b.hx - lx, lz + b.hz, b.hz - lz], m = Math.min(...o), k = o.indexOf(m);
+            if (k === 0) px = -(lx + b.hx + r); else if (k === 1) px = (b.hx - lx + r); else if (k === 2) pz = -(lz + b.hz + r); else pz = (b.hz - lz + r);
+          }
+          pos.x += px * b.c + pz * b.s;
+          pos.z += -px * b.s + pz * b.c;
+          continue;
+        }
         const qx = Math.max(b.x0, Math.min(pos.x, b.x1)), qz = Math.max(b.z0, Math.min(pos.z, b.z1));
         const dx = pos.x - qx, dz = pos.z - qz, d2 = dx*dx + dz*dz;
         if (d2 >= r*r) continue;
@@ -652,6 +690,7 @@ let bigM = null;
     <label><input type="checkbox" id="adFly"> Volar <small>[V]</small></label><br>
     <label><input type="checkbox" id="adClip"> Noclip (atravesar todo) <small>[N]</small></label><br>
     <label><input type="checkbox" id="adInf"> Nafta y turbo infinitos</label><br>
+    <label><input type="checkbox" id="adCol"> Ver colisiones (rojo: pared · amar: cordón)</label><br>
     Velocidad: <input type="range" id="adSpd" min="5" max="150" style="width:120px;vertical-align:middle"> <span id="adSpdV"></span><br>
     <hr style="border:0;border-top:1px solid rgba(255,255,255,.18);margin:6px 0">
     Hora: <input type="range" id="adTime" min="0" max="24" step="0.1" style="width:105px;vertical-align:middle"> <span id="adTimeV" style="font-size:11px"></span><br>
@@ -688,6 +727,34 @@ let bigM = null;
   $('adFly').onchange = e => { ADMIN.fly = e.target.checked; if (!ADMIN.fly) vy = 0; };
   $('adClip').onchange = e => { ADMIN.noclip = e.target.checked; };
   $('adInf').onchange = e => { ADMIN.inf = e.target.checked; };
+  // Visualizador de colisiones cercanas (wireframe rojo = edificios/paredes, amarillo = cordones solo auto)
+  let colVis = false, colGroup = null;
+  const colMatW = new THREE.MeshBasicMaterial({ color: 0xff3b30, wireframe: true });
+  const colMatC = new THREE.MeshBasicMaterial({ color: 0xffd60a, wireframe: true });
+  const colBoxGeo = new THREE.BoxGeometry(1, 1, 1);
+  const rebuildColVis = () => {
+    if (colGroup){ scene.remove(colGroup); colGroup = null; }
+    if (!colVis) return;
+    colGroup = new THREE.Group();
+    const seen = new Set();
+    const ci = Math.floor(pos.x / CELL), cj = Math.floor(pos.z / CELL);
+    const drawMap = (H, mat, h) => {
+      for (let i = ci - 3; i <= ci + 3; i++) for (let j = cj - 3; j <= cj + 3; j++){
+        const l = H.get(hk(i, j)); if (!l) continue;
+        for (const b of l){
+          if (seen.has(b)) continue; seen.add(b);
+          const m = new THREE.Mesh(colBoxGeo, mat);
+          if (b.obb){ m.position.set(b.cx, h / 2, b.cz); m.scale.set(b.hx * 2, h, b.hz * 2); m.rotation.y = Math.atan2(b.s, b.c); }
+          else { m.position.set((b.x0 + b.x1) / 2, h / 2, (b.z0 + b.z1) / 2); m.scale.set(Math.max(.08, b.x1 - b.x0), h, Math.max(.08, b.z1 - b.z0)); }
+          colGroup.add(m);
+        }
+      }
+    };
+    drawMap(hash, colMatW, 2.2);
+    drawMap(carHash, colMatC, 0.45);
+    scene.add(colGroup);
+  };
+  $('adCol').onchange = e => { colVis = e.target.checked; rebuildColVis(); pauseDirty = true; };
   $('adSpd').oninput = e => { ADMIN.speed = +e.target.value; sync(); };
   $('adTime').oninput = e => { if (!dn) return; dn.applyHour(+e.target.value); dn.updateLamps(pos.x, pos.z); updateSun(pos.x, pos.z); syncTime(); pauseDirty = true; };
   $('adPauseT').onchange = e => { if (!dn) return; dn.state.paused = e.target.checked; syncTime(); };
@@ -718,6 +785,7 @@ let bigM = null;
     const [a, b] = AB(pos.x, pos.z), [lat, lon] = abToLatLon(a, b);
     $('adPos').textContent = `x ${pos.x.toFixed(1)}  y ${pos.y.toFixed(1)}  z ${pos.z.toFixed(1)}\na ${a.toFixed(1)}  b ${b.toFixed(1)}\n${lat.toFixed(6)}, ${lon.toFixed(6)}`;
     if (dn && document.activeElement !== $('adTime')) syncTime();
+    if (colVis) rebuildColVis();
   }, 200);
 }
 /* ===== fin MODO ADMIN ===== */
