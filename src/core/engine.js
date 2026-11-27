@@ -284,7 +284,7 @@ class Flat {
     g.setAttribute('color', new THREE.Float32BufferAttribute(this.c, 3));
     const nrm = new Float32Array(this.p.length); for (let i = 1; i < nrm.length; i += 3) nrm[i] = 1;
     g.setAttribute('normal', new THREE.BufferAttribute(nrm, 3));
-    const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ vertexColors: true, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 }));
+    const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ vertexColors: true }));
     m.receiveShadow = true; return m;
   }
 }
@@ -602,7 +602,7 @@ const ground = new THREE.Mesh(new THREE.PlaneGeometry(12000, 12000, 48, 48), lam
 ground.rotation.x = -Math.PI/2; ground.position.y = -.18; ground.renderOrder = -10; ground.receiveShadow = true; scene.add(ground);
 
 const [TX0, TZ0] = W(0, 0), [TX1, TZ1] = W(AMAX, BMAX);
-flat.rect(TX0 - 6, TZ0 - 6, TX1 + 6, TZ1 + 6, .015, '#6b8744');   // pasto del pueblo
+flat.rect(TX0 - 6, TZ0 - 6, TX1 + 6, TZ1 + 6, -.05, '#6b8744');   // pasto del pueblo (debajo de ROAD_Y = 0.015)
 
 const FIELD_COLS = ['#7a9a4a','#8aa556','#6b8c3e','#a39a5a','#b8a86a','#5e7f3a','#9b8a5c','#7e9f5f','#c2b278','#6f9a50','#8c7a52','#4f7a35'];
 

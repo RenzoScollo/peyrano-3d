@@ -945,7 +945,7 @@ export function buildCivic(ctx) {
 
 {
   const WATER = '#4f7f99';
-  for (const w of OSM.green) fillPoly(osmPts(w.p), -.09, '#7d9c55');
+  for (const w of OSM.green){ const pts = osmPts(w.p); if (pts.length < 3) continue; const [cx, cz] = polyCenter(pts); if (inTownBox(cx, cz, 0)) continue; fillPoly(pts, -.09, '#7d9c55'); }
   for (const w of OSM.landfill) fillPoly(osmPts(w.p), -.09, '#9a8a6a');
   for (const w of OSM.wetland) fillPoly(osmPts(w.p), -.08, '#6a8a5c');
   for (const w of OSM.scrub){ const pts = osmPts(w.p); if (pts.length < 3) continue; fillPoly(pts, -.085, '#5f7c40'); const [x0, z0, x1, z1] = bboxOf(pts); const n = Math.min(80, Math.abs(polyArea(pts)) / 120); for (let k = 0; k < n; k++){ const x = R(x0, x1), z = R(z0, z1); if (inPoly(x, z, pts) && !inTownBox(x, z, -20)) addBush(x, z, R(.8, 1.6)); } }
