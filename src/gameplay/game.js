@@ -846,6 +846,7 @@ function mergeStaticMeshes(){
   scene.updateMatrixWorld(true);
   const skip = new Set();
   for (const root of [P.g, CAR.g]) root.traverse(o => skip.add(o));
+  if (ctx.ground) skip.add(ctx.ground);
   const cands = [];
   scene.traverse(o => {
     if (!o.isMesh || o.isInstancedMesh || o.isSkinnedMesh || skip.has(o) || o.children.length) return;

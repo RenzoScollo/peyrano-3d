@@ -284,7 +284,7 @@ class Flat {
     g.setAttribute('color', new THREE.Float32BufferAttribute(this.c, 3));
     const nrm = new Float32Array(this.p.length); for (let i = 1; i < nrm.length; i += 3) nrm[i] = 1;
     g.setAttribute('normal', new THREE.BufferAttribute(nrm, 3));
-    const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ vertexColors: true }));
+    const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ vertexColors: true, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 }));
     m.receiveShadow = true; return m;
   }
 }
@@ -598,8 +598,8 @@ const mapRoads = [], mapRects = [], mapFields = [];
 /* =========================================================
    Suelo, campos alrededor
    ========================================================= */
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(12000, 12000, 48, 48), lam({ color: 0x6f8c48 }));
-ground.rotation.x = -Math.PI/2; ground.position.y = -.10; ground.receiveShadow = true; scene.add(ground);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(12000, 12000, 48, 48), lam({ color: 0x6f8c48, depthWrite: false }));
+ground.rotation.x = -Math.PI/2; ground.position.y = -.18; ground.renderOrder = -10; ground.receiveShadow = true; scene.add(ground);
 
 const [TX0, TZ0] = W(0, 0), [TX1, TZ1] = W(AMAX, BMAX);
 flat.rect(TX0 - 6, TZ0 - 6, TX1 + 6, TZ1 + 6, .015, '#6b8744');   // pasto del pueblo

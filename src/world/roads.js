@@ -13,7 +13,7 @@ for (let i = 0; i < xs.length - 1; i++) for (let j = 0; j < zs.length - 1; j++){
   const x0 = xs[i] + 4, x1 = xs[i+1] - 4, z0 = zs[j] + 4, z1 = zs[j+1] - 4;
   if (x1 > TX0 - 40 && x0 < TX1 + 40 && z1 > TZ0 - 40 && z0 < TZ1 + 40) continue;
   const col = pick(FIELD_COLS);
-  flat.rect(x0, z0, x1, z1, -.06, col); mapFields.push([x0, z0, x1, z1, col]);
+  flat.rect(x0, z0, x1, z1, -.12, col); mapFields.push([x0, z0, x1, z1, col]);
   // cortinas de árboles
   if (rnd() < .3){ const side = Math.floor(rnd()*4);
     for (let t = 0; t < 1; t += 6 / ((side < 2 ? x1 - x0 : z1 - z0))){
