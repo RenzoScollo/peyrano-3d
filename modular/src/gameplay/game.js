@@ -1,7 +1,7 @@
 // Jugador, auto, físicas/bunnyhop, interior de la Comuna, opciones, minimapa, mapa grande, modo admin y loop principal
 export function startGame(ctx) {
   const {
-    AB, AGUA_POLY, CELL, COMISARIA_POLY, G, MX, MZ, PLAZA_INM, PUMPS, REAL_BUILDINGS, ROAD_Y, S, SPAWN, THREE, TX0, TX1, TZ0, TZ1, W, abToLatLon, addCol, anims, balls, bikeWheels, boxIn, bx, camera, canvas, carHash, crowns, cylIn, darks, flat, group, hash, hk, lam, makeCar, mapFields, mapLabels, mapRects, mapRoads, mapStreetNames, palmCrowns, palmTrunks, pointOnRoad, poleIn, poles, renderer, roadLayer, roofs, scene, segs, signIn, sleepers, streetAt, sun, trims, trunks, updateSun, walkHash, walls
+    AB, AGUA_POLY, CELL, COMISARIA_POLY, G, MX, MZ, PLAZA_INM, PUMPS, REAL_BUILDINGS, ROAD_Y, S, SPAWN, THREE, TX0, TX1, TZ0, TZ1, W, abToLatLon, addCol, anims, balls, bikeWheels, boxIn, bx, camera, canvas, carHash, crowns, cylIn, darks, flat, group, hash, hk, inPlaza, inRailZone, inTownBox, lam, makeCar, mapFields, mapLabels, mapRects, mapRoads, mapStreetNames, palmCrowns, palmTrunks, pointOnRoad, poleIn, poles, renderer, roadLayer, roofs, scene, segs, signIn, sleepers, streetAt, sun, trims, trunks, updateSun, walkHash, walls
   } = ctx;
 
 
@@ -142,9 +142,12 @@ function updateCar(dt){
 }
 CAR.g.position.set(car.x, ROAD_Y, car.z); CAR.g.rotation.y = car.h;
 
-// Altura del suelo caminable bajo (x, z): calles (ROAD_Y), veredas/canteros (0.22), escaleras y tarimas con step-up automático
+// Altura del suelo caminable bajo (x, z): calles (ROAD_Y = 0.12), veredas y manzanas urbanas al mismo nivel (0.20), canteros (0.22), escaleras y tarimas con step-up automático
 function groundY(x, z, curY = 0){
-  let gy = (pointOnRoad && pointOnRoad(x, z)) ? ROAD_Y : .06;
+  let gy;
+  if (pointOnRoad && pointOnRoad(x, z)) gy = ROAD_Y;
+  else if (inTownBox(x, z, 15) && !inRailZone(x, z)) gy = .20;
+  else gy = .05;
   const maxStep = curY + .55;
   const pad = .22;
   const ci = Math.floor(x / CELL), cj = Math.floor(z / CELL);

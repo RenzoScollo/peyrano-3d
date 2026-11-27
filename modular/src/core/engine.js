@@ -235,16 +235,25 @@ class Flat {
     else for (let cx = cx0; cx <= cx1; cx++) for (let cz = cz0; cz <= cz1; cz++){ const kk = cx * 65536 + cz; let l = this._cells.get(kk); if (!l) this._cells.set(kk, l = []); l.push(id); }
     return yr;
   }
+  _liftUrban(x0, z0, x1, z1, y){
+    if (y >= .031 && y <= .11){
+      const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
+      if (cx > -530 && cx < 530 && cz > -670 && cz < 240) return y + .15;
+    }
+    return y;
+  }
   tri(a, b, c, y, col){
-    const yr = this._resolveY(Math.min(a[0], b[0], c[0]), Math.min(a[1], b[1], c[1]), Math.max(a[0], b[0], c[0]), Math.max(a[1], b[1], c[1]), y);
+    const x0 = Math.min(a[0], b[0], c[0]), z0 = Math.min(a[1], b[1], c[1]), x1 = Math.max(a[0], b[0], c[0]), z1 = Math.max(a[1], b[1], c[1]);
+    const yr = this._resolveY(x0, z0, x1, z1, this._liftUrban(x0, z0, x1, z1, y));
     this._triRaw(a, b, c, yr, col);
   }
   quad(a, b, c, d, y, col){
-    const yr = this._resolveY(Math.min(a[0], b[0], c[0], d[0]), Math.min(a[1], b[1], c[1], d[1]), Math.max(a[0], b[0], c[0], d[0]), Math.max(a[1], b[1], c[1], d[1]), y);
+    const x0 = Math.min(a[0], b[0], c[0], d[0]), z0 = Math.min(a[1], b[1], c[1], d[1]), x1 = Math.max(a[0], b[0], c[0], d[0]), z1 = Math.max(a[1], b[1], c[1], d[1]);
+    const yr = this._resolveY(x0, z0, x1, z1, this._liftUrban(x0, z0, x1, z1, y));
     this._triRaw(a, b, c, yr, col); this._triRaw(a, c, d, yr, col);
   }
   rect(x0, z0, x1, z1, y, col){
-    const yr = this._resolveY(x0, z0, x1, z1, y);
+    const yr = this._resolveY(x0, z0, x1, z1, this._liftUrban(x0, z0, x1, z1, y));
     this._triRaw([x0,z0],[x0,z1],[x1,z1], yr, col); this._triRaw([x0,z0],[x1,z1],[x1,z0], yr, col);
   }
   ribbon(pts, width, y, col, off = 0){

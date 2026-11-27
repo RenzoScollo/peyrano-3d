@@ -1,7 +1,7 @@
 // Edificios Overture (REAL_BUILDINGS), Cooperativa, patios/medianeras automáticas, arbolado urbano y optimizador anti z-fighting
 export function buildAutofill(ctx) {
   const {
-    AB, ACOPIO_POLY, AGUA_POLY, AMFAC_INT_POLY, ARIGA_POLY, AVC_O_POLY, BOMB_N_POLY, BRUNET_IND_POLY, BRUNET_N_POLY, BRUNET_S_POLY, BV_FC_NE, BV_FC_SO, CAR_OPEN, CASA1070_POLY, CASA_IRI_POLY, CASITAS_COOP_POLY, CATAMARCA_CONN, CENT_BOL_POLY, CENT_EAST_POLY, CENT_O_BOL_POLY, CHACABUCO_PTS, COMISARIA_POLY, COOP_FP, COOP_POLY, CORDOBA_E_POLY, CORD_BOMB_POLY, CORREO_N_POLY, DIABLITO_S_POLY, ENTRERIOS_O_POLY, ESC186_POLY, ESCEN_E_POLY, ESCEN_N_POLY, ESC_BRUNET_POLY, ESQ_AGUA_POLY, G, GALP26_POLY, HOGAR_POLY, JUJUY_N_POLY, JUJUY_SO_POLY, JUJUY_S_POLY, LAV25_E_POLY, LAV25_POLY, LAV_ER_MONG_POLY, MALV_POLY, MANZANA_BRUNET_POLY, MONG_POLY, MONG_S_POLY, MUSEO_POLY, NA, NB, PASO_OESTE, PLAZA_INM, PLAZA_SE_SUR_POLY, QUINTA_POLY, R, REAL_BUILDINGS, S, SAGARDUY_POLY, SANLUIS_E_POLY, SHELL_POLY, TERM_POLY, THREE, W, addBush, addCol, addTree, bboxOf, box, boxGeo, boxIn, bx, colLocal, crowns, cylIn, darks, distToPolyline, extrudePoly, fillPoly, flat, gableIn, ground, group, inOsmPark, inPlaza, inPoly, inRailZone, inTownBox, inYard, inner, lam, lampSpots, mapLabels, mapRects, nearRail, nearRuralRoad, obb, overlap, pick, plazaRects, poleIn, poles, polyArea, polyCenter, railDist, region, regionRect, renderer, rnd, roofs, ruralExcl, ruralTreeSpots, scene, segs, shA, shB, signIn, streetReg, streetTreeSpots, treeSpots, trims, walls, xs
+    AB, ACOPIO_POLY, AGUA_POLY, AMFAC_INT_POLY, ARIGA_POLY, AVC_O_POLY, BOMB_N_POLY, BRUNET_IND_POLY, BRUNET_N_POLY, BRUNET_S_POLY, BV_FC_NE, BV_FC_SO, CAR_OPEN, CASA1070_POLY, CASA_IRI_POLY, CASITAS_COOP_POLY, CATAMARCA_CONN, CENT_BOL_POLY, CENT_EAST_POLY, CENT_O_BOL_POLY, CHACABUCO_PTS, COMISARIA_POLY, COOP_FP, COOP_POLY, CORDOBA_E_POLY, CORD_BOMB_POLY, CORREO_N_POLY, DIABLITO_S_POLY, ENTRERIOS_O_POLY, ESC186_POLY, ESCEN_E_POLY, ESCEN_N_POLY, ESC_BRUNET_POLY, ESQ_AGUA_POLY, G, GALP26_POLY, HOGAR_POLY, JUJUY_N_POLY, JUJUY_SO_POLY, JUJUY_S_POLY, LAV25_E_POLY, LAV25_POLY, LAV_ER_MONG_POLY, MALV_POLY, MANZANA_BRUNET_POLY, MONG_POLY, MONG_S_POLY, MUSEO_POLY, NA, NB, PASO_OESTE, PLAZA_INM, PLAZA_SE_SUR_POLY, QUINTA_POLY, R, REAL_BUILDINGS, S, SAGARDUY_POLY, SANLUIS_E_POLY, SHELL_POLY, TERM_POLY, THREE, W, addBush, addCol, addTree, bboxOf, box, boxGeo, boxIn, bx, colLocal, crowns, cylIn, darks, distToPolyline, extrudePoly, fillPoly, flat, gableIn, ground, group, inOsmPark, inPlaza, inPoly, inRailZone, inTownBox, inYard, inner, isPlaza, lam, lampSpots, mapLabels, mapRects, nearRail, nearRuralRoad, obb, overlap, pick, plazaRects, poleIn, poles, polyArea, polyCenter, railDist, region, regionRect, renderer, rnd, roofs, ruralExcl, ruralTreeSpots, scene, segs, shA, shB, signIn, streetReg, streetTreeSpots, treeSpots, trims, walls, xs
   } = ctx;
 
 function pointOnRoad(x, z){
@@ -497,6 +497,17 @@ function buildBlockPatiosAndWalls(){
     }
     flush();
   };
+
+  // Elevar el césped base de todas las manzanas urbanas (fuera de las 4 plazas centrales y vías) al nivel de la vereda
+  for (let i = 0; i < NA; i++) for (let j = 0; j < NB; j++){
+    if (isPlaza(i, j)) continue;
+    const [ix0, iz0, ix1, iz1] = inner(i, j);
+    if (ix1 - ix0 < 16 || iz1 - iz0 < 16) continue;
+    if (!regionRect(ix0, iz0, ix1, iz1, 0)) continue;
+    const cx = (ix0 + ix1) / 2, cz = (iz0 + iz1) / 2;
+    if (inRailZone(cx, cz) || inRailZone(ix0, iz0) || inRailZone(ix1, iz1) || inRailZone(ix0, iz1) || inRailZone(ix1, iz0)) continue;
+    flat.rect(ix0, iz0, ix1, iz1, .175, '#6f8c48');
+  }
 
   for (let i = 0; i < NA; i++) for (let j = 0; j < NB; j++){
     const [ix0, iz0, ix1, iz1] = inner(i, j);
