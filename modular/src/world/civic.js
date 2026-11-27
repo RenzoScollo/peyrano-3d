@@ -945,19 +945,19 @@ export function buildCivic(ctx) {
 
 {
   const WATER = '#4f7f99';
-  for (const w of OSM.green) fillPoly(osmPts(w.p), .036, '#7d9c55');
-  for (const w of OSM.landfill) fillPoly(osmPts(w.p), .036, '#9a8a6a');
-  for (const w of OSM.wetland) fillPoly(osmPts(w.p), .04, '#6a8a5c');
-  for (const w of OSM.scrub){ const pts = osmPts(w.p); if (pts.length < 3) continue; fillPoly(pts, .038, '#5f7c40'); const [x0, z0, x1, z1] = bboxOf(pts); const n = Math.min(80, Math.abs(polyArea(pts)) / 120); for (let k = 0; k < n; k++){ const x = R(x0, x1), z = R(z0, z1); if (inPoly(x, z, pts) && !inTownBox(x, z, -20)) addBush(x, z, R(.8, 1.6)); } }
-  for (const w of OSM.water){ const pts = osmPts(w.p); if (pts.length > 2){ fillPoly(pts, .055, WATER); mapRoads.push({ pts: [...pts, pts[0]], w: 4, col: WATER, y: .05 }); } }
-  for (const w of OSM.waterway){ const pts = []; for (let i = 0; i < w.p.length; i += 2) pts.push([w.p[i], w.p[i + 1]]); const wd = w.k === 'river' ? 10 : w.k === 'stream' ? 5 : 3; flat.ribbon(pts, wd + 3, .045, '#6f8a52'); flat.ribbon(pts, wd, .055, WATER); mapRoads.push({ pts, w: wd, col: WATER, y: .05 }); if (w.n) mapLabels.push([...pts[Math.floor(pts.length / 2)], w.n]); }
+  for (const w of OSM.green) fillPoly(osmPts(w.p), -.045, '#7d9c55');
+  for (const w of OSM.landfill) fillPoly(osmPts(w.p), -.045, '#9a8a6a');
+  for (const w of OSM.wetland) fillPoly(osmPts(w.p), -.04, '#6a8a5c');
+  for (const w of OSM.scrub){ const pts = osmPts(w.p); if (pts.length < 3) continue; fillPoly(pts, -.042, '#5f7c40'); const [x0, z0, x1, z1] = bboxOf(pts); const n = Math.min(80, Math.abs(polyArea(pts)) / 120); for (let k = 0; k < n; k++){ const x = R(x0, x1), z = R(z0, z1); if (inPoly(x, z, pts) && !inTownBox(x, z, -20)) addBush(x, z, R(.8, 1.6)); } }
+  for (const w of OSM.water){ const pts = osmPts(w.p); if (pts.length > 2){ fillPoly(pts, -.025, WATER); mapRoads.push({ pts: [...pts, pts[0]], w: 4, col: WATER, y: .05 }); } }
+  for (const w of OSM.waterway){ const pts = []; for (let i = 0; i < w.p.length; i += 2) pts.push([w.p[i], w.p[i + 1]]); const wd = w.k === 'river' ? 10 : w.k === 'stream' ? 5 : 3; flat.ribbon(pts, wd + 3, -.035, '#6f8a52'); flat.ribbon(pts, wd, -.025, WATER); mapRoads.push({ pts, w: wd, col: WATER, y: .05 }); if (w.n) mapLabels.push([...pts[Math.floor(pts.length / 2)], w.n]); }
   // parques reales (los del centro ya son las cuatro plazas)
   for (const w of OSM.park){
     const pts = osmPts(w.p); if (pts.length < 3) continue;
     const [cx, cz] = polyCenter(pts);
     if (Math.abs(cx - MX) < 110 && Math.abs(cz - MZ) < 110) continue;
     OSM_PARKS.push(pts);
-    fillPoly(pts, .052, '#5f9140');
+    fillPoly(pts, -.028, '#5f9140');
     const [x0, z0, x1, z1] = bboxOf(pts), n = Math.min(60, Math.abs(polyArea(pts)) / 260);
     for (let k = 0; k < n; k++){ const x = R(x0, x1), z = R(z0, z1); if (inPoly(x, z, pts) && !overlap(x - 1.5, z - 1.5, x + 1.5, z + 1.5)) treeSpots.push([x, z, R(.9, 1.4), false]); }
     mapRects.push([...bboxOf(pts), '#3f9a3a']); if (w.n) mapLabels.push([cx, cz, w.n]);

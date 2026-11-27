@@ -494,7 +494,7 @@ export function buildCentroOesteBrunet(ctx) {
     }
     // vereda: pasto con cordón amarillo en la esquina, arbustos pelados y árbol
     flat.rect(-13.5, -63.5, -10.6, ZB, .206, '#c4bfb4'); pasto(-63.5, -55.5, '#6f8f45'); arbol(-62, 1.15);
-    flat.rect(XF, ZB, XL - OCH, ZB + 1.9, .206, '#b8a99a'); flat.rect(XF, ZB + 1.9, -13.5, ZB + 4.1, .205, '#6f8f45');
+    flat.rect(XF, ZB, XL - OCH, ZB + 1.9, .206, '#b8a99a'); flat.rect(XF, ZB + 1.9, -13.5, ZB + 3.5, .205, '#6f8f45');
     addTree(-24.3, -53.4, .75, false, ['#9c7a45', '#8a6a3a']); addTree(-22.5, -53.3, .5, false, ['#9c7a45', '#8a6a3a']); addTree(-16.5, -53.2, .45, false, ['#9c7a45', '#8a6a3a']);
     { const cg = group(-23.6, -54.2); bx(cg, 0, .1, 0, .65, .5, .35, '#3a3a3a'); bx(cg, 0, .15, 0, .55, .4, .28, '#9cb0c8'); for (const s of [-1, 1]) bx(cg, s * .28, 0, 0, .04, .6, .04, '#3a3a3a'); }   // canasto de basura
     mapLabels.push([-20, -59.5, 'Farm. Ferretti']);

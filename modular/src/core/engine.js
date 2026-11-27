@@ -599,7 +599,7 @@ const mapRoads = [], mapRects = [], mapFields = [];
    Suelo, campos alrededor
    ========================================================= */
 const ground = new THREE.Mesh(new THREE.PlaneGeometry(12000, 12000, 48, 48), lam({ color: 0x6f8c48 }));
-ground.rotation.x = -Math.PI/2; ground.receiveShadow = true; scene.add(ground);
+ground.rotation.x = -Math.PI/2; ground.position.y = -.10; ground.receiveShadow = true; scene.add(ground);
 
 const [TX0, TZ0] = W(0, 0), [TX1, TZ1] = W(AMAX, BMAX);
 flat.rect(TX0 - 6, TZ0 - 6, TX1 + 6, TZ1 + 6, .015, '#6b8744');   // pasto del pueblo

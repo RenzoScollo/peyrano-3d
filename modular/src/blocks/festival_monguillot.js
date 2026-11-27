@@ -778,7 +778,7 @@ export function buildFestivalMonguillot(ctx) {
   const body = (g, x0, x1, d0, d1, h, col) => { bx(g, (x0 + x1) / 2, 0, -(d0 + d1) / 2, x1 - x0, h, d1 - d0, col); colLocal(g, x0, -d1, x1, -d0, col); };
   const rejaV = (g, x, y0, z, w, h, col, step = .13) => { for (let k = 1; k < Math.round(w / step); k++) bx(g, x - w / 2 + k * step, y0, z, .03, h, .03, col); for (const y of [y0, y0 + h - .04]) bx(g, x, y, z, w + .04, .04, .04, col); };
   const enrollar = (g, x, y0, w, h, col, lin) => { bx(g, x, y0, .04, w, h, .05, col); for (let y = y0 + .1; y < y0 + h - .04; y += .1) bx(g, x, y, .07, w, .02, .01, lin); bx(g, x, y0 + h, .06, w + .1, .18, .1, lin); };
-  const veredaB = (x0, x1, col = '#c4bfb4', gr = '#6f8f45') => { flat.rect(x0, ZB, x1, ZB + 1.9, .206, col); flat.rect(x0, ZB + 1.9, x1, ZB + 4.1, .205, gr); };
+  const veredaB = (x0, x1, col = '#c4bfb4', gr = '#6f8f45') => { flat.rect(x0, ZB, x1, ZB + 1.9, .206, col); flat.rect(x0, ZB + 1.9, x1, ZB + 3.5, .205, gr); };
   const PELADO = ['#9c7a45', '#8a6a3a'];
   const sub = (g, z) => { const f = group(0, 0); g.add(f); f.position.set(0, 0, z); return f; };   // subgrupo con el frente corrido hacia atrás
   const hastial = (g, cx, y0, z, w, h, col) => { const sh = new THREE.Shape(); sh.moveTo(-w / 2, 0); sh.lineTo(w / 2, 0); sh.lineTo(0, h); sh.lineTo(-w / 2, 0);
@@ -834,7 +834,7 @@ export function buildFestivalMonguillot(ctx) {
     for (const [x, z] of [[-5.6, -1.6], [-4.7, -2.6], [-5.9, -3.8]]) { cylIn(g, x, .45, z, .18, .9, '#f4f4f0'); const h = new THREE.Mesh(new THREE.SphereGeometry(.13, 8, 6), lam({ color: 0xf4f4f0 })); h.position.set(x, 1.0, z); g.add(h); }   // figuras blancas del jardín
     bx(g, 5.2, 0, -15.5, 2.6, 2.6, 3, '#efefec'); bx(g, 5.2, 2.3, -13.95, 2.7, .35, .15, '#3a8a5a');                                                         // cochera del fondo con borde verde
     addBush(-45.3, ZB + .9, .7, 0); addTree(-45.7, -53.3, .4, false, PELADO);
-    veredaB(-53, -40, '#a89a8a', '#6f8f45'); flat.rect(-42.8, ZB + 1.9, -39.8, ZB + 4.1, .2058, '#b9b4aa');   // entrada al pasillo de autos
+    veredaB(-53, -40, '#a89a8a', '#6f8f45'); flat.rect(-42.8, ZB + 1.9, -39.8, ZB + 3.5, .2058, '#b9b4aa');   // entrada al pasillo de autos
     { const ag = group(-48.5, -73.5); cylIn(ag, 0, 6, 0, .25, 12, '#5a4030'); for (let k = 0; k < 6; k++) { const m = new THREE.Mesh(new THREE.ConeGeometry(2.6 - k * .35, 1.6, 8), lam({ color: '#2f4a2a' })); m.position.set(0, 5.5 + k * 1.25, 0); ag.add(m); } }   // araucaria
   }
   // C) casa de ladrillo retirada (x -62..-53) con reja verde sobre muro, portón de madera y ventanas con reja; árbol y buzón en la vereda
@@ -873,7 +873,7 @@ export function buildFestivalMonguillot(ctx) {
     bx(g, .95, 2.0, -.8, .08, .25, .12, '#2a2a2a'); bx(g, 3.45, 1.0, -.6, .04, .04, .5, '#cfcfcf');
     signIn(g, '423', 3.85, 1.75, .05, .35, .16, '#f2f2ee', '#2a2a2a');
     bx(g, 3.9, 3.1, .2, .8, .55, .3, '#efefec');
-    veredaB(-73, -62, '#8a6e62', '#6f8f45'); flat.rect(-72.3, ZB + 1.9, -68.7, ZB + 4.1, .2058, '#8a6e62'); addTree(-66.6, -53.0, 1.0, false, PELADO);   // frente al portón: sin pasto, sin cordón y sin árbol
+    veredaB(-73, -62, '#8a6e62', '#6f8f45'); flat.rect(-72.3, ZB + 1.9, -68.7, ZB + 3.5, .2058, '#8a6e62'); addTree(-66.6, -53.0, 1.0, false, PELADO);   // frente al portón: sin pasto, sin cordón y sin árbol
     { const t = group(-65.3, -53.7); for (const s of [-1, 1]) poleIn(t, [s * .3, 0, 0], [s * .3, .9, 0], .03, '#5a5a5a'); bx(t, 0, .55, 0, .7, .05, .4, '#5a5a5a'); cylIn(t, -.15, .78, 0, .14, .35, '#f2f2f2'); cylIn(t, .17, .78, 0, .14, .35, '#e8c23a'); }   // canasto con baldes
   }
   // E) planta baja de ladrillo con pilastras blancas y parapeto gris manchado (x -81..-73): persianas, puerta blanca, buzón
@@ -920,7 +920,7 @@ export function buildFestivalMonguillot(ctx) {
     // (detrás, sobre Córdoba, sigue el ladrillo viejo con arcos: se arma en el bloque "Córdoba lado este, de Dr. Brunet al Banco Macro")
     cylIn(group(-84, -62), 0, 3.9, 0, .55, 1.1, '#e8e8e8');   // tanque de agua sobre la casa de la esquina
     veredaB(XC + OC, XE, '#c4bfb4', '#6f8f45');
-    flat.rect(XC - 1.9, -66, XC, ZB - OC, .206, '#c4bfb4'); flat.rect(XC - 4.1, -66, XC - 1.9, ZB + 4.1, .205, '#6f8f45');
+    flat.rect(XC - 1.9, -66, XC, ZB - OC, .206, '#c4bfb4'); flat.rect(XC - 3.5, -66, XC - 1.9, ZB + 3.5, .205, '#6f8f45');
     flat.rect(XC - 1.9, ZB - OC, XC + OC, ZB + 1.9, .2065, '#c4bfb4');
     addTree(-83.6, -52.6, 1.0, false, PELADO); addTree(-92.5, -63, .9, false, PELADO);
     bici(XC - .6, ZB + .3, Math.PI / 4);
