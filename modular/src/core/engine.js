@@ -235,25 +235,16 @@ class Flat {
     else for (let cx = cx0; cx <= cx1; cx++) for (let cz = cz0; cz <= cz1; cz++){ const kk = cx * 65536 + cz; let l = this._cells.get(kk); if (!l) this._cells.set(kk, l = []); l.push(id); }
     return yr;
   }
-  _liftUrban(x0, z0, x1, z1, y){
-    if (y >= .031 && y <= .11){
-      const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
-      if (cx > -530 && cx < 530 && cz > -670 && cz < 240) return y + .15;
-    }
-    return y;
-  }
   tri(a, b, c, y, col){
-    const x0 = Math.min(a[0], b[0], c[0]), z0 = Math.min(a[1], b[1], c[1]), x1 = Math.max(a[0], b[0], c[0]), z1 = Math.max(a[1], b[1], c[1]);
-    const yr = this._resolveY(x0, z0, x1, z1, this._liftUrban(x0, z0, x1, z1, y));
+    const yr = this._resolveY(Math.min(a[0], b[0], c[0]), Math.min(a[1], b[1], c[1]), Math.max(a[0], b[0], c[0]), Math.max(a[1], b[1], c[1]), y);
     this._triRaw(a, b, c, yr, col);
   }
   quad(a, b, c, d, y, col){
-    const x0 = Math.min(a[0], b[0], c[0], d[0]), z0 = Math.min(a[1], b[1], c[1], d[1]), x1 = Math.max(a[0], b[0], c[0], d[0]), z1 = Math.max(a[1], b[1], c[1], d[1]);
-    const yr = this._resolveY(x0, z0, x1, z1, this._liftUrban(x0, z0, x1, z1, y));
+    const yr = this._resolveY(Math.min(a[0], b[0], c[0], d[0]), Math.min(a[1], b[1], c[1], d[1]), Math.max(a[0], b[0], c[0], d[0]), Math.max(a[1], b[1], c[1], d[1]), y);
     this._triRaw(a, b, c, yr, col); this._triRaw(a, c, d, yr, col);
   }
   rect(x0, z0, x1, z1, y, col){
-    const yr = this._resolveY(x0, z0, x1, z1, this._liftUrban(x0, z0, x1, z1, y));
+    const yr = this._resolveY(x0, z0, x1, z1, y);
     this._triRaw([x0,z0],[x0,z1],[x1,z1], yr, col); this._triRaw([x0,z0],[x1,z1],[x1,z0], yr, col);
   }
   ribbon(pts, width, y, col, off = 0){
@@ -740,7 +731,12 @@ function gableIn(g, x, y, z, sx, sy, sz, col, ry = 0){ const m = new THREE.Mesh(
 function colLocal(g, x0, z0, x1, z1, mapCol = '#c9b7a0'){
   g.updateMatrixWorld(true); const v = new THREE.Vector3(); const a = [1e9, 1e9, -1e9, -1e9];
   for (const [x, z] of [[x0, z0], [x1, z0], [x0, z1], [x1, z1]]){ v.set(x, 0, z).applyMatrix4(g.matrixWorld); a[0] = Math.min(a[0], v.x); a[1] = Math.min(a[1], v.z); a[2] = Math.max(a[2], v.x); a[3] = Math.max(a[3], v.z); }
-  addCol(...a); if (mapCol) mapRects.push([...a, mapCol]);
+  const ry = g.rotation ? (g.rotation.y || 0) : 0;
+  if (Math.abs(Math.sin(2 * ry)) >= .08){
+    v.set((x0 + x1) / 2, 0, (z0 + z1) / 2).applyMatrix4(g.matrixWorld);
+    addColOBB(v.x, v.z, Math.abs(x1 - x0) / 2, Math.abs(z1 - z0) / 2, ry);
+  } else addCol(...a);
+  if (mapCol) mapRects.push([...a, mapCol]);
 }
 function textTex(text, w, h, bg, fg){
   const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d');
