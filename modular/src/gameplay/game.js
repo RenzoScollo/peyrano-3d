@@ -48,6 +48,11 @@ let yaw = SPAWN[3], pitch = .32, dist = 8, lastMouse = -10;
    ========================================================= */
 
 const CAR = makeCar(0xc0392b);
+// Faros delanteros del auto (se encienden automáticamente al atardecer y de noche)
+const carHeadlight = new THREE.SpotLight(0xfff1cc, 0, 48, Math.PI / 4.2, 0.45, 1.4);
+carHeadlight.position.set(0, 0.85, 2.15);
+carHeadlight.target.position.set(0, 0.2, 16);
+CAR.g.add(carHeadlight, carHeadlight.target);
 const car = { x: MX - 24, z: MZ + 3.5, h: -Math.PI/2, vx: 0, vz: 0, speed: 0, slip: 0, steer: 0, fuel: .35, nitro: 1, turbo: false };
 let driving = false;
 const carCircles = () => [-1.4, 0, 1.4].map(o => ({ x: car.x + Math.sin(car.h) * o, z: car.z + Math.cos(car.h) * o }));
@@ -648,13 +653,28 @@ let bigM = null;
     <label><input type="checkbox" id="adClip"> Noclip (atravesar todo) <small>[N]</small></label><br>
     <label><input type="checkbox" id="adInf"> Nafta y turbo infinitos</label><br>
     Velocidad: <input type="range" id="adSpd" min="5" max="150" style="width:120px;vertical-align:middle"> <span id="adSpdV"></span><br>
+    <hr style="border:0;border-top:1px solid rgba(255,255,255,.18);margin:6px 0">
+    Hora: <input type="range" id="adTime" min="0" max="24" step="0.1" style="width:105px;vertical-align:middle"> <span id="adTimeV" style="font-size:11px"></span><br>
+    <label><input type="checkbox" id="adPauseT"> Pausar tiempo</label>
+    <span style="float:right">
+      <button id="adDay" style="padding:1px 5px;font-size:11px">Día</button>
+      <button id="adDusk" style="padding:1px 5px;font-size:11px">Tarde</button>
+      <button id="adNight" style="padding:1px 5px;font-size:11px">Noche</button>
+    </span><br>
     <select id="adTp" style="width:100%;margin:4px 0"></select>
     <button id="adGo" style="width:49%">Ir</button> <button id="adCar" style="width:49%">Traer auto</button>
     <div id="adPos" style="font:11px monospace;opacity:.85;margin-top:6px;white-space:pre"></div>
     <small style="opacity:.75">Volando: Espacio sube, C baja, Shift x3.<br>Con el mapa grande (M) abierto, hacé click para teletransportarte.</small>`;
   document.body.appendChild(el);
   const $ = id => el.querySelector('#' + id);
-  const sync = () => { $('adFly').checked = ADMIN.fly; $('adClip').checked = ADMIN.noclip; $('adInf').checked = ADMIN.inf; $('adSpd').value = ADMIN.speed; $('adSpdV').textContent = ADMIN.speed + ' m/s'; };
+  const dn = ctx.dayNight;
+  const syncTime = () => {
+    if (!dn) return;
+    $('adTime').value = dn.state.hour.toFixed(1);
+    $('adTimeV').textContent = dn.formatHour();
+    $('adPauseT').checked = dn.state.paused;
+  };
+  const sync = () => { $('adFly').checked = ADMIN.fly; $('adClip').checked = ADMIN.noclip; $('adInf').checked = ADMIN.inf; $('adSpd').value = ADMIN.speed; $('adSpdV').textContent = ADMIN.speed + ' m/s'; syncTime(); };
   const fillTp = () => { $('adTp').innerHTML = places().map((p, i) => `<option value="${i}">${p[0]}</option>`).join(''); };
   const teleport = (x, z) => {
     if (driving){ car.x = x; car.z = z; car.vx = car.vz = 0; }
@@ -669,6 +689,12 @@ let bigM = null;
   $('adClip').onchange = e => { ADMIN.noclip = e.target.checked; };
   $('adInf').onchange = e => { ADMIN.inf = e.target.checked; };
   $('adSpd').oninput = e => { ADMIN.speed = +e.target.value; sync(); };
+  $('adTime').oninput = e => { if (!dn) return; dn.applyHour(+e.target.value); updateSun(pos.x, pos.z); syncTime(); pauseDirty = true; };
+  $('adPauseT').onchange = e => { if (!dn) return; dn.state.paused = e.target.checked; syncTime(); };
+  const setPreset = h => { if (!dn) return; dn.applyHour(h); updateSun(pos.x, pos.z); syncTime(); pauseDirty = true; };
+  $('adDay').onclick = () => setPreset(13.0);
+  $('adDusk').onclick = () => setPreset(18.25);
+  $('adNight').onclick = () => setPreset(22.5);
   $('adGo').onclick = () => { const p = places()[+$('adTp').value]; if (p) teleport(p[1], p[2]); };
   $('adCar').onclick = () => { if (!driving){ car.x = pos.x + 4; car.z = pos.z; car.vx = car.vz = 0; car.h = facing; CAR.g.position.set(car.x, 0, car.z); CAR.g.rotation.y = car.h; } };
   addEventListener('keydown', e => {
@@ -686,11 +712,12 @@ let bigM = null;
     const p = bigM.inverse().transformPoint(new DOMPoint(px, py));
     teleport(p.x * OSC, p.y * OSC); toggleBig();
   });
-  // coordenadas en vivo
+  // coordenadas y hora en vivo
   setInterval(() => {
     if (!ADMIN.on) return;
     const [a, b] = AB(pos.x, pos.z), [lat, lon] = abToLatLon(a, b);
     $('adPos').textContent = `x ${pos.x.toFixed(1)}  y ${pos.y.toFixed(1)}  z ${pos.z.toFixed(1)}\na ${a.toFixed(1)}  b ${b.toFixed(1)}\n${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+    if (dn && document.activeElement !== $('adTime')) syncTime();
   }, 200);
 }
 /* ===== fin MODO ADMIN ===== */
@@ -1047,12 +1074,20 @@ function loop(){
   const t = clock.elapsedTime;
   if (GS === 'play'){
     update(dt);
+    if (ctx.dayNight) {
+      ctx.dayNight.update(dt, pos.x, pos.z);
+      carHeadlight.intensity = ctx.dayNight.state.nightFactor * 42;
+    }
     for (const a of anims) a(t, dt);
     renderer.render(scene, camera);
     drawMini();
     if (bigOpen) drawBig();
   } else if (GS === 'menu'){
     cineFrame(dt);
+    if (ctx.dayNight) {
+      ctx.dayNight.update(dt, camera.position.x, camera.position.z);
+      carHeadlight.intensity = ctx.dayNight.state.nightFactor * 42;
+    }
     for (const a of anims) a(t, dt);
     renderer.render(scene, camera);
   } else if (pauseDirty){   // pausa: el mundo queda quieto; se redibuja solo si cambia algo (opciones, tamaño de ventana)

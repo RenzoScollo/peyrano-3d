@@ -154,7 +154,8 @@ scene.background = new THREE.Color(SKY);
 scene.fog = new THREE.Fog(SKY, 250, 1700);
 const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.25, 2200);   // la niebla tapa todo a 1700 m: más lejos no hace falta dibujar
 
-scene.add(new THREE.HemisphereLight(0xdcecff, 0x5d6b3a, 1.3));
+const hemi = new THREE.HemisphereLight(0xdcecff, 0x5d6b3a, 1.3);
+scene.add(hemi);
 const sun = new THREE.DirectionalLight(0xfff1dc, 2.4);
 sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
@@ -167,6 +168,14 @@ const SUN_OFF = new THREE.Vector3(70, 130, 45);
 const SUN_L = SUN_OFF.clone().normalize();
 const SUN_U = new THREE.Vector3(0, 1, 0).cross(SUN_L).normalize();
 const SUN_V = SUN_L.clone().cross(SUN_U).normalize();
+function setSunDir(x, y, z){
+  SUN_OFF.set(x, y, z);
+  SUN_L.copy(SUN_OFF).normalize();
+  SUN_U.set(0, 1, 0).cross(SUN_L);
+  if (SUN_U.lengthSq() < 1e-4) SUN_U.set(1, 0, 0);
+  SUN_U.normalize();
+  SUN_V.copy(SUN_L).cross(SUN_U).normalize();
+}
 const _sunC = new THREE.Vector3(), _sunT = new THREE.Vector3();
 function updateSun(cx, cz){
   const sc = sun.shadow.camera;
@@ -981,6 +990,8 @@ export const ctx = {
   SKY,
   camera,
   sun,
+  hemi,
+  setSunDir,
   SUN_OFF,
   SUN_L,
   SUN_U,
