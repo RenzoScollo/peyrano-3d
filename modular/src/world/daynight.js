@@ -2,10 +2,10 @@
 export function initDayNight(ctx) {
   const { THREE, scene, sun, hemi, setSunDir, balls, lampSpots } = ctx;
 
-  // Estado del ciclo (hora en 0..24; speed = horas de juego por segundo)
+  // Estado del ciclo (arranca al mediodía y pausado hasta que se destilde en Modo Admin)
   const state = {
-    hour: 14.0,
-    paused: false,
+    hour: 13.0,
+    paused: true,
     speed: 0.16,
     nightFactor: 0,
   };
@@ -41,11 +41,11 @@ export function initDayNight(ctx) {
   const stars = new THREE.Points(starGeo, starMat);
   skyGroup.add(stars);
 
-  // Pool de 6 luces cálidas dinámicas que siguen a los faroles callejeros más cercanos de noche
-  const LAMP_N = 6;
+  // Pool de 20 luces cálidas dinámicas que siguen a los faroles callejeros más cercanos de noche
+  const LAMP_N = 20;
   const lampLights = [];
   for (let i = 0; i < LAMP_N; i++) {
-    const pl = new THREE.PointLight(0xffc270, 0, 34, 1.6);
+    const pl = new THREE.PointLight(0xffc270, 0, 38, 1.5);
     pl.position.set(0, 6.2, 0);
     scene.add(pl);
     lampLights.push(pl);
@@ -152,7 +152,7 @@ export function initDayNight(ctx) {
       const sp = lampSpots[i];
       const dx = sp[0] - cx, dz = sp[1] - cz;
       const d2 = dx * dx + dz * dz;
-      if (d2 > 55 * 55) continue;
+      if (d2 > 130 * 130) continue;
       if (best.length < LAMP_N) {
         best.push([d2, sp[0], sp[1]]);
         best.sort((u, v) => u[0] - v[0]);
@@ -195,5 +195,5 @@ export function initDayNight(ctx) {
   }
 
   applyHour(state.hour);
-  ctx.dayNight = { state, applyHour, update, formatHour };
+  ctx.dayNight = { state, applyHour, update, updateLamps, formatHour };
 }
