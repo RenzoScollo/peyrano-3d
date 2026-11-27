@@ -520,23 +520,23 @@ const box = (x, y, z, sx, sy, sz, color, ry = 0) => { const m = mesh(boxGeo, col
    ========================================================= */
 const CELL = 16, hash = new Map();
 const hk = (i, j) => i * 100003 + j;
-function addCol(x0, z0, x1, z1){
+function addCol(x0, z0, x1, z1, maxY = 7.5){
   if (x0 > x1){ const t = x0; x0 = x1; x1 = t; }
   if (z0 > z1){ const t = z0; z0 = z1; z1 = t; }
   if (x1 - x0 < 1e-4 || z1 - z0 < 1e-4) return;
-  const b = { x0, z0, x1, z1 };
+  const b = { x0, z0, x1, z1, maxY };
   for (let i = Math.floor(x0/CELL); i <= Math.floor(x1/CELL); i++)
     for (let j = Math.floor(z0/CELL); j <= Math.floor(z1/CELL); j++){
       const k = hk(i,j); if (!hash.has(k)) hash.set(k, []); hash.get(k).push(b);
     }
 }
 // Colisión orientada (OBB 2D) para edificios, ochavas y escenarios rotados en diagonal (sin paredes invisibles)
-function addColOBB(cx, cz, hx, hz, ry){
+function addColOBB(cx, cz, hx, hz, ry, maxY = 7.5){
   if (hx < 1e-4 || hz < 1e-4) return;
   const c = Math.cos(ry), s = Math.sin(ry);
   const ex = Math.abs(c) * hx + Math.abs(s) * hz;
   const ez = Math.abs(s) * hx + Math.abs(c) * hz;
-  const b = { obb: true, cx, cz, hx, hz, c, s, x0: cx - ex, z0: cz - ez, x1: cx + ex, z1: cz + ez };
+  const b = { obb: true, cx, cz, hx, hz, c, s, maxY, x0: cx - ex, z0: cz - ez, x1: cx + ex, z1: cz + ez };
   for (let i = Math.floor(b.x0/CELL); i <= Math.floor(b.x1/CELL); i++)
     for (let j = Math.floor(b.z0/CELL); j <= Math.floor(b.z1/CELL); j++){
       const k = hk(i,j); if (!hash.has(k)) hash.set(k, []); hash.get(k).push(b);
@@ -552,6 +552,29 @@ function addCarCol(x0, z0, x1, z1){
   for (let i = Math.floor(x0/CELL); i <= Math.floor(x1/CELL); i++)
     for (let j = Math.floor(z0/CELL); j <= Math.floor(z1/CELL); j++){
       const k = hk(i,j); if (!carHash.has(k)) carHash.set(k, []); carHash.get(k).push(b);
+    }
+}
+// Superficies caminables (veredas, canteros centrales, escaleras, tarimas) para que los pies apoyen arriba y suban escalones automáticamente
+const walkHash = new Map();
+function addFloor(x0, z0, x1, z1, topY){
+  if (x0 > x1){ const t = x0; x0 = x1; x1 = t; }
+  if (z0 > z1){ const t = z0; z0 = z1; z1 = t; }
+  if (x1 - x0 < 1e-4 || z1 - z0 < 1e-4) return;
+  const b = { x0, z0, x1, z1, topY };
+  for (let i = Math.floor(x0/CELL); i <= Math.floor(x1/CELL); i++)
+    for (let j = Math.floor(z0/CELL); j <= Math.floor(z1/CELL); j++){
+      const k = hk(i,j); if (!walkHash.has(k)) walkHash.set(k, []); walkHash.get(k).push(b);
+    }
+}
+function addFloorOBB(cx, cz, hx, hz, ry, topY){
+  if (hx < 1e-4 || hz < 1e-4) return;
+  const c = Math.cos(ry), s = Math.sin(ry);
+  const ex = Math.abs(c) * hx + Math.abs(s) * hz;
+  const ez = Math.abs(s) * hx + Math.abs(c) * hz;
+  const b = { obb: true, cx, cz, hx, hz, c, s, topY, x0: cx - ex, z0: cz - ez, x1: cx + ex, z1: cz + ez };
+  for (let i = Math.floor(b.x0/CELL); i <= Math.floor(b.x1/CELL); i++)
+    for (let j = Math.floor(b.z0/CELL); j <= Math.floor(b.z1/CELL); j++){
+      const k = hk(i,j); if (!walkHash.has(k)) walkHash.set(k, []); walkHash.get(k).push(b);
     }
 }
 function overlap(x0, z0, x1, z1){
@@ -1054,6 +1077,9 @@ export const ctx = {
   addColOBB,
   carHash,
   addCarCol,
+  walkHash,
+  addFloor,
+  addFloorOBB,
   overlap,
   mapRoads,
   mapRects,

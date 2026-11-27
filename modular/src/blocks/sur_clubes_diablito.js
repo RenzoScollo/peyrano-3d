@@ -1,7 +1,7 @@
 // Zona Sur y Clubes: Club Rivadavia, Pilates Gym, Diablito Bar, Av. Centenario S, Escuela Dr. Brunet y Dr. Brunet/Independencia
 export function buildSurClubesDiablito(ctx) {
   const {
-    G, R, S, THREE, addCol, addTree, balls, box, boxIn, bx, canvas, civic, colLocal, crowns, cylIn, extrudePoly, flat, frustumMesh, gableIn, group, inner, lam, makeCar, mapLabels, mapRects, mapRoads, mesh, offsetPoly, palmTrunks, pick, plazaRects, poleIn, poles, rnd, roadLayer, scene, signIn, textTex, treeSpots, trims, trunks, walls, zs
+    G, R, S, THREE, addCol, addColOBB, addTree, balls, box, boxIn, bx, canvas, civic, colLocal, crowns, cylIn, extrudePoly, flat, frustumMesh, gableIn, group, inner, lam, makeCar, mapLabels, mapRects, mapRoads, mesh, offsetPoly, palmTrunks, pick, plazaRects, poleIn, poles, rnd, roadLayer, scene, signIn, textTex, treeSpots, trims, trunks, walls, zs
   } = ctx;
 
 {
@@ -330,7 +330,10 @@ export function buildSurClubesDiablito(ctx) {
   const barLight = new THREE.PointLight(0xffb84d, .85, 18);
   barLight.position.set(x0 - .5, 3.2, z0 - .5); scene.add(barLight);
 
-  colLocal(g, 0, 0, 20.6, 12.6, '#b86b52');
+  // Colisión en L + pared exacta de la ochava en OBB (deja libre el triángulo frente a la puerta de Diablito Bar)
+  colLocal(g, CH, 0, 20.6, 12.6, '#b86b52');
+  colLocal(g, 0, CH, CH, 12.6, null);
+  addColOBB(x0 + 1.4 + CH / 2, z0 + 1.4 + CH / 2, CH * Math.SQRT1_2, 0.22, -Math.PI * 3 / 4);
   mapLabels.push([x0 + 7, z0 + 6, 'Diablito Bar']);
 }
 

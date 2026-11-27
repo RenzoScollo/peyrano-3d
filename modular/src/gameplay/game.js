@@ -1,7 +1,7 @@
 // Jugador, auto, físicas/bunnyhop, interior de la Comuna, opciones, minimapa, mapa grande, modo admin y loop principal
 export function startGame(ctx) {
   const {
-    AB, AGUA_POLY, CELL, COMISARIA_POLY, G, MX, MZ, PLAZA_INM, PUMPS, REAL_BUILDINGS, S, SPAWN, THREE, TX0, TX1, TZ0, TZ1, W, abToLatLon, addCol, anims, balls, bikeWheels, boxIn, bx, camera, canvas, carHash, crowns, cylIn, darks, flat, group, hash, hk, lam, makeCar, mapFields, mapLabels, mapRects, mapRoads, mapStreetNames, palmCrowns, palmTrunks, pointOnRoad, poleIn, poles, renderer, roadLayer, roofs, scene, segs, signIn, sleepers, streetAt, sun, trims, trunks, updateSun, walls
+    AB, AGUA_POLY, CELL, COMISARIA_POLY, G, MX, MZ, PLAZA_INM, PUMPS, REAL_BUILDINGS, ROAD_Y, S, SPAWN, THREE, TX0, TX1, TZ0, TZ1, W, abToLatLon, addCol, anims, balls, bikeWheels, boxIn, bx, camera, canvas, carHash, crowns, cylIn, darks, flat, group, hash, hk, lam, makeCar, mapFields, mapLabels, mapRects, mapRoads, mapStreetNames, palmCrowns, palmTrunks, pointOnRoad, poleIn, poles, renderer, roadLayer, roofs, scene, segs, signIn, sleepers, streetAt, sun, trims, trunks, updateSun, walkHash, walls
   } = ctx;
 
 
@@ -133,13 +133,37 @@ function updateCar(dt){
     const sp = Math.hypot(car.vx, car.vz), ang = Math.atan2(car.vx, car.vz);
     for (const s of [-.86, .86]) addSkid(car.x - fx * 1.35 + lx * s, car.z - fz * 1.35 + lz * s, ang, sp * dt + .15);
   }
-  CAR.g.position.set(car.x, 0, car.z); CAR.g.rotation.y = car.h;
+  const carY = pointOnRoad(car.x, car.z) ? ROAD_Y : .06;
+  CAR.g.position.set(car.x, carY, car.z); CAR.g.rotation.y = car.h;
   for (const w of CAR.wheels) w.rotation.x += vF * dt / .36;
   for (const f of CAR.fronts) f.rotation.y = car.steer;
   for (const f of CAR.flames){ f.visible = turbo; if (turbo){ const s = .8 + Math.random() * .6; f.scale.set(1, 1, s); } }
-  facing = car.h; pos.set(car.x, 0, car.z);
+  facing = car.h; pos.set(car.x, carY, car.z);
 }
-CAR.g.position.set(car.x, 0, car.z); CAR.g.rotation.y = car.h;
+CAR.g.position.set(car.x, ROAD_Y, car.z); CAR.g.rotation.y = car.h;
+
+// Altura del suelo caminable bajo (x, z): calles (ROAD_Y), veredas/canteros (0.22), escaleras y tarimas con step-up automático
+function groundY(x, z, curY = 0){
+  let gy = (pointOnRoad && pointOnRoad(x, z)) ? ROAD_Y : .06;
+  const maxStep = curY + .55;
+  const pad = .22;
+  const ci = Math.floor(x / CELL), cj = Math.floor(z / CELL);
+  for (let i = ci - 1; i <= ci + 1; i++) for (let j = cj - 1; j <= cj + 1; j++){
+    const l = walkHash.get(hk(i, j)); if (!l) continue;
+    for (let k = 0; k < l.length; k++){
+      const b = l[k];
+      if (b.topY <= gy || b.topY > maxStep) continue;
+      if (b.obb){
+        const dx = x - b.cx, dz = z - b.cz;
+        const lx = dx * b.c - dz * b.s, lz = dx * b.s + dz * b.c;
+        if (Math.abs(lx) <= b.hx + pad && Math.abs(lz) <= b.hz + pad) gy = b.topY;
+      } else if (x >= b.x0 - pad && x <= b.x1 + pad && z >= b.z0 - pad && z <= b.z1 + pad){
+        gy = b.topY;
+      }
+    }
+  }
+  return gy;
+}
 
 function collide(){
   pushOut(pos, .35);
@@ -164,11 +188,14 @@ function insideCol(x, z){
 }
 function pushOut(pos, r, H = hash){
   let hit = false;
+  const py = pos.y || 0;
   for (let iter = 0; iter < 3; iter++){
     const ci = Math.floor(pos.x / CELL), cj = Math.floor(pos.z / CELL);
     for (let i = ci - 1; i <= ci + 1; i++) for (let j = cj - 1; j <= cj + 1; j++){
       const l = H.get(hk(i, j)); if (!l) continue;
       for (const b of l){
+        // Si el jugador está volando o saltando por encima de la altura real de esta caja, no se traba en el aire
+        if (py >= (b.maxY || 7.5)) continue;
         if (b.obb){
           // Resolver en espacio local de la caja orientada (OBB 2D)
           const dx = pos.x - b.cx, dz = pos.z - b.cz;
@@ -273,9 +300,10 @@ function updateFoot(dt){
   // a mucha velocidad se mueve en pasitos para no atravesar paredes
   const steps = Math.max(1, Math.ceil(Math.hypot(vel.x, vel.y) * dt / .3));
   for (let i = 0; i < steps; i++){ pos.x += vel.x * dt / steps; pos.z += vel.y * dt / steps; if (!(ADMIN.on && ADMIN.noclip)) collide(); }
+  const gy = groundY(pos.x, pos.z, pos.y);
   if (fly){   // ADMIN: volar (Espacio sube, C / Ctrl baja)
     vy = ((keys.Space ? 1 : 0) - (keys.KeyC || keys.ControlLeft ? 1 : 0)) * sp * .6;
-    pos.y = Math.max(0, pos.y + vy * dt); onGround = pos.y <= 0;
+    pos.y = Math.max(gy, pos.y + vy * dt); onGround = pos.y <= gy + .02;
   } else {
     if (keys.Space && onGround){
       vy = 6.5; onGround = false;
@@ -286,8 +314,17 @@ function updateFoot(dt){
         vel.x = ux * ns; vel.y = uz * ns;
       }
     }
-    vy -= 20 * dt; pos.y += vy * dt;
-    if (pos.y <= 0){ if (!onGround) landT = now; pos.y = 0; vy = 0; onGround = true; }
+    if (onGround && gy > pos.y && gy <= pos.y + .55){
+      // Subida automática de cordones, veredas, canteros centrales y escalones
+      pos.y = gy; vy = 0;
+    } else if (onGround && gy < pos.y && pos.y - gy <= .35){
+      // Bajada suave al bajar un cordón o escalón
+      pos.y = gy; vy = 0;
+    } else {
+      vy -= 20 * dt; pos.y += vy * dt;
+      if (pos.y <= gy){ if (!onGround) landT = now; pos.y = gy; vy = 0; onGround = true; }
+      else onGround = false;
+    }
   }
   { const v = Math.hypot(vel.x, vel.y) * 3.6;   // velocímetro del bunnyhop
     if (v > 45 && !fly){ bhopHud.style.display = 'block'; bhopHud.textContent = `🐇 ${Math.round(v)} km/h`; bhopHud.style.color = `hsl(${Math.max(0, 120 - v * .8)}, 90%, 60%)`; }

@@ -1,8 +1,6 @@
-// Auditoría y generación automática de colisiones faltantes para toda la geometría sólida a nivel del suelo
-// Corrige edificios, tapiales, anexos, columnas, escenarios y muros rotados que no tenían addCol(),
-// respetando aleros/galerías cubiertas (yMin >= 1.65), pisos/veredas (yMax <= 0.35), carteles y puertas transitables.
+// Auditoría y generación automática de colisiones y pisos caminables (escaleras, veredas, canteros, columnas de luz)
 export function buildMissingCollisions(ctx) {
-  const { THREE, scene, ground, hash, CELL, addCol, addColOBB, pointOnRoad } = ctx;
+  const { THREE, scene, ground, hash, carHash, CELL, addCol, addColOBB, addFloor, addFloorOBB, pointOnRoad, poles } = ctx;
 
   scene.updateMatrixWorld(true);
 
@@ -24,6 +22,34 @@ export function buildMissingCollisions(ctx) {
     return false;
   };
 
+  // 1) Registrar TODAS las veredas, cordones y canteros centrales de los bulevares (carHash) como pisos caminables a y = 0.22
+  let addedFloors = 0;
+  {
+    const seenCar = new Set();
+    for (const arr of carHash.values()) {
+      for (const b of arr) {
+        if (seenCar.has(b)) continue;
+        seenCar.add(b);
+        addFloor(b.x0, b.z0, b.x1, b.z1, 0.22);
+        addedFloors++;
+      }
+    }
+  }
+
+  // 2) Colisiones para TODAS las columnas de luz, faroles y postes verticales instanciados en poles.list
+  let addedPoles = 0;
+  if (poles && poles.list) {
+    for (let i = 0; i < poles.list.length; i++) {
+      const p = poles.list[i]; // [x, y, z, sx, sy, sz, ry, col]
+      const x = p[0], y = p[1], z = p[2], sx = p[3], sy = p[4];
+      if (sy < 1.5 || y > 1.2) continue;
+      if (hasColAt(x, z, 0.05)) continue;
+      const r = Math.max(0.15, sx * 0.55);
+      addCol(x - r, z - r, x + r, z + r, y + sy);
+      addedPoles++;
+    }
+  }
+
   // Zonas de puertas transitables donde nunca debe bloquearse el acceso (ej. Comuna)
   const nearDoor = (x, z) =>
     Math.hypot(x - 32.0, z - (-402.1)) < 1.8 ||
@@ -41,16 +67,13 @@ export function buildMissingCollisions(ctx) {
     const geo = obj.geometry;
     if (!geo) return;
     const gtype = geo.type || '';
-    // Ignorar planos/carteles/murales, esferas de copas/bochas, conos, toros
     if (gtype === 'PlaneGeometry' || gtype === 'CircleGeometry' || gtype === 'RingGeometry' ||
         gtype === 'SphereGeometry' || gtype === 'IcosahedronGeometry' || gtype === 'ConeGeometry' || gtype === 'TorusGeometry') return;
 
-    // Obtener transformación mundial real
     let wx = 0, wy = 0, wz = 0, ry = 0, sx = 1, sy = 1, sz = 1;
     if (obj.matrixWorld && obj.matrixWorld.decompose && wQuat && wEuler) {
       obj.matrixWorld.decompose(wPos, wQuat, wScale);
       wEuler.setFromQuaternion(wQuat, 'YXZ');
-      // Ignorar piezas muy inclinadas en X o Z (techos inclinados, rampas, escaleras en diagonal)
       if (Math.abs(wEuler.x) > 0.25 || Math.abs(wEuler.z) > 0.25) return;
       wx = wPos.x; wy = wPos.y; wz = wPos.z; ry = wEuler.y;
       sx = Math.abs(wScale.x); sy = Math.abs(wScale.y); sz = Math.abs(wScale.z);
@@ -66,19 +89,32 @@ export function buildMissingCollisions(ctx) {
       const bd = geo.parameters.depth * sz;
       const yMin = wy - bh / 2;
       const yMax = wy + bh / 2;
+      const hx = bw / 2, hz = bd / 2;
+      const axisAligned = Math.abs(Math.sin(2 * ry)) < 0.08;
 
-      // Solo obstáculos sólidos a altura caminable/manejable (excluye techos, aleros, pisos, baldosas, molduras finas)
+      // 3a) Escalones, escaleras (ej. Parroquia, Escenario Festival), andenes y plataformas caminables bajas
+      if (yMax > 0.14 && yMin < 1.8 && bh >= 0.08 && bh <= 0.45 && Math.min(bw, bd) >= 0.28 && Math.max(bw, bd) >= 0.45) {
+        if (axisAligned) {
+          const rot90 = Math.abs(Math.sin(ry)) > 0.7;
+          const ax = rot90 ? hz : hx, az = rot90 ? hx : hz;
+          addFloor(wx - ax, wz - az, wx + ax, wz + az, yMax);
+        } else {
+          addFloorOBB(wx, wz, hx, hz, ry, yMax);
+        }
+        addedFloors++;
+        // Si es un escalón bajo (<= 0.42 m), no lo bloqueamos como pared: se sube caminando!
+        if (bh <= 0.42) return;
+      }
+
+      // 3b) Obstáculos sólidos a altura caminable/manejable (excluye techos, aleros, pisos, baldosas, molduras finas)
       if (yMin >= 1.65 || yMax <= 0.35) return;
       if (bh < 0.38) return;
       if (Math.max(bw, bd) < 0.24 || Math.min(bw, bd) < 0.08) return;
       if (nearDoor(wx, wz)) return;
-
-      // Evitar paredes invisibles sobre asfalto de calles (salvo que sea un objeto chico como un poste/semaforo)
       if (Math.max(bw, bd) > 2.5 && pointOnRoad && pointOnRoad(wx, wz)) return;
 
-      // Comprobar si ya está cubierto por una colisión existente (centro y dos extremos del eje largo)
+      // Comprobar si ya está cubierto por una colisión existente
       const c = Math.cos(ry), s = Math.sin(ry);
-      const hx = bw / 2, hz = bd / 2;
       const checkPts = [[wx, wz]];
       if (bw >= bd && bw > 1.2) {
         const off = hx * 0.72;
@@ -89,15 +125,13 @@ export function buildMissingCollisions(ctx) {
       }
       if (checkPts.every(([px, pz]) => hasColAt(px, pz))) return;
 
-      // Si está alineado a los ejes (0°, 90°, 180°, 270°) -> AABB; si está en diagonal -> OBB exacto!
-      if (Math.abs(Math.sin(2 * ry)) < 0.08) {
+      if (axisAligned) {
         const rot90 = Math.abs(Math.sin(ry)) > 0.7;
-        const ax = rot90 ? hz : hx;
-        const az = rot90 ? hx : hz;
-        addCol(wx - ax, wz - az, wx + ax, wz + az);
+        const ax = rot90 ? hz : hx, az = rot90 ? hx : hz;
+        addCol(wx - ax, wz - az, wx + ax, wz + az, yMax);
         addedAABB++;
       } else {
-        addColOBB(wx, wz, hx, hz, ry);
+        addColOBB(wx, wz, hx, hz, ry, yMax);
         addedOBB++;
       }
       return;
@@ -107,9 +141,9 @@ export function buildMissingCollisions(ctx) {
       const r = Math.max(geo.parameters.radiusTop || 0, geo.parameters.radiusBottom || 0) * Math.max(sx, sz);
       const h = (geo.parameters.height || 0) * sy;
       const yMin = wy - h / 2, yMax = wy + h / 2;
-      if (yMin >= 1.65 || yMax <= 0.35 || h < 0.45 || r < 0.22) return;
+      if (yMin >= 1.65 || yMax <= 0.35 || h < 0.45 || r < 0.14) return;
       if (nearDoor(wx, wz) || hasColAt(wx, wz)) return;
-      addCol(wx - r, wz - r, wx + r, wz + r);
+      addCol(wx - r, wz - r, wx + r, wz + r, yMax);
       addedAABB++;
       return;
     }
@@ -122,10 +156,10 @@ export function buildMissingCollisions(ctx) {
       const cx = (box3.min.x + box3.max.x) / 2, cz = (box3.min.z + box3.max.z) / 2;
       if (nearDoor(cx, cz) || hasColAt(cx, cz)) return;
       if (pointOnRoad && pointOnRoad(cx, cz)) return;
-      addCol(box3.min.x, box3.min.z, box3.max.x, box3.max.z);
+      addCol(box3.min.x, box3.min.z, box3.max.x, box3.max.z, yMax);
       addedAABB++;
     }
   });
 
-  console.log(`[colisiones] auto-agregadas: ${addedAABB} AABB + ${addedOBB} OBB rotadas`);
+  console.log(`[colisiones] pisos/escalones: ${addedFloors} | columnas luz: ${addedPoles} | paredes: ${addedAABB} AABB + ${addedOBB} OBB`);
 }
