@@ -492,7 +492,7 @@ export function buildNorteIriondoShell(ctx) {
   flat.rect(67, -624.5, 89.5, -587, .072, '#a59e90');
   for (const [x0, z0, x1, z1] of [[67, -624.5, 89.5, -622], [80, -606, 89.5, -594], [68, -606, 76, -598], [82, -620, 89, -612]]) flat.rect(x0, z0, x1, z1, .074, '#7f9c52');
   flat.rect(67, -630, 89.5, -624.5, .073, '#6f9a47');     // franja de pasto de la vereda sobre Iriondo
-  flat.rect(89.5, -624.5, 93.5, -587, .073, '#6f9a47');   // y sobre Entre Ríos
+  flat.rect(89.5, -624.5, 92.88, -587, .073, '#6f9a47');   // y sobre Entre Ríos
   poles.add(76, 0, -626.5, .3, 8, .3, 0, '#c4c2bb');      // poste de hormigón con farol sobre la vereda
   poleIn(g, [76, 7.6, -626.5], [77.6, 7.9, -626.8], .05, '#9a9a96'); bx(g, 77.8, 7.75, -626.8, .7, .16, .3, '#d8d8d2');
   addCol(75.8, -626.7, 76.2, -626.3);

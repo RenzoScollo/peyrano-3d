@@ -890,7 +890,11 @@ export function buildManzanaAmfacMalvinas(ctx) {
     flat.rect(XL - 10, -234.5, XL, -229, .05, '#6f9a4a');
     rejaV(g, 0, 0, -.1, w, 1.6, '#1f1f1f', .12); for (let x = -w / 2; x <= w / 2 + .01; x += 2.75) bx(g, x, 0, -.1, .1, 1.75, .1, '#1f1f1f');
     colLocal(g, -w / 2, -.2, w / 2, 0, null);
-    bx(g, w / 2 - .1, 0, -5, .2, 1.9, 10, '#7c8a7f');                                       // cerco de chapa del lado de San Luis
+    // reja negra continua sobre el lado de San Luis (coincide con sv1)
+    for (let lx = -9.9; lx < 0; lx += .13) bx(g, w / 2 - .08, 0, lx, .03, 1.6, .03, '#1f1f1f');
+    for (const y of [.04, 1.56]) bx(g, w / 2 - .08, y, -5, .04, .04, 10, '#1f1f1f');
+    for (const lz of [-2.5, -5, -7.5, -9.9]) bx(g, w / 2 - .08, 0, lz, .09, 1.72, .09, '#6b4a3a');
+    colLocal(g, w / 2 - .2, -10, w / 2, 0, null);
     for (const [lx, lz, s] of [[-1.5, -2, 1.2], [.6, -3.4, 1.0], [-2.2, -6, .9], [1.4, -7.5, 1.1]]){ const [x, z] = [XL + lz, zc - lx]; addBush(x, z, s, 0); }
     addTree(XL - 6, zc - .5, 1.0, false);
     for (const z of [-233.8]) { poles.add(-9.3, 0, z, .16, 8.5, .16, 0, '#7a6a55'); addCol(-9.5, z - .2, -9.1, z + .2); }

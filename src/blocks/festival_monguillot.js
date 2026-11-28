@@ -551,7 +551,7 @@ export function buildFestivalMonguillot(ctx) {
   { const g = casa(-36, -39.5);   // local -1.75..1.75
     body(g, -1.75, 1.75, 5, 14, 2.9, '#f2f0ea'); bx(g, 0, 2.8, -5, 3.6, .15, .3, '#d9d6cf');
     bx(g, 0, 0, -4.97, 2.8, 2.3, .05, '#e6e3dc'); bx(g, 0, .02, -4.93, 2.6, 2.2, .04, '#b5683a'); for (let y = .25; y < 2.2; y += .22) bx(g, 0, y, -4.9, 2.6, .03, .01, '#8a4a22');
-    flat.rect(-39.5, ZL, -36, ZL + 5, .065, '#c9c5ba'); flat.rect(-39.5, ZL - 4, -36, ZL, .2058, '#c9c5ba');
+    flat.rect(-39.5, ZL, -36, ZL + 5, .065, '#c9c5ba'); flat.rect(-39.5, ZL - 3.38, -36, ZL, .2058, '#c9c5ba');
   }
   // M2) casa blanca con faja gris arriba: puerta doble de madera con vidrios, ventanas con reja blanca, entrada metida con panel blanco (x -39.5..-48.5)
   { const g = casa(-39.5, -48.5);   // local -4.5..4.5
@@ -634,7 +634,7 @@ export function buildFestivalMonguillot(ctx) {
       const geo = new THREE.ConeGeometry(1, 1.2, 4, 1); geo.rotateY(Math.PI / 4); const m = new THREE.Mesh(geo, lam({ color: '#b0563a' }));
       m.scale.set(8.8 / Math.SQRT2, 1, 3.8 / Math.SQRT2); m.position.set(-85.5, 2.8 + .6, ZL + 11.5); scene.add(m);
       const gg = group(-89.5, ZL + 11.5, -Math.PI / 2); bx(gg, 0, 0, .03, 2.6, 2.3, .05, '#d9a070'); bx(gg, 0, .02, .07, 2.4, 2.2, .04, '#b5683a'); bx(gg, 0, .02, .1, .03, 2.2, .01, '#7a4420');
-      flat.rect(-93.5, ZL + 10.1, -89.5, ZL + 12.9, .2058, '#c9c5ba'); }
+      flat.rect(-92.88, ZL + 10.1, -89.5, ZL + 12.9, .2058, '#c9c5ba'); }
     bx(group(-81.3, ZL + 1.2), 0, 0, 0, .3, 2.2, 2.4, '#e6e3dc');                                                                  // murito blanco al lado
     poleIn(group(-81.7, ZL - 3.0), [0, 0, 0], [0, 7.5, 0], .1, '#c0392b'); poleIn(group(-87.8, ZL - 3.1), [0, 0, 0], [0, 8, 0], .14, '#c9c4b8');
     addTree(-85.2, ZL - 2.7, 1.15, false, PELADO);

@@ -175,7 +175,7 @@ export function buildCentroOesteBrunet(ctx) {
     for (const [lx, lz, s] of [[-3.0, -1.2, 1.1], [-2.9, -3.5, 1.0], [-3.0, -6.5, .9], [-2.8, -9, 1.0], [1.4, -.9, .8]]) addBush(cx + lx, ZF + lz, s, 0);
     addTree(cx - 2.9, ZF - 4.8, .9, false, ['#4b7a30', '#3f6b2a']);
     // árboles de la vereda (aguaribay), poste de luz y cartel de la esquina
-    pasto(cx - w / 2, cx + w / 2); flat.rect(-93, -153, -91.4, -162, .205, '#6f8f45');
+    pasto(cx - w / 2, cx + w / 2); flat.rect(-92.88, -153, -91.4, -162, .205, '#6f8f45');
     for (const x of [cx - 1.6, cx + 2.6]) addTree(x, -150.2, 1.0, false, ['#8fb04a', '#9ab85a', '#7da23f']);
     addTree(-92.2, -158, 1.05, false, ['#8fb04a', '#9ab85a']);
     poles.add(-90.8, 0, -150.4, .16, 8.5, .16, 0, '#bdb8ac'); addCol(-90.95, -150.55, -90.65, -150.25);
@@ -742,13 +742,13 @@ export function buildCentroOesteBrunet(ctx) {
       bx(h, 0, 2.9, .02, 4.5, 1.3, .03, '#a9a59a'); bx(h, 0, 2.85, .04, 4.5, .08, .06, '#8f8b80'); bx(h, 0, 0, .03, 4.5, .3, .05, '#c9c5ba');
       bx(h, .2, 0, .04, 1.1, 2.4, .06, '#c9c5ba'); bx(h, .2, .02, .08, .95, 2.3, .04, '#6e5a40'); for (let k = 0; k < 4; k++) bx(h, .2, .3 + k * .5, .11, .85, .03, .01, '#4a3a28');
       for (const [x, y, w, hh] of [[1.4, .4, .8, .3], [-1.5, .5, .6, .25]]) bx(h, x, y, .05, w, hh, .02, '#b0705a');   // revoque caído
-      flat.rect(XC - 1.9, ZF, XC, -19.5, .206, '#c4b6a6'); flat.rect(XC - 3.9, ZF, XC - 1.9, -19.5, .205, '#6f8f45');
-      flat.rect(XC - 3.9, -28.9, XC - 1.9, -27.1, .2058, '#c4b6a6');   // senderito de cemento hasta la puerta de la feria
+      flat.rect(XC - 1.9, ZF, XC, -19.5, .206, '#c4b6a6'); flat.rect(-92.88, ZF, XC - 1.9, -19.5, .205, '#6f8f45');
+      flat.rect(-92.88, -28.9, XC - 1.9, -27.1, .2058, '#c4b6a6');   // senderito de cemento hasta la puerta de la feria
       mapLabels.push([-84, -28, 'Feria La Turca']);
     }
     veredaS(XE, XC + OC); entrada(-83.7, -86.1);
-    flat.rect(XC - 1.9, ZS, XC, ZF, .206, '#c4b6a6'); flat.rect(XC - 3.9, ZS - 3.5, XC - 1.9, ZF, .205, '#6f8f45');
-    flat.rect(XC - 1.9, ZS - 3.5, XC + OC, ZS + OC, .2065, '#c4b6a6');
+    flat.rect(XC - 1.9, ZS, XC, ZF, .206, '#c4b6a6'); flat.rect(-92.88, ZS - 3.38, XC - 1.9, ZF, .205, '#6f8f45');
+    flat.rect(XC - 1.9, ZS - 3.38, XC + OC, ZS + OC, .2065, '#c4b6a6');
     addTree(-92.4, -35.5, 1.0, false, PELADO); addTree(-81, ZS - 2.6, .9, false, PELADO);
     mapLabels.push([-86, -36, 'Punto Digital']);
   }
@@ -775,8 +775,8 @@ export function buildCentroOesteBrunet(ctx) {
   const arco = (g, x, y0, w, h, glass = '#3b4a55', marco = '#e6dcc8', z = 0) => {   // ventana / puerta / nicho con medio punto
     bx(g, x, y0, z + .05, w, h - w / 2, .05, glass); const a = new THREE.Mesh(new THREE.CircleGeometry(w / 2, 16, 0, Math.PI), lam({ color: glass })); a.position.set(x, y0 + h - w / 2, z + .08); g.add(a);
     for (const s of [-1, 1]) bx(g, x + s * (w / 2 + .05), y0, z + .07, .1, h - w / 2, .08, marco); const r = new THREE.Mesh(new THREE.TorusGeometry(w / 2 + .05, .05, 6, 16, Math.PI), lam({ color: marco })); r.position.set(x, y0 + h - w / 2, z + .08); g.add(r); };
-  const veredaC = (z0, z1, col = '#c4b6a6', gr = '#6f8f45') => { flat.rect(XL - 1.9, z0, XL, z1, .206, col); flat.rect(XL - 3.9, z0, XL - 1.9, z1, .205, gr); };
-  const entradaC = (z0, z1, col = '#c4b6a6') => flat.rect(XL - 3.9, z0, XL - 1.9, z1, .2058, col);
+  const veredaC = (z0, z1, col = '#c4b6a6', gr = '#6f8f45') => { flat.rect(XL - 1.9, z0, XL, z1, .206, col); flat.rect(-92.88, z0, XL - 1.9, z1, .205, gr); };
+  const entradaC = (z0, z1, col = '#c4b6a6') => flat.rect(-92.88, z0, XL - 1.9, z1, .2058, col);
   const PELADO = ['#9c7a45', '#8a6a3a'], VERDE = ['#4b7a30', '#5e8a3a', '#557f35'];
 
   // C1) ladrillo viejo con arcos (z -77..-66): ventana con persiana, puerta blanca, ventana de arco con reja, puerta oscura, puerta roja con nicho de arco
@@ -834,7 +834,7 @@ export function buildCentroOesteBrunet(ctx) {
     bx(g, 3.75, 0, -2.6, 1.8, 2.8, .25, '#f2f0ea'); colLocal(g, 2.85, -2.75, 4.75, -2.45, null);                                       // paredón blanco detrás del portón
     body(g, .3, 4.5, 5.5, 12, 3.0, '#f2f0ea'); bx(g, 2.6, 1.0, -5.45, 1.2, 1.0, .05, '#3b4a55'); for (let i = 0; i < 4; i++) bx(g, 2.15 + i * .3, 1.0, -5.42, .03, 1.0, .02, '#f2f0ea');
     flat.rect(XL, -91.5, XL + 5.5, -87.5, .065, '#6f8f45'); flat.rect(XL, -89.4, XL + 5.5, -87.6, .07, '#b9b4aa');
-    veredaC(-97, -87.5, '#b8aca0'); entradaC(-89.5, -87.5, '#b8aca0'); flat.rect(XL - 3.9, -96.5, XL - 1.9, -95.6, .2058, '#c9c5ba');
+    veredaC(-97, -87.5, '#b8aca0'); entradaC(-89.5, -87.5, '#b8aca0'); flat.rect(-92.88, -96.5, XL - 1.9, -95.6, .2058, '#c9c5ba');
     addTree(XL - 2.8, -90.6, .7, false, PELADO); poleIn(group(XL - 2.9, -95.1), [0, 0, 0], [0, 7.5, 0], .1, '#8a8a88'); addTree(XL - 2.8, -96.6, 1.1, false, VERDE);
   }
   // C5) MUTUAL (blanca: ventanal con reja, torre con el logo, puerta con reja, banderas) y local blanco con persiana gris al lado (z -105.5..-97)
@@ -852,7 +852,7 @@ export function buildCentroOesteBrunet(ctx) {
       const f = new THREE.Mesh(new THREE.PlaneGeometry(.55, .38), lam({ color: c1, side: THREE.DoubleSide })); f.position.set(x + .28, 4.3, 1.0); f.rotation.x = -.6; g.add(f);
       const f2 = new THREE.Mesh(new THREE.PlaneGeometry(.55, .13), lam({ color: c2, side: THREE.DoubleSide })); f2.position.set(x + .28, 4.3, 1.02); f2.rotation.x = -.6; g.add(f2); }
     for (const x of [1.15, 2.35]) { cylIn(g, x, 2.6, .12, .17, .04, '#d84a3a', 0).rotation.set(Math.PI / 2, 0, 0); }
-    flat.rect(XL - 3.9, -105.5, XL, -97.4, .2062, '#9a9690');                                                                 // vereda de baldosas grises hasta el cordón
+    flat.rect(-92.88, -105.5, XL, -97.4, .2062, '#9a9690');                                                                 // vereda de baldosas grises hasta el cordón
     { const bk = group(XL - 2.4, -99.8); for (let k = 0; k < 4; k++) poleIn(bk, [0, .05, -.6 + k * .4], [0, .55, -.6 + k * .4], .025, '#c9c9c9'); poleIn(bk, [0, .55, -.65], [0, .55, .65], .02, '#c9c9c9'); }   // bicicletero
     addTree(XL - 2.6, -97.0, 1.15, false, VERDE);
     mapLabels.push([XL + 4, MZ(-101), 'Mutual']);
@@ -867,7 +867,7 @@ export function buildCentroOesteBrunet(ctx) {
   }
   // (el muro de ladrillo con la puerta blanca que sigue hasta el portón del Banco Macro es parte del bloque del banco)
   FLAT_W.rect(XL, -110.2, XL + 12, -106, .065, '#6f8f45'); TREE_W(XL + 6, -108.5, 1.2, false, VERDE);   // patio detrás del muro
-  FLAT_W.rect(XL - 1.9, -110.2, XL, -106, .206, '#c4b6a6'); FLAT_W.rect(XL - 3.9, -110.2, XL - 1.9, -106, .205, '#6f8f45');
+  FLAT_W.rect(XL - 1.9, -110.2, XL, -106, .206, '#c4b6a6'); FLAT_W.rect(-92.88, -110.2, XL - 1.9, -106, .205, '#6f8f45');
   TREE_W(XL - 2.8, -108.3, .9, false, PELADO); poleIn(GROUP_W(XL - 2.9, -107.6), [0, 0, 0], [0, 7.5, 0], .1, '#8a8a88');
   { const m = GROUP_W(XL - 3.1, -109.7); for (const [x, z] of [[-.3, -.3], [.3, -.3], [-.3, .3], [.3, .3]]) poleIn(m, [x, 0, z], [x, .5, z], .02, '#5a5a5a'); bx(m, 0, .5, 0, .7, .4, .7, '#8a9a8a'); }   // canasto de basura
   plazaRects.push([-89.6, -110.2, -70, -66]);   // sin árboles ni casas al azar en estos lotes

@@ -265,11 +265,11 @@ function drawSeg(s){
           const ca0 = Math.max(a0, c0), ca1 = Math.min(a1, c1);
           if (sa1 > sa0 + .1) swStrip(sg * (st.w/2 + swW/2), swW, sa0, sa1, '#bdb6a8');
           if (ca1 > ca0 + .1){
-            curb(sg * (st.w/2 + .06), .12, .10, ca0, ca1, '#cbc5b8');
+            curb(sg * (st.w/2 + .06), .12, .112, ca0, ca1, '#cbc5b8');
             carBlock(oLo, oHi, ca0, ca1);
           }
-          if (endA) curbEnd(a0 + .1, oLo, oHi, .10, '#cbc5b8');
-          if (endB) curbEnd(a1 - .1, oLo, oHi, .10, '#cbc5b8');
+          if (endA) curbEnd(a0 + .1, oLo, oHi, .112, '#cbc5b8');
+          if (endB) curbEnd(a1 - .1, oLo, oHi, .112, '#cbc5b8');
         };
         let cur = sw0, afterGap = false;
         for (const [g0, g1] of swGaps){
@@ -291,15 +291,15 @@ function drawSeg(s){
     const mw = st.blvd, paved = s.type === 'pAve', ccol = paved ? '#d8b13a' : '#cfc8b8';
     const drawBlvdSpan = (a0, a1) => {
       if (a1 - a0 < 3) return;
-      strip(0, mw, a0, a1, .22, paved ? '#5a7a3a' : '#617f3f');
-      for (const sg of [-1, 1]){ strip(sg * (mw/2 - .12), .25, a0, a1, .24, ccol); curb(sg * (mw/2 - .12), .25, .13, a0, a1, ccol); }
-      for (const u of [a0 + .1, a1 - .1]) curbEnd(u, -mw/2, mw/2, .235, ccol);
+      strip(0, Math.max(.4, mw - .50), a0 + .20, a1 - .20, .22, paved ? '#5a7a3a' : '#617f3f');
+      for (const sg of [-1, 1]) curb(sg * (mw/2 - .125), .25, .135, a0, a1, ccol);
+      for (const u of [a0 + .1, a1 - .1]) curbEnd(u, -mw/2, mw/2, .135, ccol);
       carBlock(-mw/2, mw/2, a0, a1);
       for (let u = a0 + 3; u < a1 - 2; u += paved ? 3.2 : 14){
         const [x, z] = P(u, R(-.4, .4)), r = rnd();
         if (!paved) addTree(x, z, R(1.1, 1.5), false, rnd() < .5 ? ['#a0642c','#b5793a','#8a5a2b'] : null, '#b9ad94');
-        else if (r < .6) addBush(x, z, R(.5, .8), .22);
-        else if (r < .72) addPalm(x, z, R(.4, .55), .22);
+        else if (r < .6) addBush(x, z, R(.5, .8), .115);
+        else if (r < .72) addPalm(x, z, R(.4, .55), .115);
         else if (r < .82) addTree(x, z, R(.7, .9), false, ['#a0642c','#b5793a','#8a5a2b'], '#b9ad94');
       }
     };
@@ -315,9 +315,9 @@ function drawSeg(s){
     for (let u = t0 + 6; u < t1; u += 24) for (const sg of [-1, 1]) lampSpots.push(P(u, sg * (st.w/2 + .4)));
     if (s.s1 <= 117.5){
       // del mástil hacia afuera: cantero angosto con bolas de luz repartidas de forma pareja
-      strip(0, 1.6, t0, t1, .24, '#d6d1c6');
-      for (const sg of [-1, 1]) curb(sg * .74, .12, .13, t0, t1, '#cfc9bd');
-      for (const u of [t0 + .1, t1 - .1]) curbEnd(u, -.8, .8, .235, '#cfc9bd');
+      strip(0, 1.36, t0 + .18, t1 - .18, .225, '#d6d1c6');
+      for (const sg of [-1, 1]) curb(sg * .74, .12, .135, t0, t1, '#cfc9bd');
+      for (const u of [t0 + .1, t1 - .1]) curbEnd(u, -.8, .8, .135, '#cfc9bd');
       carBlock(-.8, .8, t0, t1);
       const nb = Math.max(1, Math.round((t1 - t0 - 2) / 5.6));
       for (let k = 0; k <= nb; k++){
@@ -332,9 +332,9 @@ function drawSeg(s){
       const drawMedianSpan = (a0, a1) => {
         const L = a1 - a0;
         if (L < 6) return;
-        strip(0, 3, a0, a1, .22, '#5d7f3c');
-        for (const sg of [-1, 1]) curb(sg * 1.44, .12, .115, a0, a1, '#cfc9bd');
-        for (const u of [a0 + .1, a1 - .1]) curbEnd(u, -1.5, 1.5, .215, '#cfc9bd');
+        strip(0, 2.76, a0 + .18, a1 - .18, .22, '#5d7f3c');
+        for (const sg of [-1, 1]) curb(sg * 1.44, .12, .135, a0, a1, '#cfc9bd');
+        for (const u of [a0 + .1, a1 - .1]) curbEnd(u, -1.5, 1.5, .135, '#cfc9bd');
         carBlock(-1.5, 1.5, a0, a1);
         const n = Math.max(1, Math.round(L / 13));
         const step = L / n;

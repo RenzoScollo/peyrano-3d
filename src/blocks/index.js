@@ -6,6 +6,7 @@ import { buildSurClubesDiablito } from './sur_clubes_diablito.js';
 import { buildOesteFerrocarrilRural } from './oeste_ferrocarril_rural.js';
 import { buildPlazaSEAgua } from './plaza_se_agua.js';
 import { buildManzanaAmfacMalvinas } from './manzana_amfac_malvinas.js';
+import { buildSanLuisSurOeste } from './sanluis_sur_oeste.js';
 import { buildSurTerminalQuinta } from './sur_terminal_quinta.js';
 
 export function buildAllBlocks(ctx) {
@@ -16,5 +17,6 @@ export function buildAllBlocks(ctx) {
   buildOesteFerrocarrilRural(ctx);
   buildPlazaSEAgua(ctx);
   buildManzanaAmfacMalvinas(ctx);
+  buildSanLuisSurOeste(ctx);
   buildSurTerminalQuinta(ctx);
 }
