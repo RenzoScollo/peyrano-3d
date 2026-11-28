@@ -428,15 +428,254 @@ export function buildSanLuisSurOeste(ctx) {
     ]) addTree(tx, tz, ts, false, col);
     for (const [bx0, bz0, bs] of [[-79.8, -232.0, .95], [-84.0, -232.4, 1.0], [-87.8, -231.2, .9], [-82.0, -218.5, .85]]) addBush(bx0, bz0, bs, .05);
 
-    // vereda sobre San Luis (sv8: baldosas grises, franja de pasto, árbol y poste blanco de luminaria) + Córdoba
+    // vereda sobre San Luis (sv8: baldosas grises, franja de pasto, árbol y poste blanco de luminaria) + Córdoba (c1: dos árboles y cesto de madera con techito)
     veredaSL(XW, XE, '#c4bdb0', '#6a8b40');
     flat.rect(-92.88, ZN, XW, ZS, .205, '#6a8b40');
     flat.rect(XW - 1.65, ZN, XW, ZS, .206, '#c4bdb0');
     addTree(-81.6, -236.7, 1.15, false, PELADO);
+    addTree(-92.0, -231.5, 1.15, false, PELADO);
+    addTree(-92.0, -225.2, 1.15, false, PELADO);
+    addTree(-92.0, -219.4, 1.15, false, PELADO);
+    // cesto rústico de madera con techito a dos aguas en la esquina sur del baldío (c1/c2)
+    { const cg = group(-91.8, -217.2); poleIn(cg, [0, 0, 0], [0, .82, 0], .05, '#6e5c48'); bx(cg, 0, .75, 0, .55, .52, .62, '#7d6c58');
+      boxIn(cg, -.2, 1.38, 0, .44, .06, .72, '#3d5e42', 0, .55); boxIn(cg, .2, 1.38, 0, .44, .06, .72, '#3d5e42', 0, -.55); }
     poles.add(-84.5, 0, -237.2, .13, 8.2, .13, 0, '#f0efeb');
     addCol(-84.65, -237.35, -84.35, -237.05);
     poles.add(-89.3, 0, -234.8, .12, 7.8, .12, 0, '#8d8272');
     addCol(-89.45, -234.95, -89.15, -234.65);
+  }
+
+  // =========================================================================
+  // 8B) CÓRDOBA LADO ESTE — de San Luis (baldío Lote 1) hasta la esquina de Jujuy (Lote 6) — fotos c2..c7 + satélite
+  // =========================================================================
+  {
+    const XL = -89.5;     // línea municipal este de Córdoba · grupos con ry = -PI/2: local +z = calle (oeste), local +x = sur (derecha en las fotos)
+    const CURB_C = -92.88;
+    const casaC = (zN, zS) => {
+      const zc = (zN + zS) / 2;
+      return { g: group(XL, zc, -Math.PI / 2), w: zS - zN, zc, Wd: (lx, lz) => [XL - lz, zc + lx] };
+    };
+    const veredaC = (zN, zS, pave = '#cdc3b0', gr = '#6b8c42') => {
+      flat.rect(XL - 1.75, zN, XL, zS, .206, pave);
+      flat.rect(CURB_C, zN, XL - 1.75, zS, .205, gr);
+    };
+    const entradaC = (zN, zS, col = '#c6bfb2') => flat.rect(CURB_C, zN, XL, zS, .2068, col);
+    const hipRoof = (g, x, y, z, w, h, d, col) => {
+      const geo = new THREE.ConeGeometry(1, h, 4, 1); geo.rotateY(Math.PI / 4);
+      const m = new THREE.Mesh(geo, lam({ color: col }));
+      m.scale.set((w + .5) / Math.SQRT2, 1, (d + .5) / Math.SQRT2);
+      m.position.set(x, y + h / 2, z); m.castShadow = m.receiveShadow = true; g.add(m);
+    };
+
+    // ---- Lote 2 (z = -216.5 .. -204.0, w = 12.5 m): Casa moderna blanca con columnas pareadas, friso de madera y Carpintería CG Garabello atrás (c2 & c3) ----
+    {
+      const { g, w, zc, Wd } = casaC(-216.5, -204.0);   // local -6.25..6.25
+      const WH = '#f2f1ec', BEI = '#bfb28e', MAD = '#b4622e';
+      // izquierda (-6.25..-3.0): entrada vehicular a Carpintería CG Garabello (pared con enredadera + portón rojo/marrón y reja "CG")
+      rectL(Wd, -6.25, 0, -3.0, -10.5, .054, '#b8b1a4');
+      bx(g, -6.12, 0, -5.2, .26, 2.2, 10.4, '#4c7536');   // muro norte cubierto de enredadera
+      bx(g, -4.6, 0, -4.2, 3.1, 2.05, .08, '#9a4d36');    // portón de madera/chapa rojizo
+      bx(g, -5.3, 0, -3.8, 1.35, 1.95, .08, '#5a5f64');   // hojita metálica gris con "CG"
+      colLocal(g, -6.25, -4.4, -3.0, -3.7, null);
+
+      // cuerpo principal casa blanca con galería y techo plano saliente (-3.0..+6.25)
+      body(g, -2.8, 2.6, 2.4, 10.2, 3.12, WH);            // centro retirado detrás de la galería
+      body(g, 2.6, 5.9, 1.2, 10.2, 3.12, WH);             // ala derecha adelantada
+      bx(g, 1.5, 2.92, -5.1, 9.4, .34, 10.4, '#c4bfb4');  // losa techo plana saliente sobre la galería
+      // pares de columnas beige características de la galería (izquierda y centro)
+      for (const px of [-2.85, -2.35, -.15, .35]) bx(g, px, 0, -.35, .26, 2.94, .26, BEI);
+      // friso horizontal de machimbre naranja-marrón + zócalo oliva abajo
+      bx(g, .9, 2.15, -2.36, 3.55, .75, .06, MAD);
+      bx(g, .9, 0, -2.36, 5.4, .65, .05, '#a49b76');
+      bx(g, 4.25, 0, -1.16, 3.3, .65, .05, '#a49b76');
+      // aberturas: puerta de madera izq, ventanal con persiana blanca, puerta principal de madera, ventanal derecho
+      bx(g, -1.35, 0, -2.36, .88, 2.12, .05, '#9a542e');
+      bx(g, .4, .75, -2.36, 1.85, 1.35, .05, '#e8e5dc');
+      bx(g, 1.95, 0, -2.36, .92, 2.15, .06, '#a45b32');
+      bx(g, 4.1, .75, -1.16, 2.1, 1.35, .05, '#e8e5dc');
+      rectL(Wd, -3.0, 0, 6.2, -2.4, .058, '#c8c0b2');
+      // murete bajo frontal con tranquera de troncos oscuros y pilares blancos
+      bx(g, 1.5, 0, -.12, 9.0, .42, .22, '#d5d0c5');
+      for (const px of [-3.0, -.5, 2.4, 6.1]) bx(g, px, 0, -.12, .38, .92, .38, '#dcd8ce');
+      for (const [x0, x1] of [[-2.8, -.7], [-.3, 2.2], [2.6, 5.9]]) {
+        bx(g, (x0 + x1) / 2, .56, -.12, x1 - x0, .06, .08, '#4e3c2e');
+        bx(g, (x0 + x1) / 2, .78, -.12, x1 - x0, .06, .08, '#4e3c2e');
+      }
+      colLocal(g, -3.1, -.3, 6.25, .1, null);
+      // yucas/palmeritas en el jardín derecho + tanque de agua blanco en torre metálica atrás
+      for (const [lx, lz] of [[4.8, -.7], [5.4, -.9]]) { poleIn(g, [lx, 0, lz], [lx, 1.9, lz], .07, '#6b5a45'); addBush(...Wd(lx, lz), .58, 1.75); }
+      for (const [dx, dz] of [[-.45, -.45], [.45, -.45], [-.45, .45], [.45, .45]]) poleIn(g, [0 + dx, 3.1, -9.2 + dz], [0 + dx * .55, 6.4, -9.2 + dz * .55], .035, '#8a8e92');
+      cylIn(g, 0, 7.0, -9.2, .58, 1.15, '#e8e7e2');
+      // galpón trasero de techo rojo terracota de Carpintería CG Garabello (satélite 2, limpio hasta x = -71.7)
+      body(g, -6.0, 5.6, 10.6, 17.8, 3.55, '#dcd6ca');
+      boxIn(g, -.2, 3.72, -14.2, 11.8, .22, 7.6, '#9e4e3c', .06);
+      mapLabels.push([XL + 12, zc, 'Carpintería CG']);
+
+      veredaC(-216.5, -204.0, '#cdbda5', '#6c8d40');
+      entradaC(-216.4, -213.2, '#c5beb0');
+      addTree(-92.0, -208.8, 1.2, false, PELADO);
+      poles.add(-90.2, 0, -211.8, .12, 7.8, .12, 0, '#8d8272');
+      addCol(-90.35, -211.95, -90.05, -211.65);
+    }
+
+    // ---- Lote 3 (z = -204.0 .. -191.5, w = 12.5 m): Casa blanca con techo de tejas en el centro, entrada de autos a la izq y murito blanco (c4) ----
+    {
+      const { g, w, zc, Wd } = casaC(-204.0, -191.5);   // local -6.25..6.25
+      const WH = '#f2f1ec', TEJ = '#a9553c';
+      // entrada de autos izquierda (-6.25..-3.1) con portón negro de reja y pilares blancos gastados
+      rectL(Wd, -6.25, 0, -3.1, -11.5, .054, '#bdb7aa');
+      bx(g, -5.95, 0, -.15, .65, 1.55, .36, '#dad6cc');
+      bx(g, -2.95, 0, -.15, .75, 1.55, .36, '#dad6cc');
+      rejaV(g, -4.45, .05, -.15, 2.6, 1.4, '#242a26', .14);
+      // murete blanco con rejita negra y portoncito peatonal (-2.6..+6.25)
+      bx(g, 1.8, 0, -.15, 8.8, .72, .26, '#dedad0');
+      for (const px of [-2.4, -.55, .35, 3.1, 6.1]) bx(g, px, 0, -.15, .42, 1.45, .42, '#dcd8ce');
+      rejaV(g, -.1, .05, -.15, .8, 1.25, '#242a26', .11);      // portoncito peatonal
+      rejaV(g, 1.72, .72, -.15, 2.4, .58, '#242a26', .14);
+      rejaV(g, 4.6, .72, -.15, 2.7, .58, '#242a26', .14);
+      colLocal(g, -6.25, -.35, 6.25, .08, null);
+      rectL(Wd, -3.1, -.2, 6.2, -3.6, .048, '#6a8b42');
+      rectL(Wd, -.55, -.2, .4, -3.6, .056, '#c7bfb0');
+
+      // casa blanca retirada 3.5 m: cuerpo central con techo de tejas a 4 aguas + ala derecha blanca de techo plano
+      body(g, -2.5, 2.8, 3.5, 12.2, 2.95, WH);
+      hipRoof(g, .15, 2.95, -7.8, 5.4, 1.45, 8.8, TEJ);
+      body(g, 2.8, 5.8, 3.5, 12.2, 3.45, WH);
+      bx(g, 4.3, 3.45, -7.8, 3.1, .24, 8.8, '#d4d0c6');
+      // aberturas: ventanal grande bajo las tejas + puerta en sombra + ventana derecha con reja
+      bx(g, .75, .95, -3.46, 2.0, 1.4, .05, '#3b4a55');
+      bx(g, -1.2, 0, -3.46, .95, 2.15, .05, '#5a4a3a');
+      bx(g, 4.3, .95, -3.46, 1.85, 1.4, .05, '#3b4a55');
+      rejaV(g, 4.3, .95, -3.41, 1.85, 1.4, '#e5e4df', .18);
+      // patio trasero verde hasta el límite del pulmón interno (x = -71.6)
+      rectL(Wd, -6.0, -12.2, 6.0, -17.8, .042, '#628a40');
+      addTree(XL + 14.5, zc + 2.5, 1.1, false, VERDE);
+
+      veredaC(-204.0, -191.5, '#d4c3a8', '#6c8d40');
+      entradaC(-203.8, -200.6, '#d4c3a8');
+      entradaC(-198.2, -197.1, '#c5beb0');
+      addTree(-92.0, -203.2, 1.15, false, PELADO);
+      addTree(-92.0, -196.2, 1.2, false, PELADO);
+    }
+
+    // ---- Lote 4 (z = -191.5 .. -178.0, w = 13.5 m): Chalet ocre/mostaza con techo de tejas grises y pilares de ladrillo (c5) ----
+    {
+      const { g, w, zc, Wd } = casaC(-191.5, -178.0);   // local -6.75..6.75
+      const OCR = '#b68a48', LAD = '#b89476', TEJG = '#7c7a76';
+      // frente sobre línea municipal: 4 pilares de ladrillo claro + base baja de ladrillo + reja negra alta + portones
+      const pillars = [-6.45, -2.55, .15, 1.75, 5.85];
+      for (const px of pillars) {
+        bx(g, px, 0, -.15, .48, 1.92, .48, LAD);
+        bx(g, px, 1.92, -.15, .54, .08, .54, '#9e7d62');
+      }
+      rejaV(g, -4.5, .05, -.15, 3.4, 1.75, '#222426', .14);    // portón vehicular izquierdo
+      for (const [a, b] of [[-2.3, -.1], [2.0, 5.6]]) {
+        bx(g, (a + b) / 2, 0, -.15, b - a, .38, .24, LAD);
+        rejaV(g, (a + b) / 2, .38, -.15, b - a, 1.42, '#222426', .14);
+      }
+      rejaV(g, .95, .05, -.15, 1.1, 1.75, '#222426', .12);     // portón peatonal central
+      bx(g, 6.3, 0, -.15, .85, 2.05, .3, '#cfc5b4');           // pilar muro derecho hacia Lote 5
+      colLocal(g, -6.75, -.38, 6.75, .1, null);
+      // jardín frontal verde con sendero peatonal y entrada de coche
+      rectL(Wd, -6.6, -.2, 6.6, -4.8, .048, '#668d40');
+      rectL(Wd, -6.3, -.2, -2.6, -6.5, .055, '#c4beb2');
+      rectL(Wd, .3, -.2, 1.6, -4.8, .056, '#d2cdc2');
+      addBush(...Wd(4.4, -2.2), 1.35, .05);
+
+      // garaje izquierdo retirado (-6.3..-2.4, d = 6.2..13.0) + chalet ocre con techo gris a 4 aguas (-2.4..+5.4, d = 4.6..13.2)
+      body(g, -6.3, -2.4, 6.2, 13.0, 2.85, '#3b3f44');
+      bx(g, -4.35, 0, -6.16, 3.1, 2.25, .05, '#ecebe6');       // portón blanco del garaje
+      body(g, -2.4, 5.4, 4.6, 13.2, 2.95, OCR);
+      hipRoof(g, 1.5, 2.95, -8.9, 8.2, 1.75, 9.0, TEJG);
+      // puerta principal blanca con vidrio en arco + marco blanco + ventana ancha derecha
+      bx(g, .95, 0, -4.56, 1.65, 2.35, .08, '#f4f3ef');
+      bx(g, .95, 0, -4.52, 1.15, 2.15, .05, '#faf9f5');
+      bx(g, .95, 1.45, -4.48, .65, .52, .02, '#3b4a55');
+      bx(g, 3.65, .85, -4.56, 1.9, 1.35, .06, '#f4f3ef');
+      bx(g, 3.65, .92, -4.51, 1.7, 1.2, .03, '#4e5c64');
+      // quincho/anexo trasero + patiecito blanco (satélite 4, limpio dentro de x = -71.6)
+      body(g, -3.2, 2.4, 13.8, 17.6, 2.9, '#e5e0d5');
+      bx(g, -.4, 2.9, -15.7, 5.8, .18, 4.0, '#787d82');
+      rectL(Wd, 2.4, -13.4, 6.2, -17.6, .052, '#e6e2d6');
+
+      veredaC(-191.5, -178.0, '#d2cdc2', '#6a8d3f');
+      entradaC(-191.2, -187.4, '#c7c1b4');
+      entradaC(-184.4, -182.8, '#d2cdc2');
+      addTree(-92.0, -185.8, 1.2, false, PELADO);
+      addTree(-92.0, -178.8, 1.15, false, PELADO);
+      cesto(-91.6, -180.6, true);
+      poles.add(-90.1, 0, -191.2, .12, 8.0, .12, 0, '#8d8272');
+      addCol(-90.25, -191.35, -89.95, -191.05);
+    }
+
+    // ---- Lote 5 (z = -178.0 .. -165.0, w = 13.0 m): Casa moderna de 2 plantas color taupe con balcón + garaje blanco 3 hojas (c6 & c7) ----
+    {
+      const { g, w, zc, Wd } = casaC(-178.0, -165.0);   // local -6.5..6.5
+      const TAU = '#aba094', TAU_D = '#968b7f', WH = '#f5f4f0', TEJ = '#8d503a';
+      // izquierda (-6.5..-3.9): portón blanco alto de chapa horizontal con pilar taupe
+      bx(g, -6.32, 0, -.15, .36, 2.45, .36, TAU);
+      bx(g, -5.05, 0, -.12, 2.25, 2.38, .08, WH);
+      for (let y = .3; y < 2.3; y += .32) bx(g, -5.05, y, -.07, 2.2, .025, .02, '#d6d4ce');
+      colLocal(g, -6.5, -.3, -3.9, .05, null);
+
+      // cuerpo central de 2 plantas (-3.9..+3.3, w = 7.2 m)
+      body(g, -3.9, 3.3, 1.8, 11.2, 3.05, TAU);          // planta baja fondo
+      body(g, .05, 3.3, 0, 1.8, 3.05, TAU);              // volumen derecho adelantado al ras de la vereda
+      bx(g, -3.72, 0, -.15, .36, 3.05, .36, TAU);        // columna izquierda de la galería
+      bx(g, -2.0, 0, -.15, .36, 3.05, .36, TAU);         // pilar intermedio de la galería
+      bx(g, -.3, 2.65, -.95, 7.25, .72, 2.0, TAU);       // viga/banda frontal del balcón
+      bx(g, 1.68, 0, .03, 3.25, .24, .05, WH);           // zócalo blanco abajo
+      bx(g, -2.86, 0, -.2, 1.45, .62, .55, TAU_D);       // macetero bajo integrado en el vano izquierdo
+      bx(g, -2.86, .62, -.2, 1.32, .05, .42, '#4e7533');
+      addBush(...Wd(-2.86, -.2), .42, .62);
+      // aberturas planta baja: ventanita izq, ventanal con postigos blancos y puerta blanca en la galería, ventanal blanco derecho
+      bx(g, -2.86, .95, -1.76, .68, 1.15, .05, WH);
+      bx(g, -1.0, .92, -1.76, 1.48, 1.25, .05, WH);
+      bx(g, -.02, 0, -1.76, .82, 2.15, .05, WH);
+      bx(g, 1.65, .85, .04, 1.95, 1.45, .05, WH);
+      for (let y = .95; y < 2.25; y += .13) bx(g, 1.65, y, .07, 1.85, .02, .01, '#cfd2d6');
+      rectL(Wd, -3.9, 0, .05, -1.8, .06, '#a9a29a');
+
+      // planta alta retirada 1.2 m detrás del balcón con baranda de madera, macetas y techo de tejas
+      body(g, -3.9, 3.3, 1.35, 11.2, 6.05, TAU);
+      bx(g, -.3, 3.35, -.08, 7.2, .72, .22, TAU);        // baranda baja del balcón
+      bx(g, -.3, 4.18, -.08, 7.2, .07, .12, '#6b4a34');  // pasamanos de madera
+      for (const [bx0, s] of [[-2.0, .48], [.45, .46], [2.75, .52]]) addBush(...Wd(bx0, -.25), s, 3.85);
+      bx(g, -2.8, 4.15, -1.32, .72, 1.25, .05, WH);
+      bx(g, -.7, 3.65, -1.32, 1.65, 1.85, .05, WH);
+      bx(g, 1.7, 3.65, -1.32, 1.75, 1.85, .05, WH);
+      // techo inclinado oscuro/terracota sobre la planta alta (satélite 5 + c6)
+      boxIn(g, -.3, 6.22, -6.2, 7.6, .24, 10.6, TEJ, -.12);
+
+      // derecha (+3.3..+6.5, w = 3.2 m): garaje taupe de 1 planta con portón blanco de 3 hojas con vidrios arriba (c6 & c7)
+      body(g, 3.3, 6.5, 0, 10.8, 3.05, TAU);
+      bx(g, 4.9, 2.95, .04, 3.25, .24, .12, TAU_D);
+      bx(g, 4.9, 0, .04, 2.7, 2.28, .06, WH);
+      for (const sx of [4.0, 4.9, 5.8]) {
+        bx(g, sx, 1.72, .08, .72, .42, .02, '#3b4a55');
+        for (const gx of [sx - .18, sx + .18]) bx(g, gx, 1.72, .095, .03, .42, .01, WH);
+      }
+      for (const sx of [4.45, 5.35]) bx(g, sx, 0, .08, .03, 2.28, .02, '#c8c6c0');
+
+      // fondo del Lote 5: piletita angosta + quincho de techo gris claro (satélite 5, dentro de x = -71.6)
+      rectL(Wd, -6.2, -11.4, 6.2, -17.8, .045, '#c4bdb0');
+      flat.rect(XL + 12.0, zc + 1.0, XL + 15.2, zc + 5.2, .055, '#e7e2d6');
+      flat.rect(XL + 12.3, zc + 1.3, XL + 14.9, zc + 4.9, .062, '#36a2d6');
+      body(g, -6.0, 1.0, 12.4, 17.6, 2.85, '#dfdad0');
+      bx(g, -2.5, 2.85, -15.0, 7.2, .16, 5.4, '#b8bdc0');
+
+      veredaC(-178.0, -165.0, '#d2cdc2', '#6a8d3f');
+      entradaC(-177.8, -175.4, '#d2cdc2');
+      entradaC(-173.0, -171.6, '#d2cdc2');
+      entradaC(-168.4, -165.2, '#c6bfb2');
+      addTree(-92.0, -174.6, 1.15, false, PELADO);
+      addTree(-92.0, -169.4, 1.15, false, PELADO);
+      cesto(-91.5, -175.5, true);
+    }
+
+    // Empalme limpio de la franja verde de vereda del Lote 6 (esquina Jujuy ya armada en centro_oeste_brunet.js)
+    flat.rect(CURB_C, -165.0, -91.4, -162.0, .205, '#6f8f45');
+    plazaRects.push([-89.6, -216.5, -71.5, -165.0]);
   }
 
   // =========================================================================

@@ -56,7 +56,7 @@ const JUJUY_N_POLY =[[-60.8, -137], [-13.5, -137], [-13.5, -118], [-60.8, -118]]
 const JUJUY_SO_POLY =[[-89.6, -172], [-56.8, -172], [-56.8, -153], [-89.6, -153]];   // Jujuy lado sur, de la Comisaría a la esquina de Córdoba (casas armadas a mano)
 const COMISARIA_POLY =[[-57.5, -172], [-40.6, -172], [-40.6, -153], [-57.5, -153]];   // Comisaría sobre Jujuy, al oeste de la Plaza Malvinas (armada a mano)
 const CORREO_N_POLY =[[-48, -234.5], [-13.5, -234.5], [-13.5, -187.3], [-48, -187.3]];   // Av. Centenario lado oeste, del Correo a San Luis (casas armadas a mano)
-const SANLUIS_SO_POLY = [[-89.6, -234.5], [-19.3, -234.5], [-19.3, -221.5], [-35.0, -221.5], [-35.0, -183.0], [-48.0, -183.0], [-48.0, -172.0], [-71.5, -172.0], [-71.5, -216.5], [-89.6, -216.5]];   // San Luis lado sur (Av. Centenario a Córdoba) + pulmón interno con pileta en L (armado a mano)
+const SANLUIS_SO_POLY = [[-89.6, -234.5], [-19.3, -234.5], [-19.3, -221.5], [-35.0, -221.5], [-35.0, -183.0], [-48.0, -183.0], [-48.0, -172.0], [-71.5, -172.0], [-71.5, -165.0], [-89.6, -165.0]];   // San Luis lado sur + Córdoba lado este (San Luis a Jujuy) + pulmón interno con pileta en L (armado a mano)
 const MALV_POLY =[[-47, -185], [-13, -185], [-13, -152.5], [-47, -152.5]];   // Plaza Islas Malvinas (esquina Jujuy y Av. Centenario, lado oeste) + Correo Argentino (Av. Centenario 821)
 const CENT_EAST_POLY =[[13, -234.5], [53, -234.5], [53, -152.5], [13, -152.5]];   // Av. Centenario lado este, de la esquina de Jujuy hasta San Luis (incluye lote de naranjos y AMFAC)
 const AMFAC_INT_POLY = [[13, -234.5], [90, -234.5], [90, -152.5], [13, -152.5]];   // manzana completa de AMFAC / Peghi / Soc. Italiana (frentes e interior armados a mano)
@@ -84,8 +84,9 @@ const CAR_OPEN = [[8.8, -624.5, 13.7, -586],
   [-462.2, -350.5, -459.2, -347.5],
   [-432, -350.5, -428, -347.5],   // tranquera de la planta de acopio sobre Bv. Lavalle
   [-398.6, -392, -394.5, -386],
-  // portones de San Luis lado sur (Peyrano Diesel, chalet, portón de chapa + garaje, casa VENDO)
+  // portones de San Luis lado sur y Córdoba lado este (San Luis a Jujuy)
   [-43.8, -238.5, -36.8, -234.0], [-48.2, -238.5, -44.8, -234.0], [-60.5, -238.5, -54.5, -234.0], [-72.8, -238.5, -69.8, -234.0],
+  [-94.0, -216.4, -89.0, -213.2], [-94.0, -203.8, -89.0, -200.6], [-94.0, -191.2, -89.0, -187.4], [-94.0, -177.8, -89.0, -175.4], [-94.0, -168.4, -89.0, -165.2],
   [424.5, -543.5, 428.5, -539.5], [441, -543.5, 445.5, -539.5], [394.5, -577.5, 398.5, -573.5]];   // portones de la cuadra del Hogar de Ancianos (Bolívar y San Juan)   // tranqueras de la planta de acopio sobre Buenos Aires   // tranquera con camino de ripio de la esquina 25 de Mayo y Bv. Lavalle
 
 export {
