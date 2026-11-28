@@ -158,9 +158,14 @@ export function buildCentroOesteBrunet(ctx) {
     piedra(g, 1.4, 0, -1.58, 4.5, .9); piedra(g, -1.65, 0, -3.18, 1.5, .9);
     for (const x of [.4, 2.6]){ bx(g, x, .95, -1.57, 1.3, 1.4, .04, '#3b4a55'); rejaV(g, x, .95, -1.52, 1.3, 1.4, RJ, .12); bx(g, x, .9, -1.5, 1.4, .06, .14, '#cfc9bb'); }
     bx(g, -1.65, 0, -3.17, .9, 2.2, .05, '#6e5a46'); rejaV(g, -1.65, 0, -.2, 1.5, 1.4, RJ, .12);   // puerta de la galería y portoncito de reja en el hueco del murito
-    // costado sobre Córdoba (local -x): ventana con reja y chimenea de piedra
+    // costado sobre Córdoba (local -x): dos ventanales con reja, puerta vidriada, alero saliente y banco de madera (c7)
     { const sg = group(0, 0); g.add(sg); sg.position.set(-2.4, 0, -6); sg.rotation.y = -Math.PI / 2;
-      bx(sg, 1.5, .95, .02, 1.2, 1.3, .04, '#3b4a55'); rejaV(sg, 1.5, .95, .07, 1.2, 1.3, RJ, .12); piedra(sg, 0, 0, .02, 9.6, .8); }
+      bx(sg, 2.2, .92, .02, 1.65, 1.38, .04, '#3b4a55'); rejaV(sg, 2.2, .92, .07, 1.65, 1.38, RJ, .12);
+      bx(sg, -.3, 0, .02, 1.1, 2.15, .04, '#5a4a3a'); rejaV(sg, -.3, 0, .07, 1.1, 2.15, RJ, .12);
+      bx(sg, -2.5, .92, .02, 1.35, 1.35, .04, '#3b4a55'); rejaV(sg, -2.5, .92, .07, 1.35, 1.35, RJ, .12);
+      bx(sg, -.4, 2.86, .45, 9.6, .26, 1.05, '#c7b8a0');   // alero plano beige sobresaliendo sobre el jardín de Córdoba
+      bx(sg, -1.4, .42, .45, 1.25, .10, .38, '#a65c2e');   // banco de madera naranja bajo el alero
+      piedra(sg, 0, 0, .02, 9.6, .8); }
     bx(g, -2.0, 3.1, -7.5, .9, 1.9, .9, '#a89880'); piedra(g, -2.0, 3.1, -7.04, .9, 1.9);
     cylIn(g, 2.4, 4.0, -9, .45, .8, '#7f878d');
     // murito de laja con reja negra: frente sobre Jujuy (con hueco en la galería) y lado de Córdoba, encerrando el jardín de la esquina
@@ -172,7 +177,7 @@ export function buildCentroOesteBrunet(ctx) {
     murito(-w / 2, -.2, -2.4, -.2); murito(-.9, -.2, w / 2, -.2); murito(-w / 2, -.2, -w / 2, -11);
     for (const x of [-w / 2, -2.4, -.9, w / 2]) { bx(g, x, 0, -.2, .45, 1.5, .45, '#b48a64'); }
     rectG(g, -w / 2, -.2, -2.4, -11, '#5f8f3e'); rectG(g, -2.4, -.2, w / 2, -1.6, '#5f8f3e');
-    for (const [lx, lz, s] of [[-3.0, -1.2, 1.1], [-2.9, -3.5, 1.0], [-3.0, -6.5, .9], [-2.8, -9, 1.0], [1.4, -.9, .8]]) addBush(cx + lx, ZF + lz, s, 0);
+    for (const [lx, lz, s] of [[-2.6, -1.2, 1.0], [-2.6, -3.5, .92], [-2.6, -6.5, .85], [-2.6, -9, .92], [1.4, -.9, .8]]) addBush(cx + lx, ZF + lz, s, 0);
     addTree(cx - 2.9, ZF - 4.8, .9, false, ['#4b7a30', '#3f6b2a']);
     // árboles de la vereda (aguaribay), poste de luz y cartel de la esquina
     pasto(cx - w / 2, cx + w / 2); flat.rect(-92.88, -153, -91.4, -162, .205, '#6f8f45');
