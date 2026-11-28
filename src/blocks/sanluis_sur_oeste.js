@@ -74,50 +74,59 @@ export function buildSanLuisSurOeste(ctx) {
   }, 128, 128);
 
   // =========================================================================
-  // 1) Casa retirada blanca detrás de reja negra + portón de chapa rojiza (x = -23.5 .. -34.5, w = 11.0 m) — sv1 & sv2
+  // 1) Casa moderna blanca ancha detrás de reja negra + tapial derecho + portón de chapa rojiza (x = -19.3 .. -34.5, w = 15.2 m) — sv1, sv2 & sv_esq
   // =========================================================================
   {
-    const { g, w, cx, Wd } = casa(-23.5, -34.5);   // local -5.5..5.5 (+x hacia oeste)
-    // frente sobre línea municipal: reja vertical negra con postes oxidados + portoncito + pilar de ladrillo + portón de chapa rojiza
-    const fencePosts = [-5.4, -3.5, -1.6, .2, 1.3, 2.3];
+    const { g, w, cx, Wd } = casa(-19.3, -34.5);   // local -7.6..7.6 (+x hacia oeste)
+    // frente sobre línea municipal: reja vertical negra ancha con postes oxidados + portoncito + tapial de placas + pilar ladrillo + portón chapa rojiza
+    const fencePosts = [-7.5, -5.2, -2.9, -.6, 1.5, 2.7, 3.85];
     for (const px of fencePosts) bx(g, px, 0, -.08, .08, 1.65, .08, '#7a5240');
-    rejaV(g, -2.6, 0, -.08, 5.6, 1.58, '#282a2c', .12);
-    rejaV(g, .75, 0, -.06, 1.0, 1.55, '#303234', .11);   // portoncito peatonal
-    rejaV(g, 1.8, 0, -.08, .95, 1.58, '#282a2c', .12);
-    bx(g, 2.6, 0, -.12, .65, 2.05, .32, '#b06e50');      // pilar de ladrillo
-    bx(g, 4.15, 0, -.10, 2.5, 1.98, .07, '#a55244');     // portón de chapa acanalada rojiza
-    for (let px = 3.0; px < 5.35; px += .22) bx(g, px, .02, -.06, .04, 1.94, .02, '#843e32');
-    bx(g, 5.42, 0, -.12, .18, 2.05, .28, '#4a6b34');     // enredadera trepando junto al galpón
-    colLocal(g, -5.5, -.25, 5.5, .05, null);
+    rejaV(g, -3.0, 0, -.08, 9.0, 1.58, '#282a2c', .12);
+    rejaV(g, 2.1, 0, -.06, 1.1, 1.55, '#303234', .11);   // portoncito peatonal frente al porche
+    rejaV(g, 3.28, 0, -.08, 1.1, 1.58, '#282a2c', .12);
+    // tapial de placas premoldeadas derecho (separa el jardín del portón de chapa)
+    bx(g, 3.92, 0, -3.6, .18, 2.0, 7.0, '#b4b1a8');
+    for (let dz = -.3; dz > -6.8; dz -= 1.45) bx(g, 3.92, 0, dz, .24, 2.1, .16, '#928f88');
+    colLocal(g, 3.78, -7.1, 4.06, 0, null);
+    // pilar de ladrillo visto + portón de chapa acanalada rojiza + enredadera
+    bx(g, 4.45, 0, -.14, 1.1, 2.05, .32, '#b87254');
+    plano(g, 4.45, 1.02, .03, 1.1, 2.05, brickTex, .8, 1.4);
+    bx(g, 6.25, 0, -.10, 2.55, 1.98, .07, '#a55244');
+    for (let px = 5.05; px < 7.45; px += .22) bx(g, px, .02, -.06, .04, 1.94, .02, '#843e32');
+    bx(g, 7.52, 0, -.12, .18, 2.05, .28, '#4a6b34');
+    colLocal(g, -7.6, -.25, 7.6, .05, null);
 
-    // jardín delantero verde con sendero al porche y farolito negro
-    rectL(Wd, -5.4, -.2, 5.4, -7.2, .048, '#678c40');
-    rectL(Wd, .2, -.2, 1.4, -7.2, .054, '#c7bfb0');
-    poleIn(g, [.05, 0, -4.5], [.05, 2.3, -4.5], .04, '#242628');
-    bx(g, .05, 2.3, -4.5, .24, .32, .24, '#242628');
-    for (const [lx, lz, s] of [[-4.0, -3.5, .75], [-2.0, -5.8, .65], [1.9, -4.6, .7]]) addBush(...Wd(lx, lz), s, .05);
+    // jardín delantero verde ancho con sendero al porche y farolito negro
+    rectL(Wd, -7.5, -.2, 7.5, -7.0, .048, '#678c40');
+    rectL(Wd, 1.55, -.2, 2.75, -7.0, .054, '#c7bfb0');
+    poleIn(g, [1.2, 0, -4.8], [1.2, 2.4, -4.8], .04, '#242628');
+    bx(g, 1.2, 2.4, -4.8, .24, .32, .24, '#242628');
+    for (const [lx, lz, s] of [[-5.6, -5.6, .65], [-3.8, -5.8, .7], [3.3, -2.5, .75], [3.2, -5.0, .65]]) addBush(...Wd(lx, lz), s, .05);
 
-    // casa moderna baja retirada (encaja limpia entre el almacén y la casita trasera de D)
-    body(g, -4.6, 2.0, 7.2, 12.6, 3.0, '#efece5');
-    body(g, 2.0, 4.5, 8.8, 12.6, 3.25, '#ece9e1');
-    bx(g, -.05, 2.95, -7.15, 9.2, .28, .4, '#bdb9ae');   // cenefa plana grisácea
-    bx(g, 3.25, 2.85, -7.8, 2.6, .42, 2.0, '#efece5');   // techo del porche derecho
-    bx(g, 4.38, 0, -7.1, .28, 2.9, .28, '#efece5');      // columna derecha del porche
-    // zócalo de ladrillo/piedra claro + 4 ventanales horizontales con rejas blancas
-    bx(g, -1.3, 0, -7.18, 6.5, .95, .05, '#c9b398');
-    for (const wx of [-3.7, -2.2, -.5, .95]) {
-      bx(g, wx, 1.05, -7.17, 1.15, 1.05, .04, '#3b4a55');
-      rejaV(g, wx, 1.05, -7.12, 1.15, 1.05, '#eceae4', .16);
+    // casa moderna blanca ancha (arranca pegada al tapial del patio de la esquina hasta el fondo del portón rojo)
+    body(g, -7.45, 1.25, 6.9, 12.6, 2.98, '#efece5');    // cuerpo principal horizontal ancho (8.7 m)
+    body(g, 1.25, 4.35, 8.8, 12.6, 3.28, '#ece9e1');     // fondo del porche cuadrado derecho
+    body(g, 4.35, 7.4, 7.6, 12.6, 2.65, '#eae7df');      // anexo bajo a la derecha detrás del portón rojo
+    bx(g, -3.1, 2.94, -6.85, 8.85, .28, .42, '#bdb9ae'); // cenefa plana gris del cuerpo principal
+    bx(g, 2.8, 2.88, -7.75, 3.25, .44, 2.15, '#efece5'); // losa saliente del porche
+    bx(g, 2.8, 3.26, -6.68, 3.3, .14, .22, '#bdb9ae');
+    bx(g, 4.22, 0, -6.85, .30, 2.92, .30, '#efece5');    // columna derecha del porche
+    bx(g, 1.38, 0, -6.85, .30, 2.92, .30, '#efece5');    // pilastra izquierda del porche
+    // zócalo de ladrillo/piedra claro + 4 ventanales horizontales agrupados en dos pares (como en sv_esq)
+    bx(g, -3.1, 0, -6.88, 8.7, .98, .05, '#c9b398');
+    for (const wx of [-6.05, -4.5, -1.65, -.1]) {
+      bx(g, wx, 1.06, -6.87, 1.25, 1.05, .04, '#3b4a55');
+      rejaV(g, wx, 1.06, -6.82, 1.25, 1.05, '#eceae4', .16);
     }
-    bx(g, 3.25, 1.1, -8.76, 1.2, 1.0, .04, '#3b4a55');
-    rejaV(g, 3.25, 1.1, -8.71, 1.2, 1.0, '#2a2c2e', .15);
+    bx(g, 2.8, 1.08, -8.76, 1.55, 1.02, .04, '#3b4a55');
+    rejaV(g, 2.8, 1.08, -8.71, 1.55, 1.02, '#2a2c2e', .15);
 
-    // vereda (sv1-sv2): pasto ancho, sendero de hormigón, poste blanco/rojo, dos arbolitos y cesto de alambre
-    veredaSL(-34.5, -23.5, '#c6bfb2', '#688c3e');
-    poles.add(-25.4, 0, -237.2, .13, 8.2, .13, 0, '#eceae4');
-    poles.add(-25.4, 0, -237.2, .15, 2.4, .15, 0, '#c8684e');
-    addCol(-25.55, -237.35, -25.25, -237.05);
-    addTree(-24.6, -236.6, .82, false, PELADO);
+    // vereda (sv1-sv2-sv_esq): pasto ancho, sendero de hormigón, poste blanco/rojo, dos arbolitos y cesto de alambre
+    veredaSL(-34.5, -19.3, '#c6bfb2', '#688c3e');
+    poles.add(-21.2, 0, -237.2, .13, 8.2, .13, 0, '#eceae4');
+    poles.add(-21.2, 0, -237.2, .15, 2.4, .15, 0, '#c8684e');
+    addCol(-21.35, -237.35, -21.05, -237.05);
+    addTree(-22.2, -236.6, .82, false, PELADO);
     addTree(-33.4, -236.9, .88, false, PELADO);
     cesto(-31.7, -236.9, false);
   }
@@ -258,74 +267,112 @@ export function buildSanLuisSurOeste(ctx) {
   }
 
   // =========================================================================
-  // 5) Casa crema con galería y alero de tejas coloniales (x = -60.5 .. -65.5, w = 5.0 m) — sv5 & sv6
+  // 5) Casa crema con galería y alero de tejas coloniales (x = -60.5 .. -65.0, w = 4.5 m) — sv5 & sv6
   // =========================================================================
   {
-    const { g, w, cx, Wd } = casa(-60.5, -65.5);   // local -2.5..2.5
+    const { g, w, cx, Wd } = casa(-60.5, -65.0);   // local -2.25..2.25
     const CRE = '#eee6d4', TEJ = '#c4643f';
     // lado izquierdo: porche/galería cubierta con alero de tejas y pilar crema
-    body(g, -2.5, -.2, 2.1, 13.5, 3.45, CRE);
-    body(g, -.2, 2.5, 0, 13.5, 3.65, CRE);
-    bx(g, 1.15, 3.65, -.1, 2.75, .22, .3, '#dcd4c2');
-    bx(g, -2.32, 0, -.25, .36, 2.45, .5, CRE);           // pilar izquierdo del porche
-    boxIn(g, -1.35, 2.55, -.95, 2.45, .14, 2.45, TEJ, -.24);  // techo inclinado de tejas de la galería
-    for (let k = 0; k < 7; k++) boxIn(g, -2.4 + k * .35, 2.63, -.95, .08, .10, 2.45, '#a64d2c', -.24);
+    body(g, -2.25, -.15, 2.1, 13.5, 3.45, CRE);
+    body(g, -.15, 2.25, 0, 13.5, 3.65, CRE);
+    bx(g, 1.05, 3.65, -.1, 2.45, .22, .3, '#dcd4c2');
+    bx(g, -2.08, 0, -.25, .34, 2.45, .5, CRE);           // pilar izquierdo del porche
+    boxIn(g, -1.2, 2.55, -.95, 2.2, .14, 2.45, TEJ, -.24);  // techo inclinado de tejas de la galería
+    for (let k = 0; k < 6; k++) boxIn(g, -2.15 + k * .36, 2.63, -.95, .08, .10, 2.45, '#a64d2c', -.24);
     // aire acondicionado blanco sobre la galería
-    bx(g, -.45, 2.95, -.9, .72, .48, .28, '#f0efeb');
+    bx(g, -.4, 2.95, -.9, .72, .48, .28, '#f0efeb');
     // puerta de madera + ventana con persiana crema dentro del porche
-    bx(g, -.72, 0, -2.06, .85, 2.1, .05, '#9e5d38');
-    bx(g, -1.75, 1.05, -2.06, 1.05, 1.1, .05, '#dfd7c5');
-    rectL(Wd, -2.5, 0, -.2, -2.1, .058, '#c5beb0');
+    bx(g, -.65, 0, -2.06, .82, 2.1, .05, '#9e5d38');
+    bx(g, -1.6, 1.05, -2.06, .98, 1.1, .05, '#dfd7c5');
+    rectL(Wd, -2.25, 0, -.15, -2.1, .058, '#c5beb0');
     // lado derecho: pared crema con ventana cerrada blanca + alerito de tejas a dos aguas
-    bx(g, 1.15, 1.05, .03, 1.25, 1.15, .05, '#f2f1ec');
-    boxIn(g, .5, 2.62, .18, 1.5, .12, .45, TEJ, -.15, .18);
-    boxIn(g, 1.8, 2.62, .18, 1.5, .12, .45, TEJ, -.15, -.18);
-    veredaSL(-65.5, -60.5, '#d4c9b2', '#6f8d42');
-    addTree(-63.8, -236.8, 1.15, false, PELADO);
+    bx(g, 1.05, 1.05, .03, 1.2, 1.15, .05, '#f2f1ec');
+    boxIn(g, .45, 2.62, .18, 1.35, .12, .45, TEJ, -.15, .18);
+    boxIn(g, 1.65, 2.62, .18, 1.35, .12, .45, TEJ, -.15, -.18);
+    veredaSL(-65.0, -60.5, '#d9caa8', '#6f8d42');
+    addTree(-63.7, -236.8, 1.15, false, PELADO);
   }
 
   // =========================================================================
-  // 6) "La pelu de viki" (VG Peluquería) — frente blanco comercial (x = -65.5 .. -69.5, w = 4.0 m) — sv6
+  // 6) "La pelu de viki" (VG Peluquería) — frente blanco moderno con ingreso y vidriera rehundidos (x = -65.0 .. -69.6, w = 4.6 m) — sv_pelu
   // =========================================================================
   {
-    const { g, w, cx } = casa(-65.5, -69.5);   // local -2.0..2.0
-    const WH = '#f7f5f2', PIE = '#dfccc0';
-    body(g, -2.0, 2.0, 0, 13.5, 3.45, WH);
-    bx(g, 0, 3.05, .04, w, .42, .08, PIE);               // guarda superior rosada/arena
-    bx(g, 0, 0, .04, w, .36, .08, PIE);                  // zócalo inferior
-    // puerta vidriada con marco de madera y vinilo "VG" a la izquierda
-    bx(g, -.95, 0, .03, 1.38, 2.32, .06, '#7d5438');
-    const vgTex = tex((x, W, H) => {
-      x.fillStyle = '#5c4636'; x.fillRect(0, 0, W, H);
-      x.fillStyle = '#f5f4f0'; x.beginPath(); x.ellipse(W / 2, H * .48, W * .38, H * .34, 0, 0, 7); x.fill();
-      x.fillStyle = '#2d2926'; x.font = 'bold 62px Georgia, serif'; x.textAlign = 'center';
-      x.fillText('VG', W / 2, H * .58);
-    }, 128, 192);
-    plano(g, -.95, 1.16, .08, 1.12, 2.1, vgTex);
-    // vidriera derecha con vinilo esmerilado "Peluquería"
-    bx(g, .95, .62, .03, 1.52, 1.72, .06, '#6e4e38');
-    const peluTex = tex((x, W, H) => {
-      x.fillStyle = '#4f463d'; x.fillRect(0, 0, W, H);
-      x.fillStyle = '#e7e4de'; x.fillRect(0, H * .25, W, H * .62);
-      x.fillStyle = '#4e4a45'; x.font = 'italic 24px Georgia, serif'; x.fillText('Peluquería', 18, H * .44);
-      x.strokeStyle = '#7c7872'; x.lineWidth = 2;
-      for (let k = 0; k < 4; k++) { x.beginPath(); x.arc(55 + k * 45, H * .68, 18, 0, 7); x.stroke(); }
-    }, 256, 192);
-    plano(g, .95, 1.48, .08, 1.38, 1.58, peluTex);
+    const { g, w, cx, Wd } = casa(-65.0, -69.6);   // local -2.3..2.3 (+x hacia oeste)
+    const WH = '#f7f4f0', PIE = '#d8c2b2', MAD = '#945f3e', MAD_D = '#6e452b';
+    // cuerpo trasero (detrás del ingreso rehundido 0.65 m y la vidriera rehundida 0.28 m)
+    body(g, -2.3, 2.3, .68, 13.5, 3.35, WH);
+    // frente en línea municipal con huecos reales: pilastra izq (-2.3..-1.88), pilar central (-.28..+.28), pilastra der (+1.88..+2.3)
+    bx(g, -2.09, 0, -.34, .42, 3.35, .68, WH);
+    bx(g, 0, 0, -.34, .56, 3.35, .68, WH);
+    bx(g, 2.09, 0, -.34, .42, 3.35, .68, WH);
+    // dintel superior continuo arriba de puerta y vidriera (y = 2.28..3.35) + antepecho debajo de la vidriera derecha (y = 0..0.64)
+    bx(g, 0, 2.28, -.34, w, 1.07, .68, WH);
+    bx(g, 1.08, 0, -.34, 1.64, .64, .68, WH);
+    // guarda superior de piedra travertino rosado/arena (y = 3.02..3.36) con juntas sutiles
+    bx(g, 0, 3.02, .025, w + .02, .34, .05, PIE);
+    for (let sx = -1.6; sx <= 1.7; sx += .78) bx(g, sx, 3.02, .055, .02, .34, .01, '#c1ab9b');
+    // zócalo de piedra travertino (solo del pilar central hacia la derecha, como en sv_pelu)
+    bx(g, 1.02, 0, .025, 2.58, .48, .05, PIE);
+    bx(g, -2.09, 0, .025, .42, .48, .05, PIE);
+    for (let sx = .15; sx <= 2.1; sx += .62) bx(g, sx, 0, .055, .02, .48, .01, '#c1ab9b');
 
-    veredaSL(-69.5, -65.5, '#d4c9b2', '#6f8d42');
-    entradaSL(-67.2, -66.1, '#c5beb0');
-    cesto(-65.8, -236.8, true);
+    // ---- Ingreso rehundido (palier izquierdo: local -1.88 .. -0.28, profundidad 0.65 m) ----
+    rectL(Wd, -1.88, 0, -.28, -.68, .062, '#d6c1a6');    // piso de baldosas cálidas del palier
+    bx(g, -1.08, 2.26, -.34, 1.6, .04, .68, '#ece8e2');  // cielorraso del palier
+    // carpintería de madera en el fondo del palier (-0.64): puerta vidriada izq (-1.82..-0.92) + paño lateral der (-0.92..-0.34)
+    bx(g, -1.37, 0, -.62, .92, 2.26, .06, MAD);
+    bx(g, -1.37, 0, -.58, .82, .44, .04, '#a66d48');     // tablero inferior de madera de la puerta
+    const vgTex = tex((x, W, H) => {
+      x.fillStyle = '#5a4334'; x.fillRect(0, 0, W, H);
+      // óvalo blanco esmerilado con monograma VG clásico
+      x.fillStyle = '#f6f5f2';
+      x.beginPath(); x.ellipse(W * .50, H * .50, W * .42, H * .40, 0, 0, 7); x.fill();
+      x.fillStyle = '#262422'; x.textAlign = 'center';
+      x.font = 'bold 68px Georgia, serif'; x.fillText('V', W * .39, H * .62);
+      x.font = 'bold 46px Georgia, serif'; x.fillText('G', W * .67, H * .50);
+    }, 160, 224);
+    plano(g, -1.37, 1.32, -.57, .74, 1.56, vgTex);
+    bx(g, -1.02, 1.05, -.55, .04, .18, .05, '#c9b38a');  // picaporte
+    // paño lateral vidriado derecho del ingreso
+    bx(g, -.62, 0, -.62, .58, 2.26, .06, MAD);
+    bx(g, -.62, 0, -.58, .50, .48, .04, '#9a6542');
+    bx(g, -.62, .52, -.59, .44, 1.62, .03, '#4f4238');   // vidrio interior cálido
+
+    // ---- Vidriera rehundida derecha (local +0.28 .. +1.88, y = 0.64..2.28, profundidad 0.28 m) ----
+    bx(g, 1.08, .64, -.16, 1.60, .06, .34, '#e6d7c4');   // alféizar claro
+    bx(g, 1.08, 2.08, -.14, 1.60, .20, .28, '#f0ede7');  // cajón de persiana blanco arriba
+    bx(g, 1.08, .68, -.32, 1.56, 1.40, .06, MAD_D);      // marco de madera interior
+    const peluTex = tex((x, W, H) => {
+      x.fillStyle = '#473e36'; x.fillRect(0, 0, W, H);   // fondo interior oscuro arriba y abajo
+      // franja esmerilada blanca traslúcida con texto "Peluquería" y dibujo floral (sv_pelu)
+      x.fillStyle = '#e7e4df'; x.fillRect(0, H * .16, W, H * .68);
+      x.fillStyle = '#5c5852'; x.font = 'italic 22px Georgia, serif'; x.fillText('Peluquería', 14, H * .34);
+      x.strokeStyle = '#6e6a64'; x.lineWidth = 2;
+      for (const [fx, fy, r] of [[85, 118, 24], [148, 104, 28], [208, 122, 22], [116, 146, 16]]) {
+        for (let k = 0; k < 6; k++) {
+          const a = k * Math.PI / 3;
+          x.beginPath(); x.ellipse(fx + Math.cos(a) * r * .55, fy + Math.sin(a) * r * .55, r * .45, r * .22, a, 0, 7); x.stroke();
+        }
+      }
+      // caballete de madera asomando abajo a la derecha (visible en sv_pelu)
+      x.fillStyle = '#b48a5c'; x.fillRect(W * .78, H * .72, 8, H * .28); x.fillRect(W * .88, H * .72, 8, H * .28);
+    }, 256, 192);
+    plano(g, 1.08, 1.38, -.28, 1.50, 1.36, peluTex);
+
+    // vereda acanalada beige, pasillo de cemento recto al ingreso y cesto negro perforado (sv_pelu)
+    veredaSL(-69.6, -65.0, '#d9caa8', '#6f8d42');
+    entradaSL(-67.6, -66.5, '#c5beb0');
+    cesto(-65.85, -236.9, true);
     mapLabels.push([cx, ZL + 6.5, 'La pelu de viki']);
   }
 
   // =========================================================================
-  // 7) Casa blanca con faja de ladrillo visto, portón marrón y cartel VENDO (x = -69.5 .. -78.5, w = 9.0 m) — sv7
+  // 7) Casa blanca con faja de ladrillo visto, portón marrón y cartel VENDO (x = -69.6 .. -78.5, w = 8.9 m) — sv7
   // =========================================================================
   {
-    const { g, w, cx } = casa(-69.5, -78.5);   // local -4.5..4.5
+    const { g, w, cx } = casa(-69.6, -78.5);   // local -4.45..4.45
     const WH = '#f2f1ed', PAR = '#cfc9bc', LAD = '#c46c54';
-    body(g, -4.5, 4.5, 0, 14.0, 3.65, WH);
+    body(g, -4.45, 4.45, 0, 14.0, 3.65, WH);
     bx(g, 0, 3.15, .02, w, .52, .08, PAR);               // parapeto superior grisáceo gastado
     bx(g, 0, 2.52, .05, w + .06, .62, .12, LAD);         // faja continua de ladrillo visto naranja
     for (let y = 2.62; y < 3.12; y += .14) bx(g, 0, y, .12, w, .018, .01, '#a3523c');
@@ -344,7 +391,7 @@ export function buildSanLuisSurOeste(ctx) {
     rejaV(g, 3.35, .92, .10, 1.35, 1.38, '#eceae4', .13);
     signIn(g, 'VENDO', 3.22, 1.28, .13, .68, .48, '#f5f4f0', '#cc2824');
 
-    veredaSL(-78.5, -69.5, '#c9c2b4', '#728c44');
+    veredaSL(-78.5, -69.6, '#c9c2b4', '#728c44');
     entradaSL(-72.8, -69.8, '#c5beb0');
     addTree(-73.5, -236.8, 1.2, false, PELADO);
     poles.add(-75.2, 0, -234.8, .12, 7.6, .12, 0, '#9a9488');
@@ -444,7 +491,7 @@ export function buildSanLuisSurOeste(ctx) {
     ]) addTree(tx, tz, ts, false, col);
 
     // Excluir árboles y casas automáticas en todo el sector trabajado
-    plazaRects.push([-89.6, -234.5, -23.5, -216.5]);
+    plazaRects.push([-89.6, -234.5, -19.3, -216.5]);
     plazaRects.push([-71.5, -216.5, -35.0, -183.0]);
     plazaRects.push([-71.5, -183.0, -48.0, -172.0]);
   }

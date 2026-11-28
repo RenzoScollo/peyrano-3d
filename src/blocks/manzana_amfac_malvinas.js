@@ -868,14 +868,22 @@ export function buildManzanaAmfacMalvinas(ctx) {
     bx(g, 3.96, 0, -4.08, .22, 3.2, 7.84, '#7d4a38');                                        // medianera alta de ladrillo del almacén (sin invadir su frente blanco)
     pasto(-215, -223); flat.rect(XL + .3, zc - 4, XL + 1.6, zc + 4, .205, '#6f8f45'); arbol(zc + .6, 1.0);
   }
-  // E) almacén de la esquina: planta baja blanca (ventana con reja, cartel redondo, puerta con pizarrón) y planta alta de ladrillo viejo
+  // E) almacén de la esquina: planta baja blanca (ventana con reja, cartel redondo, puerta con pizarrón) y planta alta de ladrillo viejo (poco profundo, con parapeto inclinado hacia el fondo)
   { const { g, w, zc } = casaW(-223, -229);   // w = 6 · local -3..3
-    const LV = '#7d4a38';
-    body(g, -w / 2, w / 2, 0, 11, 3.0, '#efeee9');
-    bx(g, 0, 3.0, -5.5, w, 3.0, 11, LV);
+    const LV = '#b37458', D = 5.8;
+    body(g, -w / 2, w / 2, 0, D, 3.0, '#efeee9');
+    bx(g, 0, 3.0, -D / 2, w, 2.55, D, LV);
+    // parapeto inclinado de ladrillo en planta alta (más alto sobre la avenida z=0, baja hacia atrás z=-D como en sv_esq)
+    {
+      const sh = new THREE.Shape([new THREE.Vector2(0, 0), new THREE.Vector2(D, 0), new THREE.Vector2(D, .08), new THREE.Vector2(0, .85)]);
+      const pm = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: w, bevelEnabled: false }), lam({ color: LV }));
+      pm.rotation.y = Math.PI / 2; pm.position.set(-w / 2, 5.55, 0); pm.castShadow = pm.receiveShadow = true; g.add(pm);
+    }
+    // cuerpo trasero revocado beige más bajo detrás del almacén (asoma arriba de la casa blanca en sv_esq)
+    body(g, -w / 2, .6, D, D + 3.8, 4.45, '#d5cbb8');
     bx(g, 0, 2.9, .2, w + .3, .2, .7, '#9a978c');                                           // cornisa / balcón de hormigón
-    for (const x of [-1.5, 1.5]){ bx(g, x, 3.7, .03, 2.2, 1.3, .05, '#6a3d2e'); bx(g, x, 3.6, .04, 2.4, .1, .06, '#9a7a62'); }   // paños hundidos
-    bx(g, 0, 5.7, .05, w + .2, .3, .14, '#6a3d2e');
+    for (const x of [-1.5, 1.5]){ bx(g, x, 3.7, .03, 2.2, 1.3, .05, '#965c44'); bx(g, x, 3.6, .04, 2.4, .1, .06, '#c4967c'); }   // paños hundidos
+    bx(g, 0, 6.15, .05, w + .2, .25, .14, '#8d563f');
     ventana(g, -1.7, 1.0, 0, 1.4, 1.1, '#e6e3dc', '#2a2a2a'); cylIn(g, -.45, 1.6, .06, .28, .05, '#2a2a2a', Math.PI / 2);
     for (const x of [-.1, 2.6]) bx(g, x, 0, .05, .35, 2.9, .12, '#e3d6b5');
     bx(g, 1.25, 0, .02, 1.4, 2.3, .05, '#2a2a2a'); bx(g, 1.25, 0, .05, 1.1, 2.0, .03, '#4a4038'); rejaV(g, 1.25, 0, .1, 1.3, 2.2, '#3a3a3a', .1);
@@ -885,20 +893,27 @@ export function buildManzanaAmfacMalvinas(ctx) {
     { const [x, z] = [XL + 3.8, zc + .6]; const pg = group(x, z); cylIn(pg, 0, 1.4, 0, .06, 2.8, '#f2f2ee'); for (let y = .2; y < 2.7; y += .3) boxIn(pg, 0, y, 0, .13, .08, .13, '#d8261f', 0, .5); poleIn(pg, [0, 2.8, 0], [-1.6, 3.6, 0], .06, '#f2f2ee'); addCol(x - .1, z - .1, x + .1, z + .1); }
     pasto(-223, -229); arbol(zc + 2.2, 1.0);
   }
-  // F) jardín con reja negra hasta la esquina de San Luis
+  // F) pequeño patio de la esquina con reja negra (5.8 m sobre San Luis) y tapial de placas premoldeadas separándolo de la casa blanca
   { const { g, w, zc } = casaW(-229, -234.5);   // w = 5.5
-    flat.rect(XL - 10, -234.5, XL, -229, .05, '#6f9a4a');
+    const D = 5.8;
+    flat.rect(XL - D, -234.5, XL, -229, .05, '#6f9a4a');
     rejaV(g, 0, 0, -.1, w, 1.6, '#1f1f1f', .12); for (let x = -w / 2; x <= w / 2 + .01; x += 2.75) bx(g, x, 0, -.1, .1, 1.75, .1, '#1f1f1f');
     colLocal(g, -w / 2, -.2, w / 2, 0, null);
-    // reja negra continua sobre el lado de San Luis (coincide con sv1)
-    for (let lx = -9.9; lx < 0; lx += .13) bx(g, w / 2 - .08, 0, lx, .03, 1.6, .03, '#1f1f1f');
-    for (const y of [.04, 1.56]) bx(g, w / 2 - .08, y, -5, .04, .04, 10, '#1f1f1f');
-    for (const lz of [-2.5, -5, -7.5, -9.9]) bx(g, w / 2 - .08, 0, lz, .09, 1.72, .09, '#6b4a3a');
-    colLocal(g, w / 2 - .2, -10, w / 2, 0, null);
-    for (const [lx, lz, s] of [[-1.5, -2, 1.2], [.6, -3.4, 1.0], [-2.2, -6, .9], [1.4, -7.5, 1.1]]){ const [x, z] = [XL + lz, zc - lx]; addBush(x, z, s, 0); }
-    addTree(XL - 6, zc - .5, 1.0, false);
+    // reja negra sobre el lado de San Luis (solo el ancho del pequeño patio de la esquina)
+    for (let lz = -D + .1; lz < 0; lz += .13) bx(g, w / 2 - .08, 0, lz, .03, 1.6, .03, '#1f1f1f');
+    for (const y of [.04, 1.56]) bx(g, w / 2 - .08, y, -D / 2, .04, .04, D, '#1f1f1f');
+    for (const lz of [-2.0, -4.0, -D]) bx(g, w / 2 - .08, 0, lz, .09, 1.72, .09, '#6b4a3a');
+    colLocal(g, w / 2 - .2, -D, w / 2, 0, null);
+    // tapial de placas premoldeadas grises entre el patio de la esquina y el jardín de la casa blanca (x = -19.3, z = -234.4..-227.5)
+    bx(g, -.5, 0, -D, w + 1.4, 2.05, .18, '#b4b1a8');
+    for (let px = -w / 2 - 1.2; px <= w / 2 + .05; px += 1.35) bx(g, px, 0, -D, .16, 2.15, .24, '#928f88');
+    for (const y of [.52, 1.04, 1.56]) bx(g, -.5, y, -D, w + 1.4, .03, .20, '#8d8a82');
+    colLocal(g, -w / 2 - 1.4, -D - .15, w / 2, -D + .15, null);
+    for (const [lx, lz, s] of [[-1.5, -1.8, 1.05], [.7, -2.8, .95], [-1.8, -4.3, .85], [1.4, -4.5, .9]]){ const [x, z] = [XL + lz, zc - lx]; addBush(x, z, s, 0); }
     for (const z of [-233.8]) { poles.add(-9.3, 0, z, .16, 8.5, .16, 0, '#7a6a55'); addCol(-9.5, z - .2, -9.1, z + .2); }
     flat.rect(-13.5, -234.5, -12, -229, .205, '#6f8f45'); pasto(-229, -234.5); arbol(zc + 1.5, .95);
+    flat.rect(XL - D, -237.88, XL, -236.15, .205, '#688c3e');
+    flat.rect(XL - D, -236.15, XL, -234.5, .206, '#c6bfb2');
   }
   plazaRects.push([-48, -234.5, -13.5, -187.3]);   // sin árboles ni casas al azar en estos lotes
   mapLabels.push([-22, -226, 'Almacén']);
